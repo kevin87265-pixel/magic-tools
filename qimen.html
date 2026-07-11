@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="color-scheme" content="dark light">
+<title>奇門遁甲・立體起盤</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: dark;
+  --bg:#080c18; --panel:rgba(13,19,36,.88); --panel-line:rgba(212,169,78,.28);
+  --ink:#e9e3d2; --ink-dim:#9aa3b8; --gold:#d4a94e; --cyan:#6ec6d8; --verm:#e0716b; --purp:#b39ae6;
+  --btn:#1a2340; --btn-line:#2e3a60; --warn:#e8b64c;
+  --fs:14px; --fs-lg:17px; --fs-title:19px;
+}
+html.light{
+  color-scheme: light;
+  --bg:#f2edda; --panel:rgba(255,252,242,.92); --panel-line:rgba(146,106,26,.35);
+  --ink:#2a2418; --ink-dim:#6b6350; --gold:#8f6a14; --cyan:#1b7f96; --verm:#b03a34; --purp:#6a4fb0;
+  --btn:#e7dfc4; --btn-line:#c9bd97; --warn:#9a6b00;
+}
+html.bigtext{ --fs:17px; --fs-lg:20px; --fs-title:23px; }
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--ink);font-family:'Noto Sans TC',sans-serif;font-size:var(--fs);overflow:hidden;height:100dvh}
+#stage{position:fixed;inset:0;touch-action:none}
+/* ── 頂部控制列 ── */
+#topbar{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;flex-direction:column;gap:6px;padding:8px 10px;
+  background:var(--bg);border-bottom:1px solid var(--panel-line)}
+.tb-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#title{font-family:'Noto Serif TC',serif;font-weight:900;font-size:var(--fs-title);letter-spacing:.14em;color:var(--gold);white-space:nowrap;text-shadow:0 0 18px rgba(212,169,78,.35)}
+#title small{font-size:.6em;letter-spacing:.3em;color:var(--ink-dim);display:block;font-weight:600}
+.spacer{flex:1}
+input[type=datetime-local]{background:var(--btn);border:1px solid var(--btn-line);color:var(--ink);border-radius:10px;padding:7px 9px;font-size:var(--fs);font-family:inherit}
+button{background:var(--btn);border:1px solid var(--btn-line);color:var(--ink);border-radius:10px;padding:8px 13px;font-size:var(--fs);font-family:inherit;cursor:pointer;font-weight:500}
+button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+button.primary{background:linear-gradient(135deg,#caa04a,#8f6a14);color:#140f04;font-weight:700;border:none;letter-spacing:.2em;padding:8px 18px}
+/* ── 盤側資訊欄（星僑式）── */
+#side{position:fixed;z-index:15;display:none;gap:5px}
+#side.show{display:grid}
+/* 直式：盤下方橫排 */
+@media (orientation:portrait){
+ #side{left:10px;right:10px;bottom:calc(62px + env(safe-area-inset-bottom));
+  grid-template-columns:repeat(6,1fr);align-items:stretch}
+ .sbox.pillars4{grid-column:span 2}
+ .snote{grid-column:1/-1}
+}
+/* 橫式：盤右側直欄 */
+@media (orientation:landscape){
+ #side{right:8px;width:92px;grid-template-columns:1fr;overflow-y:auto;align-content:start}
+}
+.sbox{background:var(--panel);border:1px solid var(--panel-line);border-radius:9px;
+ padding:5px 4px;text-align:center;color:var(--ink-dim);font-size:calc(var(--fs) - 2px);line-height:1.35;
+ display:flex;flex-direction:column;justify-content:center;backdrop-filter:blur(6px)}
+.sbox b{color:var(--ink);font-family:'Noto Serif TC',serif;font-weight:900;font-size:1.25em;letter-spacing:.1em}
+.sbox.big{color:var(--gold);font-family:'Noto Serif TC',serif;font-weight:700;font-size:var(--fs)}
+.sbox.big em{font-style:normal;color:var(--ink-dim);font-size:.78em;display:block}
+.sbox.warn{color:var(--warn);border-color:var(--warn)}
+.sbox .pcolwrap{display:flex;justify-content:space-around}
+.pcol{display:flex;flex-direction:column;align-items:center}
+.pcol span{color:var(--ink-dim);font-size:.72em}
+.pcol b{color:var(--ink);font-family:'Noto Serif TC',serif;font-weight:900;font-size:1.15em;line-height:1.15}
+.snote{text-align:center;color:var(--ink-dim);font-size:.7em;opacity:.75;padding:2px}
+/* ── 底部工具列 ── */
+#dock{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;gap:8px;justify-content:center;
+  padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--bg),transparent)}
+#dock button[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
+/* ── 盤別切換 ── */
+#panSel{display:flex;gap:4px}
+#panSel button{padding:6px 10px;border-radius:8px}
+#panSel button[aria-pressed="true"]{border-color:var(--gold);color:var(--gold);font-weight:700}
+/* ── 擇吉面板 ── */
+#zeji{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--panel);border-top:1px solid var(--panel-line);
+ border-radius:18px 18px 0 0;transform:translateY(105%);transition:transform .35s cubic-bezier(.2,.8,.2,1);
+ max-height:82dvh;overflow-y:auto;padding:14px 14px calc(20px + env(safe-area-inset-bottom));backdrop-filter:blur(10px)}
+#zeji.show{transform:translateY(0)}
+#zeji h3{font-family:'Noto Serif TC',serif;color:var(--gold);letter-spacing:.2em;font-size:var(--fs-lg);display:flex;justify-content:space-between;align-items:center;position:sticky;top:-14px;background:var(--panel);padding:6px 0}
+#zeji h3 button{padding:4px 12px}
+.dirRow{display:flex;align-items:center;gap:8px;border:1px solid var(--panel-line);border-radius:10px;padding:8px 10px;margin-top:7px;flex-wrap:wrap}
+.gradeTag{font-family:'Noto Serif TC',serif;font-weight:900;border-radius:7px;padding:2px 8px;min-width:3.4em;text-align:center}
+.g吉,.g大吉{color:#1f9d55;border:1.5px solid #1f9d55}
+html:not(.light) .g吉,html:not(.light) .g大吉{color:#5fd08a;border-color:#5fd08a}
+.g大吉{background:rgba(46,160,90,.12)}
+.g平{color:var(--ink-dim);border:1.5px solid var(--panel-line)}
+.g凶,.g大凶{color:var(--verm);border:1.5px solid var(--verm)}
+.g大凶{background:rgba(200,80,74,.12)}
+.dirName{font-weight:900;font-family:'Noto Serif TC',serif;font-size:var(--fs-lg);min-width:2.4em}
+.dirInfo{color:var(--ink)}
+.chip{font-size:.8em;border:1px solid var(--panel-line);border-radius:6px;padding:0 5px;margin-left:3px;color:var(--gold)}
+.chip.bad{color:var(--verm);border-color:var(--verm)}
+.zjBox{border:1px solid var(--panel-line);border-radius:12px;padding:10px 12px;margin-top:12px;line-height:1.7}
+.zjBox h4{color:var(--gold);font-family:'Noto Serif TC',serif;letter-spacing:.15em;margin-bottom:4px}
+.zjNote{color:var(--ink-dim);font-size:.8em;margin-top:10px;line-height:1.6}
+/* ── 降級靜態盤 ── */
+#fallback{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:12;width:min(94vw,500px);display:none}
+#fallback.show{display:block}
+#fbGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+#fbNote{text-align:center;color:var(--ink-dim);margin-top:10px;font-size:.85em}
+.cell{border:1px solid var(--panel-line);border-radius:10px;padding:8px 6px;text-align:center;position:relative;min-height:104px;background:var(--panel);line-height:1.5}
+.cell .god{color:var(--purp);font-weight:700}
+.cell .star{color:var(--cyan);font-weight:700}
+.cell .star em{font-style:normal;font-family:'Noto Serif TC',serif;margin-left:3px;color:var(--ink)}
+.cell .door{color:var(--verm);font-weight:700}
+.cell .earth{color:var(--gold);font-family:'Noto Serif TC',serif;font-weight:900;font-size:1.2em}
+.cell .pname{position:absolute;top:3px;right:5px;color:var(--ink-dim);font-size:.72em}
+.cell .badges{position:absolute;top:3px;left:5px;font-size:.72em;color:var(--warn)}
+.cell.zf{box-shadow:0 0 0 1.5px var(--gold) inset}
+.cell.zs{box-shadow:0 0 0 1.5px var(--verm) inset}
+.cell.center{display:flex;align-items:center;justify-content:center;flex-direction:column;color:var(--ink-dim)}
+/* == 宮位詳情 == */
+#detail{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.9);opacity:0;pointer-events:none;z-index:40;
+  background:var(--panel);border:1px solid var(--panel-line);border-radius:16px;padding:18px 20px;min-width:230px;
+  transition:.25s;backdrop-filter:blur(10px);text-align:center}
+#detail.show{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:auto}
+#detail h4{font-family:'Noto Serif TC',serif;color:var(--gold);letter-spacing:.25em;font-size:var(--fs-lg);margin-bottom:10px}
+#detail .line{margin:6px 0;font-size:var(--fs-lg)}
+#detail .lbl{color:var(--ink-dim);font-size:.78em;margin-right:8px}
+@media (max-width:640px){ #title small{display:none} #info{max-width:86vw} }
+@media (prefers-reduced-motion:reduce){ #detail{transition:none} }
+</style>
+</head>
+<body>
+<canvas id="stage" aria-label="奇門遁甲三維盤面，可拖曳旋轉"></canvas>
+
+<div id="topbar">
+  <div class="tb-row">
+    <div id="title">奇門遁甲<small>QIMEN DUNJIA・立體起盤</small></div>
+    <div class="spacer"></div>
+    <button id="btnTheme" aria-label="切換深淺色">🌗</button>
+    <button id="btnFont" aria-label="切換大字">A+</button>
+  </div>
+  <div class="tb-row">
+    <div id="panSel" role="tablist" aria-label="盤別">
+      <button data-m="hour" aria-pressed="true">時</button><button data-m="day" aria-pressed="false">日</button><button data-m="month" aria-pressed="false">月</button><button data-m="year" aria-pressed="false">年</button>
+    </div>
+    <input type="datetime-local" id="dt" aria-label="起盤時間">
+    <button id="btnNow">此刻</button>
+    <button id="btnGo" class="primary">起 盤</button>
+  </div>
+</div>
+
+<div id="side" aria-label="盤況資訊"></div>
+
+<div id="dock">
+  <button id="btnFree" aria-pressed="false">自由視角</button>
+  <button id="btnZeji">方位擇吉</button>
+</div>
+
+<div id="zeji" role="dialog" aria-label="方位擇吉">
+  <h3><span id="zejiTitle">方位擇吉</span><button id="btnCloseZeji">收合</button></h3>
+  <div id="zejiBody"></div>
+</div>
+
+<div id="fallback" aria-label="綜合盤"><div id="fbGrid"></div><div id="fbNote">此瀏覽器不支援 3D 動畫，已顯示靜態盤面</div></div>
+
+<div id="detail" role="dialog"><h4 id="dTitle"></h4><div id="dBody"></div><button id="btnCloseDetail" style="margin-top:10px">關閉</button></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" crossorigin="anonymous"></script>
+<script>
+/* ═══════════════ 奇門遁甲引擎：時家・轉盤・拆補法 ═══════════════ */
+const STEMS='甲乙丙丁戊己庚辛壬癸'.split('');
+const BRANCHES='子丑寅卯辰巳午未申酉戌亥'.split('');
+const STARS={1:'天蓬',2:'天芮',3:'天沖',4:'天輔',5:'天禽',6:'天心',7:'天柱',8:'天任',9:'天英'};
+const DOORS={1:'休門',2:'死門',3:'傷門',4:'杜門',6:'開門',7:'驚門',8:'生門',9:'景門'};
+const GODS=['值符','騰蛇','太陰','六合','勾陳','朱雀','九地','九天'];
+const RING=[1,8,3,4,9,2,7,6];
+const RING_STARS=['天蓬','天任','天沖','天輔','天英','天芮','天柱','天心'];
+const RING_DOORS=['休門','生門','傷門','杜門','景門','死門','驚門','開門'];
+const YI=['戊','己','庚','辛','壬','癸'];
+const DIPAN_ORDER=['戊','己','庚','辛','壬','癸','丁','丙','乙'];
+const PALACE_BRANCHES={1:['子'],8:['丑','寅'],3:['卯'],4:['辰','巳'],9:['午'],2:['未','申'],7:['酉'],6:['戌','亥']};
+const PALACE_NAMES={1:'坎一',2:'坤二',3:'震三',4:'巽四',5:'中五',6:'乾六',7:'兌七',8:'艮八',9:'離九'};
+const GUA={1:'坎',2:'坤',3:'震',4:'巽',5:'中',6:'乾',7:'兌',8:'艮',9:'離'};
+const NUM='一二三四五六七八九';
+const DIR_NAME={1:'北',8:'東北',3:'東',4:'東南',9:'南',2:'西南',7:'西',6:'西北'};
+const DOOR_ELEM={'休門':'水','生門':'土','傷門':'木','杜門':'木','景門':'火','死門':'土','驚門':'金','開門':'金'};
+const PAL_ELEM={1:'水',8:'土',3:'木',4:'木',9:'火',2:'土',7:'金',6:'金'};
+const KE={'木':'土','土':'水','水':'火','火':'金','金':'木'};
+const XING={'戊':3,'己':2,'庚':8,'辛':9,'壬':4,'癸':4}; // 六儀擊刑宮
+const MU={'甲':2,'乙':6,'丙':6,'丁':8,'戊':6,'己':8,'庚':8,'辛':4,'壬':4,'癸':2}; // 十干墓宮
+const DOOR_HOME={'休門':1,'死門':2,'傷門':3,'杜門':4,'開門':6,'驚門':7,'生門':8,'景門':9};
+const STEM_ELEM=['木','木','火','火','土','土','金','金','水','水'];
+const TERM_NAMES=['春分','清明','穀雨','立夏','小滿','芒種','夏至','小暑','大暑','立秋','處暑','白露','秋分','寒露','霜降','立冬','小雪','大雪','冬至','小寒','大寒','立春','雨水','驚蟄'];
+const JU_TABLE={'冬至':[1,7,4],'驚蟄':[1,7,4],'小寒':[2,8,5],'大寒':[3,9,6],'春分':[3,9,6],'立春':[8,5,2],'雨水':[9,6,3],'清明':[4,1,7],'立夏':[4,1,7],'穀雨':[5,2,8],'小滿':[5,2,8],'芒種':[6,3,9],'夏至':[-9,-3,-6],'白露':[-9,-3,-6],'小暑':[-8,-2,-5],'大暑':[-7,-1,-4],'秋分':[-7,-1,-4],'立秋':[-2,-5,-8],'處暑':[-1,-4,-7],'寒露':[-6,-9,-3],'立冬':[-6,-9,-3],'霜降':[-5,-8,-2],'小雪':[-5,-8,-2],'大雪':[-4,-7,-1]};
+function jdnFromYMD(y,m,d){const a=Math.floor((14-m)/12),yy=y+4800-a,mm=m+12*a-3;return d+Math.floor((153*mm+2)/5)+365*yy+Math.floor(yy/4)-Math.floor(yy/100)+Math.floor(yy/400)-32045;}
+const D2R=Math.PI/180;
+function sunLongitude(jd){const T=(jd-2451545)/36525;
+ const L0=280.46646+36000.76983*T+0.0003032*T*T;
+ const M=357.52911+35999.05029*T-0.0001537*T*T;
+ const C=(1.914602-0.004817*T-0.000014*T*T)*Math.sin(M*D2R)+(0.019993-0.000101*T)*Math.sin(2*M*D2R)+0.000289*Math.sin(3*M*D2R);
+ let lam=(L0+C-0.00569-0.00478*Math.sin((125.04-1934.136*T)*D2R))%360; if(lam<0)lam+=360; return lam;}
+function termFromLongitude(lon){return TERM_NAMES[Math.floor(lon/15)%24];}
+function termTimeJD(targetLon,jdGuess){let jd=jdGuess;
+ for(let i=0;i<60;i++){let diff=(sunLongitude(jd)-targetLon+540)%360-180;
+  if(Math.abs(diff)<1e-7)break; jd-=diff/0.9856;}
+ return jd;}
+function jdToLocal(jd,tz){const ms=(jd-2440587.5)*86400000+tz*3600000;const d=new Date(ms);
+ return {y:d.getUTCFullYear(),mo:d.getUTCMonth()+1,d:d.getUTCDate(),h:d.getUTCHours(),mi:d.getUTCMinutes()};}
+function fmtLocal(t){return t.mo+'/'+t.d+' '+String(t.h).padStart(2,'0')+':'+String(t.mi).padStart(2,'0');}
+function solsticeJD(year,winter){return termTimeJD(winter?270:90,jdnFromYMD(year,winter?12:6,21));}
+// 日家：距二至最近之甲子日為錨，陽[1,4,7]陰[9,3,6]每60日一元
+function juDayFn(y,mo,d,tz){
+ const jd=jdnFromYMD(y,mo,d);
+ const cands=[];
+ for(const [yr,w] of [[y-1,false],[y-1,true],[y,false],[y,true]]){
+  const t=jdToLocal(solsticeJD(yr,w),tz);
+  const sj=jdnFromYMD(t.y,t.mo,t.d);
+  const idx=((sj+49)%60+60)%60;
+  let a1=sj+(60-idx)%60, a2=a1-60;
+  const anchor=(a1-sj<=sj-a2)?a1:a2;
+  cands.push({anchor,w});
+ }
+ let best=null;
+ for(const cd of cands)if(cd.anchor<=jd&&(!best||cd.anchor>best.anchor))best=cd;
+ const seq=best.w?[1,4,7]:[9,3,6];
+ const block=Math.floor((jd-best.anchor)/60)%3;
+ return {ju:seq[block],yang:best.w,yuan:['上元','中元','下元'][block]};
+}
+// 年家：只用陰遁，1864上元陰1、1924中元陰4、1984下元陰7（60年一元）
+function juYearFn(gzYear){const k=Math.floor((((gzYear-1864)%180)+180)%180/60);
+ return {ju:[1,4,7][k],yang:false,yuan:['上元','中元','下元'][k]};}
+// 月家：只用陰遁，年支四孟陰1／四仲陰7／四季陰4（另派一四七，見註）
+function juMonthFn(yearIdx){const yb=yearIdx%12;
+ const k=[2,8,5,11].includes(yb)?0:[0,6,3,9].includes(yb)?1:2;
+ return {ju:[1,7,4][k],yang:false,yuan:['上元(孟)','中元(仲)','下元(季)'][k]};}
+function fourPillars(y,mo,d,h,mi,tzHours,lateZiNextDay=true){
+ const jdUT=jdnFromYMD(y,mo,d)-0.5+(h+mi/60-tzHours)/24;
+ const lon=sunLongitude(jdUT), term=termFromLongitude(lon);
+ const monthNum=Math.floor(((lon-315+360)%360)/30);
+ let gzYear=y; if(mo<=2&&monthNum>=10)gzYear=y-1;
+ const yearIdx=((gzYear-4)%60+60)%60;
+ const monthStem=((yearIdx%10)%5*2+2+monthNum)%10, monthBranch=(2+monthNum)%12;
+ let dj=jdnFromYMD(y,mo,d); if(lateZiNextDay&&h>=23)dj+=1;
+ const dayIdx=((dj+49)%60+60)%60;
+ const hourBranch=Math.floor((h+1)/2)%12;
+ const hourStem=((dayIdx%10)%5*2+hourBranch)%10;
+ const find=(s,b)=>{for(let i=0;i<60;i++)if(i%10===s&&i%12===b)return i;};
+ return {jdUT,lon,term,yearIdx,monthIdx:find(monthStem,monthBranch),dayIdx,hourIdx:find(hourStem,hourBranch)};
+}
+function gz(i){return STEMS[i%10]+BRANCHES[i%12];}
+function findJu(term,dayIdx){
+ const back=(dayIdx%10)%5, futou=((dayIdx-back)%60+60)%60, fb=futou%12;
+ const yuan=[0,6,3,9].includes(fb)?0:[2,8,5,11].includes(fb)?1:2;
+ const v=JU_TABLE[term][yuan];
+ return {ju:Math.abs(v),yang:v>0,yuan:['上元','中元','下元'][yuan],futou};
+}
+function arrangeBoard(ju,yang,hourIdx){
+ const earth={};
+ for(let i=0;i<9;i++){const p=yang?((ju-1+i)%9)+1:(((ju-1-i)%9)+9)%9+1; earth[p]=DIPAN_ORDER[i];}
+ const xun=Math.floor(hourIdx/10), xunYi=YI[xun];
+ const kong=[BRANCHES[(10-2*xun+12)%12],BRANCHES[(11-2*xun+12)%12]];
+ const p0=+Object.keys(earth).find(k=>earth[k]===xunYi);
+ const zhiFuStar=STARS[p0], zhiShiDoor=p0===5?'死門':DOORS[p0];
+ const hs=STEMS[hourIdx%10], useStem=hs==='甲'?xunYi:hs;
+ const pt0=+Object.keys(earth).find(k=>earth[k]===useStem); // 值符落宮（飛佈，可入中）
+ const ptR=pt0===5?2:pt0, p0R=p0===5?2:p0;                  // 轉佈用寄宮
+ // 九星飛佈（隨值符位移，經中宮）
+ const heaven={},heavenFull={};
+ const offset=pt0-p0;
+ for(let h=1;h<=9;h++){
+  const pal=((h-1+offset)%9+9)%9+1;
+  heavenFull[pal]=STARS[h]; heaven[pal]=STARS[h].slice(1);
+ }
+ // 天盤干轉佈（值符儀自旬首宮轉至時干宮）
+ const hStem={}; hStem[5]=[earth[5]];
+ const posH=RING.indexOf(p0R), posT=RING.indexOf(ptR);
+ for(let k=0;k<8;k++)hStem[RING[(posT+k)%8]]=[earth[RING[(posH+k)%8]]];
+ // 八門轉佈（值使飛宮定位）
+ let n=hourIdx-xun*10;
+ let pd=yang?((p0-1+n)%9)+1:(((p0-1-n)%9)+9)%9+1; if(pd===5)pd=2;
+ const doors={}, d0=RING_DOORS.indexOf(zhiShiDoor), posD=RING.indexOf(pd);
+ for(let k=0;k<8;k++)doors[RING[(posD+k)%8]]=RING_DOORS[(d0+k)%8];
+ // 八神轉佈
+ const gods={}, posG=RING.indexOf(ptR);
+ for(let k=0;k<8;k++){const pal=yang?RING[(posG+k)%8]:RING[((posG-k)%8+8)%8]; gods[pal]=GODS[k];}
+ return {earth,heaven,heavenFull,hStem,doors,gods,xunYi,kong,zhiFuStar,zhiShiDoor,zhiFuPalace:pt0,zhiShiPalace:pd,xunHead:gz(xun*10)};
+}
+function computeChart(y,mo,d,h,mi,tz,mode='hour',lateZi=true){
+ const fp=fourPillars(y,mo,d,h,mi,tz,lateZi);
+ let juInfo;
+ if(mode==='hour')juInfo=findJu(fp.term,fp.dayIdx);
+ else if(mode==='day')juInfo=juDayFn(y,mo,d,tz);
+ else if(mode==='month'){let gy=y;const mn=Math.floor(((fp.lon-315+360)%360)/30);if(mo<=2&&mn>=10)gy=y-1;juInfo=juMonthFn(fp.yearIdx);}
+ else {let gy=y;const mn=Math.floor(((fp.lon-315+360)%360)/30);if(mo<=2&&mn>=10)gy=y-1;juInfo=juYearFn(gy);}
+ const {ju,yang}=juInfo, yuan=juInfo.yuan;
+ const futou=mode==='hour'?findJu(fp.term,fp.dayIdx).futou:null;
+ const pillarIdx={hour:fp.hourIdx,day:fp.dayIdx,month:fp.monthIdx,year:fp.yearIdx}[mode];
+ const board=arrangeBoard(ju,yang,pillarIdx);
+ const pb=pillarIdx%12;
+ const maMap={8:'寅',0:'寅',4:'寅',2:'申',6:'申',10:'申',5:'亥',9:'亥',1:'亥',11:'巳',3:'巳',7:'巳'};
+ const ma=maMap[pb];
+ const maPalace=+Object.keys(PALACE_BRANCHES).find(p=>PALACE_BRANCHES[p].includes(ma));
+ const kongPalaces=Object.keys(PALACE_BRANCHES).filter(p=>PALACE_BRANCHES[p].some(b=>board.kong.includes(b))).map(Number);
+ const xunD=Math.floor(fp.dayIdx/10);
+ const dayKong=[BRANCHES[(10-2*xunD+12)%12],BRANCHES[(11-2*xunD+12)%12]];
+ const dayKongPalaces=Object.keys(PALACE_BRANCHES).filter(p=>PALACE_BRANCHES[p].some(b=>dayKong.includes(b))).map(Number);
+ const warn=(mode==='hour'||mode==='day')&&(termFromLongitude(sunLongitude(fp.jdUT-2/24))!==fp.term||termFromLongitude(sunLongitude(fp.jdUT+2/24))!==fp.term);
+ // 交節時刻（本節起點＋下節起點）
+ const curLon=Math.floor(fp.lon/15)*15;
+ const jdCur=termTimeJD(curLon,fp.jdUT-(((fp.lon-curLon)%360)/0.9856));
+ const jdNext=termTimeJD((curLon+15)%360,jdCur+14);
+ const termCur={name:TERM_NAMES[curLon/15%24],t:fmtLocal(jdToLocal(jdCur,tz))};
+ const termNext={name:TERM_NAMES[((curLon+15)%360)/15%24],t:fmtLocal(jdToLocal(jdNext,tz))};
+ // 五不遇時（時干剋日干、同陰陽）
+ const hsI=fp.hourIdx%10, dsI=fp.dayIdx%10;
+ const wubuyu=KE[STEM_ELEM[hsI]]===STEM_ELEM[dsI]&&hsI%2===dsI%2;
+ const c={...fp,mode,pillars:{year:gz(fp.yearIdx),month:gz(fp.monthIdx),day:gz(fp.dayIdx),hour:gz(fp.hourIdx)},
+  ju,yang,yuan,futou:futou?gz(futou):null,board,ma,maPalace,kongPalaces,dayKong,dayKongPalaces,termWarn:warn,
+  termCur,termNext,wubuyu};
+ c.dirs=evalDirections(c);
+ return c;
+}
+// ── 方位擇吉：三吉門／三奇／五吉神＋刑墓迫空＋名格 ──
+function evalDirections(c){
+ const b=c.board, out=[];
+ for(const p of RING){
+  const door=b.doors[p], god=b.gods[p], star=b.heavenFull[p], hs=b.hStem[p]||[];
+  let score=0; const tags=[], bad=[];
+  if(['開門','休門','生門'].includes(door)){score+=2;tags.push(door.slice(0,1)+'門吉');}
+  else if(door==='景門'){tags.push('景門平');}
+  else {score-=2;bad.push(door);}
+  hs.forEach(g=>{if('乙丙丁'.includes(g)){score+=2;tags.push(g+'奇');}});
+  if(god==='值符'){score+=2;tags.push('值符');}
+  else if(['太陰','六合','九地','九天'].includes(god)){score+=1;tags.push(god);}
+  else {score-=1;bad.push(god);}
+  hs.forEach(g=>{if(XING[g]===p){score-=2;bad.push('擊刑');}});
+  hs.forEach(g=>{if(MU[g]===p){score-=2;bad.push('入墓');}});
+  if(KE[DOOR_ELEM[door]]===PAL_ELEM[p]){score-=1;bad.push('門迫');}
+  if(c.kongPalaces.includes(p)){score-=1;bad.push('空亡');}
+  if(c.maPalace===p)tags.push('驛馬');
+  if(hs.includes('丙')&&b.earth[p]==='戊'){score+=3;tags.push('青龍返首');}
+  if(hs.includes('戊')&&b.earth[p]==='丙'){score+=3;tags.push('飛鳥跌穴');}
+  const grade=score>=4?'大吉':score>=2?'吉':score>=0?'平':score>=-2?'凶':'大凶';
+  out.push({palace:p,dir:DIR_NAME[p],door,god,star,hs,score,grade,tags,bad});
+ }
+ return out.sort((a,b2)=>b2.score-a.score);
+}
+/* ═══════════════ 主題管理（防 Android/LINE 反色）═══════════════ */
+const htmlEl=document.documentElement;
+function applyTheme(){
+ const light=localStorage.getItem('qm3d_theme')==='light';
+ const big=localStorage.getItem('qm3d_big')==='1';
+ htmlEl.classList.toggle('light',light);
+ htmlEl.classList.toggle('bigtext',big);
+ htmlEl.style.colorScheme=light?'light':'dark';
+ let meta=document.querySelector('meta[name="color-scheme"]');
+ meta.setAttribute('content',light?'light':'dark light');
+ if(scene)refreshSceneTheme();
+}
+document.getElementById('btnTheme').onclick=()=>{localStorage.setItem('qm3d_theme',htmlEl.classList.contains('light')?'dark':'light');applyTheme();if(currentChart)build3D(currentChart,false);};
+document.getElementById('btnFont').onclick=()=>{localStorage.setItem('qm3d_big',htmlEl.classList.contains('bigtext')?'0':'1');applyTheme();if(currentChart)build3D(currentChart,false);};
+
+/* ═══════════════ Three.js 場景 ═══════════════ */
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let scene,camera,renderer,root,layers=[],stars,cards=[],currentChart=null;
+const CELL=2.35, GAP=CELL, LAYER_GAP_OPEN=1.9, LAYER_GAP_STACK=0.14;
+let layerGap=LAYER_GAP_OPEN, camDist=13.5, camPitch=0.9;
+const LAYER_DEF=[
+ {key:'earth',name:'空間盤',color:0xd4a94e,css:'#d4a94e'},
+ {key:'door', name:'時機盤',color:0xe0716b,css:'#e0716b'},
+ {key:'sky',  name:'星宿盤',color:0x6ec6d8,css:'#6ec6d8'},
+];
+const GRID_POS={4:[0,0],9:[0,1],2:[0,2],3:[1,0],5:[1,1],7:[1,2],8:[2,0],1:[2,1],6:[2,2]};
+
+function initScene(){
+ const cv=document.getElementById('stage');
+ renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:false});
+ renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+ scene=new THREE.Scene();
+ camera=new THREE.PerspectiveCamera(46,innerWidth/innerHeight,.1,200);
+ root=new THREE.Group(); scene.add(root);
+ // 星空
+ const g=new THREE.BufferGeometry(), N=900, pos=new Float32Array(N*3);
+ for(let i=0;i<N;i++){const r=40+Math.random()*50,th=Math.random()*Math.PI*2,ph=Math.acos(2*Math.random()-1);
+  pos[i*3]=r*Math.sin(ph)*Math.cos(th);pos[i*3+1]=r*Math.cos(ph);pos[i*3+2]=r*Math.sin(ph)*Math.sin(th);}
+ g.setAttribute('position',new THREE.BufferAttribute(pos,3));
+ stars=new THREE.Points(g,new THREE.PointsMaterial({size:.14,color:0xbfd4ff,transparent:true,opacity:.8}));
+ scene.add(stars);
+ refreshSceneTheme(); resize(); animate();
+}
+function refreshSceneTheme(){
+ const light=htmlEl.classList.contains('light');
+ scene.background=new THREE.Color(light?0xf2edda:0x080c18);
+ if(stars)stars.material.opacity=light?0.18:0.8;
+}
+function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);if(typeof layoutSide==='function')layoutSide();if(locked){const ft=refit();camDist=ft.dist;camDyT=ft.dy;camDxT=ft.dx;}}
+addEventListener('resize',resize);
+
+/* 卡片貼圖：各層文字分區，疊合時自然組成完整宮位 */
+function cardTexture(layer,palace,ch){
+ const light=htmlEl.classList.contains('light');
+ const big=htmlEl.classList.contains('bigtext');
+ const S=512, K=2, cv=document.createElement('canvas'); cv.width=cv.height=S;
+ const c=cv.getContext('2d');
+ const b=currentChart.board, ju=(big?1.12:1)*K;
+ const ink=light?'#2a2418':'#e9e3d2', dim=light?'#6b6350':'#9aa3b8';
+ const gold=light?'#8f6a14':'#d4a94e', cyan=light?'#1b7f96':'#6ec6d8';
+ const verm=light?'#b03a34':'#e0716b', purp=light?'#6a4fb0':'#b39ae6';
+ c.textAlign='center'; c.textBaseline='middle';
+ // 每層同位置格框（疊合時重合為一盤）：地盤實底、其餘半透明底
+ if(layer==='earth')c.fillStyle=light?'rgba(255,252,242,.94)':'rgba(13,19,36,.92)';
+ else c.fillStyle=light?'rgba(255,252,242,.30)':'rgba(13,19,36,.30)';
+ roundRect(c,6*K,6*K,S-12*K,S-12*K,14*K); c.fill();
+ c.strokeStyle=light?'rgba(146,106,26,.72)':'rgba(212,169,78,.72)'; c.lineWidth=3*K;
+ roundRect(c,6*K,6*K,S-12*K,S-12*K,14*K); c.stroke();
+ if(layer==='earth'){
+  if(palace===b.zhiFuPalace||palace===b.zhiShiPalace){
+   c.strokeStyle=palace===b.zhiFuPalace?gold:verm; c.lineWidth=3*K;
+   roundRect(c,12*K,12*K,S-24*K,S-24*K,10*K); c.stroke();
+  }
+  // 底列：卦名｜地盤干｜洛書數
+  c.fillStyle=dim; c.font=`600 ${26*ju}px 'Noto Sans TC',sans-serif`;
+  c.fillText(GUA[palace],S*0.16,S*0.84);
+  c.fillText(NUM[palace-1],S*0.84,S*0.84);
+  c.fillStyle=gold; c.font=`900 ${48*ju}px 'Noto Serif TC',serif`;
+  c.fillText(b.earth[palace]||'',S/2,S*0.84);
+  // 左上：空(時空)／馬
+  let badge='';
+  if(currentChart.kongPalaces.includes(palace))badge+='空';
+  if(currentChart.maPalace===palace)badge+='馬';
+  const de=(currentChart.dirs||[]).find(x=>x.palace===palace);
+  if(de){if(de.bad.includes('擊刑'))badge+='刑';if(de.bad.includes('入墓'))badge+='墓';if(de.bad.includes('門迫'))badge+='迫';}
+  if(badge){c.fillStyle=light?'#9a6b00':'#e8b64c';c.font=`700 ${24*ju}px 'Noto Sans TC',sans-serif`;c.textAlign='right';c.fillText(badge,S-14*K,S*0.13);c.textAlign='center';}
+ }else if(layer==='sky'){
+  // 星宿盤：天盤干（頂）＋九星（左）＋八神（右）
+  const st=(b.hStem[palace]||[]).join('');
+  if(st){c.fillStyle=ink;c.font=`900 ${50*ju}px 'Noto Serif TC',serif`;c.fillText(st,S/2,S*0.19);}
+  const t=b.heaven[palace]||'';
+  if(t){c.fillStyle=cyan;c.font=`700 ${42*ju}px 'Noto Sans TC',sans-serif`;c.fillText(t,S*0.21,S*0.50);}
+  const g=b.gods[palace]||'';
+  if(g){c.fillStyle=purp;c.font=`700 ${38*ju}px 'Noto Sans TC',sans-serif`;c.fillText(g,S*0.78,S*0.50);}
+ }else if(layer==='door'){
+  const dfull=b.doors[palace], t=dfull?dfull[0]:'';
+  if(t){
+   c.fillStyle=verm;c.font=`900 ${62*ju}px 'Noto Serif TC',serif`;c.fillText(t,S/2,S*0.50);
+   const ds=b.earth[DOOR_HOME[dfull]];
+   if(ds){c.fillStyle=dim;c.font=`600 ${30*ju}px 'Noto Serif TC',serif`;c.textAlign='left';c.fillText(ds,14*K,S*0.13);c.textAlign='center';}
+  }
+ }
+ const tx=new THREE.CanvasTexture(cv);
+ tx.anisotropy=renderer&&renderer.capabilities?renderer.capabilities.getMaxAnisotropy():4;
+ tx.minFilter=THREE.LinearMipmapLinearFilter;
+ return tx;
+}
+function roundRect(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
+
+/* ═══════════════ 建盤 ═══════════════ */
+let tweens=[];
+function tween(o){o.t0=performance.now();tweens.push(o);}
+function easeOutBack(t){const c1=1.4;return 1+(c1+1)*Math.pow(t-1,3)+c1*Math.pow(t-1,2);}
+function easeOut(t){return 1-Math.pow(1-t,3);}
+function easeInOut(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;}
+
+function build3D(chart,animateIn=true){
+ currentChart=chart;
+ if(!webgl){renderFallback(chart);renderInfo(chart);return;}
+ layers.forEach(l=>root.remove(l.group)); layers=[]; cards=[];
+ LAYER_DEF.forEach((L,li)=>{
+  const grp=new THREE.Group();
+  for(const pStr of Object.keys(GRID_POS)){
+   const p=+pStr;
+   const [r,cIdx]=GRID_POS[p];
+   const geo=new THREE.PlaneGeometry(CELL*0.94,CELL*0.94);
+   const mat=new THREE.MeshBasicMaterial({map:cardTexture(L.key,p),transparent:true,opacity:0,side:THREE.DoubleSide,depthWrite:false});
+   const m=new THREE.Mesh(geo,mat);
+   m.rotation.x=-Math.PI/2;
+   m.position.set((cIdx-1)*GAP,0,(r-1)*GAP);
+   m.userData={palace:p,layer:L.key};
+   grp.add(m); cards.push(m);
+  }
+  // 盤名標籤（攤開時顯示）
+  const lcv=document.createElement('canvas');lcv.width=512;lcv.height=128;
+  const lc=lcv.getContext('2d');lc.textAlign='center';lc.textBaseline='middle';
+  lc.fillStyle=L.css;lc.font="900 72px 'Noto Serif TC',serif";
+  lc.fillText(L.name,256,64);
+  const ltx=new THREE.CanvasTexture(lcv);
+  const label=new THREE.Mesh(new THREE.PlaneGeometry(GAP*2.2,GAP*0.55),
+   new THREE.MeshBasicMaterial({map:ltx,transparent:true,opacity:0,depthWrite:false}));
+  label.rotation.x=-Math.PI/2; label.position.set(0,0,GAP*1.95); label.userData.isLabel=true;
+  grp.add(label);
+  root.add(grp);
+  layers.push({group:grp,def:L,label});
+ });
+ layerGap=LAYER_GAP_OPEN;
+ layoutLayers(false);
+ locked=false;
+ // 進場：各層轉一整圈直接疊上，鏡頭同步轉俯視，末層落下即成盤
+ renderInfo(chart); // 先渲染側欄以便量測淨空區
+ if(animateIn&&!reduced){
+  // 大樓式進場：逐層旋轉落定、停格，末層後壓合定盤
+  const DROP=1150, HOLD=300;
+  layers.forEach((l,li)=>{
+   const targetY=l.group.position.y;
+   l.group.position.y=targetY+13; l.group.rotation.y=Math.PI*2;
+   l.group.children.forEach(ch=>{if(ch.material)ch.material.opacity=0;});
+   setTimeout(()=>{
+    tween({dur:DROP,fn:t=>{
+     l.group.position.y=targetY+13*(1-easeOut(t));
+     l.group.rotation.y=Math.PI*2*(1-easeInOut(t));
+     l.group.children.forEach(ch=>{if(ch.material&&!ch.userData.isLabel)ch.material.opacity=Math.min(1,t*2.5);});
+    }});
+   },li*(DROP+HOLD));
+  });
+  setTimeout(()=>settleFlat(),LAYER_DEF.length*(DROP+HOLD)+100);
+ }else{
+  layers.forEach(l=>{
+   l.group.children.forEach(ch=>{if(ch.material&&!ch.userData.isLabel)ch.material.opacity=1;});
+   l.group.rotation.y=0;
+  });
+  settleFlat(true);
+ }
+}
+function layoutLayers(anim=true){
+ layers.forEach((l,li)=>{
+  const y=(li-(LAYER_DEF.length-1)/2)*layerGap;
+  if(anim&&!reduced){const from=l.group.position.y;tween({dur:600,fn:t=>{l.group.position.y=from+(y-from)*easeOut(t);}});}
+  else l.group.position.y=y;
+ });
+}
+/* 攤開三盤貼齊（沿攤開軸放大視野） */
+function freeFit(portrait){
+ const tanF=Math.tan(camera.fov/2*D2R);
+ const tb=document.getElementById('topbar').getBoundingClientRect();
+ const dk=document.getElementById('dock').getBoundingClientRect();
+ const sd=document.getElementById('side');
+ let bottomTop=dk.top;
+ if(sd.classList.contains('show')&&portrait){
+  const r=sd.getBoundingClientRect(); if(r.height>0)bottomTop=Math.min(bottomTop,r.top);
+ }
+ const topH=tb.bottom+6, availH=Math.max(140,bottomTop-topH-6);
+ let leftX=0, rightX=innerWidth;
+ if(sd.classList.contains('show')&&!portrait){
+  const r=sd.getBoundingClientRect();
+  if(r.left>160)rightX=Math.min(rightX,r.left-10);
+ }
+ const availW=Math.max(160,(rightX-leftX)*0.97);
+ const spreadHalf=GAP*5.75, sideHalf=GAP*1.95; // 含標籤
+ const halfZ=portrait?spreadHalf:sideHalf, halfX=portrait?GAP*1.62:spreadHalf;
+ const dH=(halfZ/tanF)*(innerHeight/availH);
+ const dW=(halfX/(tanF*camera.aspect))*(innerWidth/availW);
+ const dist=Math.max(dH,dW)*1.04;
+ const wpp=(2*dist*tanF)/innerHeight;
+ const dy=(innerHeight/2-(topH+availH/2))*wpp;
+ const dx=((leftX+rightX)/2-innerWidth/2)*wpp;
+ return {dist,dy,dx};
+}
+/* 版面感知貼齊：量測頂欄／資訊帶／工具列，把盤面塞進淨空區 */
+function refit(){
+ const tanF=Math.tan(camera.fov/2*D2R), half=GAP*1.62;
+ const tb=document.getElementById('topbar').getBoundingClientRect();
+ const dk=document.getElementById('dock').getBoundingClientRect();
+ const sd=document.getElementById('side');
+ const portrait=innerHeight>innerWidth;
+ let bottomTop=dk.top;
+ if(sd.classList.contains('show')&&portrait){
+  const r=sd.getBoundingClientRect(); if(r.height>0)bottomTop=Math.min(bottomTop,r.top);
+ }
+ const topH=tb.bottom+6, availH=Math.max(140,bottomTop-topH-6);
+ let leftX=0, rightX=innerWidth;
+ if(sd.classList.contains('show')&&!portrait){
+  const r=sd.getBoundingClientRect();
+  if(r.left>160)rightX=Math.min(rightX,r.left-10);
+ }
+ const availW=Math.max(160,(rightX-leftX)*0.97);
+ const dH=(half/tanF)*(innerHeight/availH);
+ const dW=(half/(tanF*camera.aspect))*(innerWidth/availW);
+ const dist=Math.max(dH,dW)*1.04;
+ const wpp=(2*dist*tanF)/innerHeight;
+ const dy=(innerHeight/2-(topH+availH/2))*wpp;
+ const dx=((leftX+rightX)/2-innerWidth/2)*wpp;
+ return {dist,dy,dx};
+}
+/* 合盤：疊平＋轉正＋俯視鎖定 */
+function settleFlat(instant=false){
+ const ft=refit();
+ const gapFrom=layerGap, distFrom=camDist, rotFrom=rotY, dyFrom=camDyT, dxFrom=camDxT;
+ const rotTo=Math.round(rotY/(Math.PI*2))*Math.PI*2;
+ if(instant||reduced){
+  layerGap=LAYER_GAP_STACK; layoutLayers(false);
+  pitchT=1.55; rotY=0; camDist=ft.dist; camDyT=ft.dy; camDxT=ft.dx; locked=true; return;
+ }
+ tween({dur:900,fn:t=>{
+  const e=easeOut(t);
+  layerGap=gapFrom+(LAYER_GAP_STACK-gapFrom)*e; layoutLayers(false);
+  rotY=rotFrom+(rotTo-rotFrom)*e;
+  camDist=distFrom+(ft.dist-distFrom)*e;
+  camDyT=dyFrom+(ft.dy-dyFrom)*e;
+  camDxT=dxFrom+(ft.dx-dxFrom)*e;
+  pitchT=0.9+(1.55-0.9)*e;
+  if(t>=1)locked=true;
+ }});
+}
+/* ═══════════════ 資訊卡 & 2D ═══════════════ */
+function renderInfo(c){
+ const s=document.getElementById('side'); s.classList.add('show');
+ const pil=c.pillars, hourMode=c.mode==='hour';
+ const act={hour:'hour',day:'day',month:'month',year:'year'}[c.mode];
+ const col=(lab,g,on)=>`<div class="pcol"${on?' style="color:var(--gold)"':''}><span>${lab}</span><b${on?' style="color:var(--gold)"':''}>${g[0]}</b><b${on?' style="color:var(--gold)"':''}>${g[1]}</b></div>`;
+ s.innerHTML=`
+  <div class="sbox pillars4"><div class="pcolwrap">${col('年',pil.year,act==='year')}${col('月',pil.month,act==='month')}${col('日',pil.day,act==='day')}${col('時',pil.hour,act==='hour')}</div></div>
+  <div class="sbox big">${PAN_NAME[c.mode]}<br>${c.yang?'陽':'陰'}${NUM[c.ju-1]}局<em>${c.yuan}</em></div>
+  <div class="sbox">${c.board.xunHead}旬<b>符首${c.board.xunYi}</b></div>
+  <div class="sbox">值符<b>${c.board.zhiFuStar.slice(1)}${NUM[c.board.zhiFuPalace-1]}</b></div>
+  <div class="sbox">值使<b>${c.board.zhiShiDoor[0]}${NUM[c.board.zhiShiPalace-1]}</b></div>
+  ${hourMode?`<div class="sbox">日空<b>${c.dayKong.join('')}</b></div>
+  <div class="sbox">時空<b>${c.board.kong.join('')}</b></div>`:`<div class="sbox">旬空<b>${c.board.kong.join('')}</b></div>`}
+  <div class="sbox">驛馬<b>${c.ma}</b></div>
+  <div class="sbox">${c.termCur.name} ${c.termCur.t}<br>${c.termNext.name} ${c.termNext.t}</div>
+  ${c.wubuyu&&hourMode?'<div class="sbox warn">五不遇時<br>諸事不宜</div>':''}
+  ${c.termWarn?'<div class="sbox warn">⚠ 近交節<br>覆核局數</div>':''}
+  <div class="snote">時家奇門系・九星飛佈・門神轉佈・${c.mode==='hour'?'拆補法':c.mode==='day'?'近二至甲子起元':'古法陰遁'}・日柱23:00換日</div>`;
+ layoutSide();
+}
+/* 橫式側欄：頂貼控制列、底不過工具列 */
+function layoutSide(){
+ const sd=document.getElementById('side');
+ if(!sd.classList.contains('show'))return;
+ if(innerWidth>innerHeight){
+  const tb=document.getElementById('topbar').getBoundingClientRect();
+  const dk=document.getElementById('dock').getBoundingClientRect();
+  sd.style.top=(tb.bottom+8)+'px';
+  sd.style.bottom='auto';
+  sd.style.maxHeight=Math.max(120,dk.top-tb.bottom-16)+'px';
+ }else{
+  sd.style.top=''; sd.style.bottom=''; sd.style.maxHeight='';
+ }
+}
+function renderZeji(c){
+ if(!c)return;
+ document.getElementById('zejiTitle').textContent=`方位擇吉（${PAN_NAME[c.mode]}・${c.yang?'陽':'陰'}${NUM[c.ju-1]}局）`;
+ const rows=c.dirs.map(d=>`<div class="dirRow">
+   <span class="gradeTag g${d.grade}">${d.grade}</span>
+   <span class="dirName">${d.dir}</span>
+   <span class="dirInfo">${d.door[0]}門・${d.star}・${d.god}・${d.hs.join('')}${c.board.earth[d.palace]}</span>
+   <span>${d.tags.map(t=>`<span class="chip">${t}</span>`).join('')}${d.bad.map(t=>`<span class="chip bad">${t}</span>`).join('')}</span>
+  </div>`).join('');
+ const best=c.dirs[0];
+ const wPick=[...c.dirs].map(d=>({d,w:d.score+(d.door==='休門'?2:0)+(d.star==='天蓬'?1:0)+(d.hs.some(g=>'壬癸'.includes(g))?1:0)+(d.palace===1?1:0)})).sort((a,b2)=>b2.w-a.w)[0].d;
+ const bads=c.dirs.filter(d=>d.grade==='凶'||d.grade==='大凶').map(d=>d.dir).join('、')||'無';
+ const stay={hour:'約2小時',day:'當日（宜達24小時）',month:'本月多次前往',year:'本年度重大行動'}[c.mode];
+ document.getElementById('zejiBody').innerHTML=rows+`
+  <div class="zjBox"><h4>納 氣</h4>吉方：<b>${best.dir}</b>（${best.door}・${best.god}・${best.hs.join('')||'—'}）。往此方出行、辦事、洽談，於當地停留${stay}以納旺氣。忌往：${bads}。</div>
+  <div class="zjBox"><h4>養 水</h4>取水方：<b>${wPick.dir}</b>（${wPick.door}${wPick.star==='天蓬'?'・天蓬水星':''}${wPick.hs.some(g=>'壬癸'.includes(g))?'・帶壬癸水':''}）。宜於此方取潔淨水飲用，或於居家／店面之${wPick.dir}方置水養氣；水須常保潔淨流動。</div>
+  <div class="zjNote">評分通則：三吉門（開休生）、三奇（乙丙丁）、五吉神（值符太陰六合九地九天）為吉；擊刑、入墓、門迫、空亡減分；含青龍返首、飛鳥跌穴名格。未含全部格局，重大事項請人工覆盤。納氣養水採通行吉方取氣取水法。</div>`;
+}
+function renderFallback(c){
+ const g=document.getElementById('fbGrid'); g.innerHTML='';
+ document.getElementById('fallback').classList.add('show');
+ [[4,9,2],[3,5,7],[8,1,6]].flat().forEach(p=>{
+  const div=document.createElement('div');
+  
+  div.className='cell'+(p===c.board.zhiFuPalace?' zf':'')+(p===c.board.zhiShiPalace?' zs':'');
+  let badges='';
+  if(c.kongPalaces.includes(p))badges+='空';
+  if(c.maPalace===p)badges+=(badges?'/':'')+'馬';
+  div.innerHTML=`<span class="badges">${badges}</span>
+   <div style="font-weight:900;font-family:'Noto Serif TC',serif;font-size:1.15em">${c.board.hStem[p].join('')}</div>
+   <div><span class="star">${c.board.heaven[p]||''}</span> <span class="door" style="font-size:1.15em">${c.board.doors[p]?c.board.doors[p][0]:''}</span> <span class="god">${c.board.gods[p]||''}</span></div>
+   <div><span class="pname" style="position:static">${GUA[p]}</span> <span class="earth">${c.board.earth[p]}</span> <span class="pname" style="position:static">${NUM[p-1]}</span></div>`;
+  div.onclick=()=>showDetail(p);
+  g.appendChild(div);
+ });
+}
+function showDetail(p){
+ const c=currentChart,b=c.board;
+ document.getElementById('dTitle').textContent=PALACE_NAMES[p]+'宮';
+ let extra='';
+ if(c.kongPalaces.includes(p))extra+='<div class="line" style="color:var(--warn)">○ 時空</div>';
+ if(c.dayKongPalaces.includes(p))extra+='<div class="line" style="color:var(--warn)">○ 日空</div>';
+ if(c.maPalace===p)extra+='<div class="line" style="color:var(--warn)">⚡ 驛馬</div>';
+ if(p===b.zhiFuPalace)extra+='<div class="line" style="color:var(--gold)">★ 值符宮</div>';
+ if(p===b.zhiShiPalace)extra+='<div class="line" style="color:var(--verm)">★ 值使宮</div>';
+ document.getElementById('dBody').innerHTML=
+  `<div class="line"><span class="lbl">天盤干</span><b>${b.hStem[p].join('・')}</b></div>
+   ${b.gods[p]?`<div class="line"><span class="lbl">八神</span><b style="color:var(--purp)">${b.gods[p]}</b></div>`:''}
+   <div class="line"><span class="lbl">九星</span><b style="color:var(--cyan)">${b.heavenFull[p]}</b></div>
+   ${b.doors[p]?`<div class="line"><span class="lbl">八門</span><b style="color:var(--verm)">${b.doors[p]}</b></div>`:''}
+   <div class="line"><span class="lbl">地盤干</span><b style="color:var(--gold)">${b.earth[p]}</b></div>${extra}`;
+ document.getElementById('detail').classList.add('show');
+}
+document.getElementById('btnCloseDetail').onclick=()=>document.getElementById('detail').classList.remove('show');
+
+/* ═══════════════ 互動：旋轉／縮放／點擊 ═══════════════ */
+const cvEl=document.getElementById('stage');
+let dragging=false,px=0,py=0,moved=0,pinch0=0,locked=false;
+let rotY=0.65,pitchT=0.9;
+cvEl.addEventListener('pointerdown',e=>{dragging=true;moved=0;px=e.clientX;py=e.clientY;cvEl.setPointerCapture(e.pointerId);});
+cvEl.addEventListener('pointermove',e=>{if(!dragging)return;
+ const dx=e.clientX-px,dy=e.clientY-py;moved+=Math.abs(dx)+Math.abs(dy);
+ if(!locked){rotY+=dx*0.006; pitchT=Math.min(1.55,Math.max(0.15,pitchT+dy*0.004));}
+ px=e.clientX;py=e.clientY;});
+cvEl.addEventListener('pointerup',e=>{dragging=false;if(moved<7)pick(e.clientX,e.clientY);});
+cvEl.addEventListener('wheel',e=>{camDist=Math.min(26,Math.max(7,camDist+e.deltaY*0.012));},{passive:true});
+cvEl.addEventListener('touchmove',e=>{if(e.touches.length===2){
+ const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+ if(pinch0)camDist=Math.min(26,Math.max(7,camDist*(pinch0/d)));pinch0=d;}},{passive:true});
+cvEl.addEventListener('touchend',()=>{pinch0=0;});
+const ray=new THREE.Raycaster(),v2=new THREE.Vector2();
+function pick(x,y){if(!currentChart)return;
+ v2.set(x/innerWidth*2-1,-(y/innerHeight)*2+1);
+ ray.setFromCamera(v2,camera);
+ const hit=ray.intersectObjects(cards)[0];
+ if(hit)showDetail(hit.object.userData.palace);
+}
+
+/* ═══════════════ 主迴圈 ═══════════════ */
+let camPitchCur=0.9, camDyT=0, camDyCur=0, camDxT=0, camDxCur=0;
+function animate(){
+ requestAnimationFrame(animate);
+ const now=performance.now();
+ tweens=tweens.filter(tw=>{const t=Math.min(1,(now-tw.t0)/tw.dur);tw.fn(t);return t<1;});
+ if(!reduced&&stars)stars.rotation.y+=0.00035;
+ root.rotation.y=rotY;
+ camPitchCur+=(pitchT-camPitchCur)*0.12;
+ camDyCur+=(camDyT-camDyCur)*0.12; camDxCur+=(camDxT-camDxCur)*0.12;
+ camera.position.set(camDxCur,Math.sin(camPitchCur)*camDist,Math.cos(camPitchCur)*camDist+camDyCur);
+ camera.lookAt(camDxCur,0,camDyCur);
+ renderer.render(scene,camera);
+}
+
+/* ═══════════════ 控制列 ═══════════════ */
+function setDT(d){const p=n=>String(n).padStart(2,'0');
+ document.getElementById('dt').value=`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;}
+let panMode='hour';
+const PAN_NAME={hour:'時盤',day:'日盤',month:'月盤',year:'年盤'};
+document.querySelectorAll('#panSel button').forEach(b=>{
+ b.onclick=()=>{panMode=b.dataset.m;
+  document.querySelectorAll('#panSel button').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));
+  cast();};
+});
+document.getElementById('btnZeji').onclick=()=>{renderZeji(currentChart);document.getElementById('zeji').classList.add('show');};
+document.getElementById('btnCloseZeji').onclick=()=>document.getElementById('zeji').classList.remove('show');
+document.getElementById('btnNow').onclick=()=>setDT(new Date());
+document.getElementById('btnGo').onclick=cast;
+function cast(){
+ document.getElementById('btnFree').setAttribute('aria-pressed','false');
+ rotY=0.65;pitchT=0.9;camDist=13.5;
+ const v=document.getElementById('dt').value; if(!v)return;
+ const d=new Date(v);
+ const tz=-d.getTimezoneOffset()/60;
+ const chart=computeChart(d.getFullYear(),d.getMonth()+1,d.getDate(),d.getHours(),d.getMinutes(),tz,panMode);
+ build3D(chart,true);
+}
+document.getElementById('btnFree').onclick=()=>{
+ const btn=document.getElementById('btnFree'), on=btn.getAttribute('aria-pressed')==='true';
+ btn.setAttribute('aria-pressed',on?'false':'true');
+ if(on){ // 收回→滑回疊合成盤
+  layers.forEach(l=>{const g=l.group,fx=g.position.x,fz=g.position.z;
+   tween({dur:700,fn:t=>{const e2=easeOut(t);
+    g.position.x=fx*(1-e2); g.position.z=fz*(1-e2);
+    if(l.label)l.label.material.opacity=0.9*(1-t);}});});
+  settleFlat();
+ }else{ // 攤開三張獨立盤（橫式左右排、直式上下排）
+  locked=true; rotY=0; pitchT=1.55;
+  const portrait=innerHeight>innerWidth, S=GAP*3.7;
+  const ft=freeFit(portrait);
+  const d0=camDist, dy0=camDyT, dx0=camDxT;
+  tween({dur:800,fn:t=>{const e2=easeOut(t);
+   camDist=d0+(ft.dist-d0)*e2; camDyT=dy0+(ft.dy-dy0)*e2; camDxT=dx0+(ft.dx-dx0)*e2;}});
+  layers.forEach((l,i)=>{const g=l.group, off=(i-1)*S, fy=g.position.y;
+   tween({dur:800,fn:t=>{const e2=easeOut(t);
+    if(portrait){g.position.z=off*e2; g.position.x*= (1-e2);}
+    else {g.position.x=off*e2; g.position.z*=(1-e2);}
+    g.position.y=fy*(1-e2);
+    if(l.label)l.label.material.opacity=0.9*t;}});});
+ }
+};
+
+/* == 啟動：WebGL 失敗自動降級靜態盤 == */
+let webgl=true;
+applyTheme();
+try{
+ if(typeof THREE==='undefined')throw new Error('THREE not loaded');
+ initScene();
+}catch(err){
+ webgl=false;
+ document.getElementById('stage').style.display='none';
+ document.getElementById('btnFree').style.display='none';
+ console.warn('3D init failed, fallback to static board:',err);
+}
+setDT(new Date()); cast();
+</script>
+</body>
+</html>
