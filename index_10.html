@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" data-theme="dark" style="color-scheme: dark;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark light">
+<title>神奇身心靈學苑｜玄學工具入口</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0d18;
+  --bg-card:#16162a;
+  --bg-card-hover:#1c1c34;
+  --ink:#e8e2d5;
+  --ink-soft:#9a94a8;
+  --gold:#c9a962;
+  --gold-dim:rgba(201,169,98,.35);
+  --cinnabar:#c14a32;
+  --violet:#8a7ab8;
+  --astral:#6f93c4;
+  --line:rgba(201,169,98,.18);
+  --tag-student:#4a7c6f;
+  --tag-teacher:#8a5a9e;
+  --fs:1;
+}
+[data-theme="light"]{
+  --bg:#f4efe4;
+  --bg-card:#fdfaf2;
+  --bg-card-hover:#fff;
+  --ink:#2a2633;
+  --ink-soft:#6f6a7c;
+  --gold:#a07f35;
+  --gold-dim:rgba(160,127,53,.4);
+  --cinnabar:#b03a22;
+  --violet:#6b5b95;
+  --astral:#41628f;
+  --line:rgba(160,127,53,.28);
+  --tag-student:#3a6c5f;
+  --tag-teacher:#7a4a8e;
+}
+[data-fs="large"]{ --fs:1.18; }
+
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Noto Sans TC',"PingFang TC","Microsoft JhengHei",sans-serif;
+  font-size:calc(16px * var(--fs));
+  line-height:1.7;
+  min-height:100vh;
+  transition:background .3s,color .3s;
+}
+.wrap{max-width:960px;margin:0 auto;padding:0 20px 80px;}
+
+/* ── 開場三層轉盤 ── */
+#intro{
+  position:fixed;inset:0;z-index:999;
+  background:var(--bg);
+  display:grid;place-items:center;
+  transition:opacity .45s ease;
+}
+#intro.done{opacity:0;pointer-events:none;}
+.istage{
+  display:grid;place-items:center;
+  transition:transform .45s ease;
+}
+#intro.done .istage{transform:scale(.9);}
+.ispin{
+  grid-area:1/1;width:var(--d);height:var(--d);
+  animation:spin2 70s linear infinite;
+}
+.s1{--d:min(94vmin,500px);--r:calc(var(--d)/2 - 20px);}
+.s2{--d:min(76vmin,404px);--r:calc(var(--d)/2 - 21px);animation-duration:55s;animation-direction:reverse;}
+.s3{--d:min(58vmin,308px);--r:calc(var(--d)/2 - 19px);animation-duration:45s;}
+.s4{--d:min(41vmin,218px);--r:calc(var(--d)/2 - 17px);animation-duration:35s;animation-direction:reverse;}
+.s5{--d:min(25vmin,132px);--r:calc(var(--d)/2 - 15px);animation-duration:28s;}
+@keyframes spin2{to{transform:rotate(360deg);}}
+.iring{
+  width:100%;height:100%;position:relative;
+  border:1px solid var(--gold-dim);border-radius:50%;
+  animation:iEnter .7s cubic-bezier(.22,.9,.3,1) both;
+}
+.s1 .iring{border-color:rgba(111,147,196,.35);}
+.s2 .iring{animation-delay:.18s;}
+.s3 .iring{animation-delay:.36s;border-style:dashed;}
+.s4 .iring{animation-delay:.54s;}
+.s5 .iring{animation-delay:.72s;border-style:dashed;}
+@keyframes iEnter{
+  from{opacity:0;transform:scale(1.55) rotate(-70deg);}
+  to{opacity:1;transform:scale(1) rotate(0deg);}
+}
+.iring span{
+  position:absolute;left:50%;top:50%;
+  font-family:'Noto Serif TC',serif;font-weight:600;
+  color:var(--gold);opacity:.8;
+  transform:translate(-50%,-50%) rotate(var(--a)) translateY(calc(-1 * var(--r)));
+}
+.s1 .iring span{font-size:clamp(11px,2.6vmin,14px);color:var(--astral);opacity:.85;}
+.s2 .iring span{font-size:clamp(14px,3.4vmin,19px);}
+.s3 .iring span{font-size:clamp(13px,3.1vmin,17px);color:var(--violet);}
+.s4 .iring span{font-size:clamp(12px,2.8vmin,15px);color:var(--cinnabar);}
+.s5 .iring span{font-size:clamp(13px,3.1vmin,17px);color:var(--gold);font-weight:900;opacity:1;}
+.iskip{
+  position:absolute;bottom:34px;left:50%;transform:translateX(-50%);
+  color:var(--ink-soft);font-size:12.5px;letter-spacing:2px;opacity:.7;
+}
+@media (prefers-reduced-motion:reduce){
+  #intro{display:none;}
+}
+
+/* ── 頂列 ── */
+header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:18px 0;border-bottom:1px solid var(--line);
+}
+.brand{display:flex;align-items:center;gap:10px;}
+.seal{
+  width:38px;height:38px;flex:0 0 38px;
+  background:var(--cinnabar);color:#f4efe4;
+  font-family:'Noto Serif TC',serif;font-weight:900;font-size:15px;
+  display:grid;place-items:center;line-height:1.1;text-align:center;
+  border-radius:6px;letter-spacing:1px;
+  box-shadow:0 2px 8px rgba(193,74,50,.35);
+}
+.brand-name{font-family:'Noto Serif TC',serif;font-weight:900;font-size:calc(17px * var(--fs));letter-spacing:2px;}
+.toggles{display:flex;gap:8px;}
+.toggles button{
+  background:transparent;border:1px solid var(--line);color:var(--ink-soft);
+  border-radius:20px;padding:5px 12px;font-size:calc(13px * var(--fs));
+  cursor:pointer;font-family:inherit;transition:all .2s;
+}
+.toggles button:hover,.toggles button:focus-visible{border-color:var(--gold);color:var(--gold);}
+.toggles button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+
+/* ── Hero + 羅盤環 ── */
+.hero{
+  position:relative;text-align:center;
+  padding:90px 0 70px;overflow:visible;
+}
+.ring{
+  position:absolute;left:50%;top:50%;
+  width:420px;height:420px;
+  transform:translate(-50%,-50%);
+  pointer-events:none;user-select:none;
+  animation:spin 140s linear infinite;
+  opacity:.55;
+}
+.ring span{
+  position:absolute;left:50%;top:50%;
+  font-family:'Noto Serif TC',serif;font-weight:600;
+  font-size:20px;color:var(--gold-dim);
+  transform:translate(-50%,-50%) rotate(var(--a)) translateY(-200px);
+}
+.ring::before{
+  content:"";position:absolute;inset:36px;
+  border:1px solid var(--gold-dim);border-radius:50%;
+}
+.ring::after{
+  content:"";position:absolute;inset:70px;
+  border:1px dashed var(--gold-dim);border-radius:50%;opacity:.6;
+}
+@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg);}}
+@media (prefers-reduced-motion:reduce){.ring{animation:none;}}
+
+.hero-eyebrow{
+  color:var(--cinnabar);font-weight:700;letter-spacing:6px;
+  font-size:calc(13px * var(--fs));margin-bottom:14px;position:relative;
+}
+.hero h1{
+  font-family:'Noto Serif TC',serif;font-weight:900;
+  font-size:calc(40px * var(--fs));letter-spacing:6px;
+  position:relative;
+}
+.hero h1 em{font-style:normal;color:var(--gold);}
+.hero p{
+  color:var(--ink-soft);margin-top:16px;position:relative;
+  font-size:calc(15px * var(--fs));
+}
+
+/* ── 分類頁籤 ── */
+.tabs{
+  display:flex;gap:10px;justify-content:center;flex-wrap:wrap;
+  margin-bottom:36px;
+}
+.tabs button{
+  background:transparent;border:1px solid var(--line);color:var(--ink-soft);
+  padding:8px 22px;border-radius:24px;cursor:pointer;
+  font-family:inherit;font-size:calc(14px * var(--fs));font-weight:500;
+  transition:all .2s;
+}
+.tabs button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+.tabs button.on{
+  background:var(--gold);border-color:var(--gold);color:#1a1508;font-weight:700;
+}
+
+/* ── 工具卡 ── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px;}
+.card{
+  background:var(--bg-card);border:1px solid var(--line);
+  border-radius:14px;padding:24px 22px 20px;
+  text-decoration:none;color:var(--ink);
+  display:flex;flex-direction:column;gap:10px;
+  transition:transform .2s,background .2s,border-color .2s;
+  position:relative;
+}
+.card:hover,.card:focus-visible{
+  background:var(--bg-card-hover);border-color:var(--gold);
+  transform:translateY(-3px);
+}
+.card:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+.card.soon{opacity:.55;cursor:default;pointer-events:none;}
+.card-glyph{
+  font-family:'Noto Serif TC',serif;font-weight:900;
+  font-size:calc(30px * var(--fs));color:var(--violet);line-height:1;
+}
+.card h3{
+  font-family:'Noto Serif TC',serif;font-weight:900;
+  font-size:calc(19px * var(--fs));letter-spacing:1px;
+}
+.card p{color:var(--ink-soft);font-size:calc(13.5px * var(--fs));flex:1;}
+.card-foot{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px;}
+.tag{
+  font-size:calc(11.5px * var(--fs));padding:2px 10px;border-radius:12px;
+  color:#fff;font-weight:500;letter-spacing:1px;
+}
+.tag.student{background:var(--tag-student);}
+.tag.teacher{background:var(--tag-teacher);}
+.soon-badge{
+  font-size:calc(11.5px * var(--fs));color:var(--gold);
+  border:1px dashed var(--gold-dim);padding:2px 10px;border-radius:12px;
+}
+.empty{
+  text-align:center;color:var(--ink-soft);padding:60px 0;
+  font-size:calc(14px * var(--fs));
+}
+
+/* ── 老師專區提示 ── */
+.note{
+  margin-top:40px;padding:16px 20px;
+  border:1px solid var(--line);border-left:3px solid var(--tag-teacher);
+  border-radius:10px;color:var(--ink-soft);
+  font-size:calc(13px * var(--fs));
+}
+.note b{color:var(--ink);}
+
+footer{
+  margin-top:60px;text-align:center;color:var(--ink-soft);
+  font-size:calc(12.5px * var(--fs));letter-spacing:2px;
+}
+footer .fseal{color:var(--cinnabar);font-family:'Noto Serif TC',serif;font-weight:900;}
+
+
+
+@media (max-width:600px){
+  .hero{padding:70px 0 54px;}
+  .hero h1{font-size:calc(30px * var(--fs));letter-spacing:4px;}
+  .ring{width:320px;height:320px;}
+  .ring span{transform:translate(-50%,-50%) rotate(var(--a)) translateY(-152px);font-size:16px;}
+  .ring::before{inset:28px;}
+  .ring::after{inset:56px;}
+}
+</style>
+</head>
+<body>
+<div id="intro" aria-hidden="true">
+  <div class="istage">
+    <div class="ispin s1"><div class="iring" id="ir1"></div></div>
+    <div class="ispin s2"><div class="iring" id="ir2"></div></div>
+    <div class="ispin s3"><div class="iring" id="ir3"></div></div>
+    <div class="ispin s4"><div class="iring" id="ir4"></div></div>
+    <div class="ispin s5"><div class="iring" id="ir5"></div></div>
+  </div>
+  <div class="iskip">輕觸跳過</div>
+</div>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <div class="seal">神奇</div>
+      <div class="brand-name">神奇身心靈學苑</div>
+    </div>
+    <div class="toggles">
+      <button id="btnTheme" aria-label="切換深淺色">🌙 深色</button>
+      <button id="btnFs" aria-label="切換大字模式">大字</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="ring" id="ring" aria-hidden="true"></div>
+    <div class="hero-eyebrow">玄 學 工 具 入 口</div>
+    <h1>知命 · 解數 · <em>啟示</em></h1>
+    <p>紫微、八字、易數、塔羅——隨查隨用的教學速查工具</p>
+  </section>
+
+  <nav class="tabs" id="tabs" aria-label="工具分類">
+    <button data-f="all" class="on">全部</button>
+    <button data-f="student">學生教學</button>
+    <button data-f="teacher">老師專區</button>
+  </nav>
+
+  <main class="grid" id="grid"></main>
+  <div class="empty" id="empty" style="display:none">此分類目前沒有工具，敬請期待。</div>
+
+  <div class="note">
+    <b>老師專區說明：</b>標示「老師專區」的工具供訂閱老師使用，正式訂閱驗證功能上線前，請勿將連結外流。
+  </div>
+
+  <footer>
+    <span class="fseal">印</span>　神奇身心靈學苑　·　MIIRAGIC
+  </footer>
+
+</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   工具清單（要加新工具只改這裡）
+   audience: "student" / "teacher" / 兩者都填
+   live: false = 顯示「即將上線」且不可點
+   url: 同 repo 相對路徑，上架後改成實際檔名
+═══════════════════════════════════════════ */
+const TOOLS = [
+  {
+    name: "數字易經",
+    glyph: "數",
+    desc: "64 卦 × 八星磁場對照速查，手機號、車牌、門牌即查即解。",
+    url: "./yijing.html",
+    audience: ["student", "teacher"],
+    live: true
+  },
+  {
+    name: "塔羅靈數",
+    glyph: "塔",
+    desc: "生命靈數與塔羅牌義快速對照，教學現場即時翻查。",
+    url: "./tarot.html",
+    audience: ["student", "teacher"],
+    live: true
+  },
+  {
+    name: "紫微斗數速查",
+    glyph: "紫",
+    desc: "星曜、宮位、四化速查表，實用班隨堂輔助工具。",
+    url: "./ziwei.html",
+    audience: ["student"],
+    live: false
+  },
+  {
+    name: "八字速查",
+    glyph: "八",
+    desc: "天干地支、十神、五行生剋速查，命理實用班教學頁。",
+    url: "./bazi.html",
+    audience: ["student"],
+    live: true
+  },
+  {
+    name: "奇門遁甲",
+    glyph: "奇",
+    desc: "3D 立體轉盤排盤，時家奇門動態演示，盤面結構一目了然。",
+    url: "./qimen.html",
+    audience: ["student", "teacher"],
+    live: true
+  },
+  {
+    name: "六爻排盤",
+    glyph: "爻",
+    desc: "起卦裝卦一氣呵成，六親世應、動變爻自動標示。",
+    url: "./liuyao.html",
+    audience: ["student", "teacher"],
+    live: false
+  }
+  /* 之後新增範例：
+  ,{
+    name: "六爻排盤",
+    glyph: "爻",
+    desc: "說明文字",
+    url: "./liuyao.html",
+    audience: ["teacher"],
+    live: false
+  }
+  */
+];
+
+/* ── 十二地支羅盤環 ── */
+const BRANCHES = "子丑寅卯辰巳午未申酉戌亥";
+const ring = document.getElementById("ring");
+[...BRANCHES].forEach((ch, i) => {
+  const s = document.createElement("span");
+  s.textContent = ch;
+  s.style.setProperty("--a", (i * 30) + "deg");
+  ring.appendChild(s);
+});
+
+/* ── 開場三層轉盤 ──
+   INTRO_EVERY_TIME = false → 同一次瀏覽只播一次（從工具返回不重播）
+   改成 true 則每次載入都播 */
+const INTRO_EVERY_TIME = true;
+(function () {
+  const intro = document.getElementById("intro");
+  if (!intro) return;
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let seen = false;
+  try { seen = sessionStorage.getItem("portal_intro") === "1"; } catch (e) {}
+  if (reduced || (!INTRO_EVERY_TIME && seen)) { intro.remove(); return; }
+
+  function fill(id, chars) {
+    const el = document.getElementById(id);
+    const arr = [...chars];
+    arr.forEach((ch, i) => {
+      const s = document.createElement("span");
+      s.textContent = ch;
+      s.style.setProperty("--a", (i * 360 / arr.length) + "deg");
+      el.appendChild(s);
+    });
+  }
+  fill("ir1", "角亢氐房心尾箕斗牛女虛危室壁奎婁胃昴畢觜參井鬼柳星張翼軫"); // 外圈：二十八宿
+  fill("ir2", "子丑寅卯辰巳午未申酉戌亥"); // 第二圈：十二地支
+  fill("ir3", "甲乙丙丁戊己庚辛壬癸");     // 第三圈：十天干
+  fill("ir4", "乾兌離震巽坎艮坤");         // 第四圈：八卦
+  fill("ir5", "金木水火土");               // 內圈：五行
+
+  try { sessionStorage.setItem("portal_intro", "1"); } catch (e) {}
+
+  let ended = false;
+  function end() {
+    if (ended) return;
+    ended = true;
+    intro.classList.add("done");
+    setTimeout(() => intro.remove(), 500);
+  }
+  setTimeout(end, 1900);
+  intro.addEventListener("click", end, { once: true });
+})();
+
+/* ── 渲染工具卡 ── */
+const grid = document.getElementById("grid");
+const empty = document.getElementById("empty");
+let currentFilter = "all";
+function render(filter) {
+  currentFilter = filter;
+  grid.innerHTML = "";
+  const list = TOOLS.filter(t => filter === "all" || t.audience.includes(filter));
+  empty.style.display = list.length ? "none" : "block";
+  list.forEach(t => {
+    const a = document.createElement("a");
+    a.className = "card" + (t.live ? "" : " soon");
+    a.href = t.live ? t.url : "#";
+    if (!t.live) a.setAttribute("aria-disabled", "true");
+    let tags = "";
+    if (t.audience.includes("student")) tags += '<span class="tag student">學生</span>';
+    if (t.audience.includes("teacher")) tags += '<span class="tag teacher">老師專區</span>';
+    if (!t.live) tags += '<span class="soon-badge">即將上線</span>';
+    a.innerHTML =
+      '<div class="card-glyph">' + esc(t.glyph || (t.name || "？")[0]) + '</div>' +
+      '<h3>' + esc(t.name) + '</h3>' +
+      '<p>' + esc(t.desc) + '</p>' +
+      '<div class="card-foot">' + tags + '</div>';
+    grid.appendChild(a);
+  });
+}
+function esc(s) {
+  return String(s || "").replace(/[&<>"']/g, c =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+render("all");
+
+/* ── 分類頁籤 ── */
+document.getElementById("tabs").addEventListener("click", e => {
+  const btn = e.target.closest("button");
+  if (!btn) return;
+  document.querySelectorAll("#tabs button").forEach(b => b.classList.remove("on"));
+  btn.classList.add("on");
+  render(btn.dataset.f);
+});
+
+/* ── 深淺色切換（含 color-scheme 同步，防 Android/LINE 反色）── */
+const html = document.documentElement;
+const btnTheme = document.getElementById("btnTheme");
+function applyTheme(t) {
+  html.dataset.theme = t;
+  html.style.colorScheme = t;               // 同步 color-scheme
+  btnTheme.textContent = t === "dark" ? "🌙 深色" : "☀️ 淺色";
+  try { localStorage.setItem("portal_theme", t); } catch (e) {}
+}
+btnTheme.addEventListener("click", () =>
+  applyTheme(html.dataset.theme === "dark" ? "light" : "dark"));
+
+/* ── 大字模式 ── */
+const btnFs = document.getElementById("btnFs");
+function applyFs(on) {
+  if (on) html.dataset.fs = "large"; else delete html.dataset.fs;
+  btnFs.textContent = on ? "標準字" : "大字";
+  try { localStorage.setItem("portal_fs", on ? "1" : "0"); } catch (e) {}
+}
+btnFs.addEventListener("click", () => applyFs(html.dataset.fs !== "large"));
+
+/* ── 還原偏好 ── */
+try {
+  const t = localStorage.getItem("portal_theme");
+  if (t) applyTheme(t);
+  if (localStorage.getItem("portal_fs") === "1") applyFs(true);
+} catch (e) {}
+</script>
+</body>
+</html>
