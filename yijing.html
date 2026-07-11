@@ -1,0 +1,1610 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" style="color-scheme: dark;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark light">
+<title>易經六十四卦・取卦速查</title>
+<style>
+:root{
+  --bg:#16181f; --card:#1f222c; --card2:#262a36; --line:#3a3f4e;
+  --text:#f0ede4; --muted:#b9b3a4; --gold:#d4a94e; --cinnabar:#d4574a; --jade:#7cc4ab;
+  --ji:#5fbf7a; --zhongji:#9fc76a; --ban:#d9b64a; --zhongxiong:#e08a4c; --xiong:#e05c5c;
+  --fs:15px;
+}
+html[data-theme="light"]{
+  --bg:#f5f0e4; --card:#fdfaf2; --card2:#f2ecdc; --line:#d8cfb8;
+  --text:#2b2620; --muted:#7a7160; --gold:#a2762a; --cinnabar:#b23a2e; --jade:#1f8a6d;
+  --ji:#1e8a45; --zhongji:#5a8a1e; --ban:#a5851a; --zhongxiong:#c06a1e; --xiong:#c03535;
+  color-scheme: light;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{color-scheme:dark}
+body{
+  background:var(--bg); color:var(--text);
+  font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  font-size:var(--fs); line-height:1.75; padding-bottom:80px;
+}
+.serif{font-family:"Noto Serif TC","Songti TC","PMingLiU",serif}
+header{
+  text-align:center; padding:34px 16px 18px;
+  border-bottom:1px solid var(--line);
+}
+header h1{font-family:"Noto Serif TC","Songti TC",serif; font-size:1.7em; letter-spacing:.18em; color:var(--gold); font-weight:700}
+header p{color:var(--muted); margin-top:6px; letter-spacing:.1em; font-size:.92em}
+.warn{
+  max-width:860px; margin:16px auto 0; padding:10px 16px;
+  border:1px dashed var(--cinnabar); border-radius:8px;
+  color:var(--cinnabar); font-weight:700; letter-spacing:.06em; text-align:center;
+}
+.ctrl{position:fixed; top:10px; right:10px; z-index:50; display:flex; gap:6px}
+.ctrl button{
+  background:var(--card); color:var(--text); border:1px solid var(--line);
+  border-radius:8px; padding:6px 10px; cursor:pointer; font-size:14px;
+}
+nav{
+  position:sticky; top:0; z-index:40; background:var(--bg);
+  display:flex; flex-direction:column; align-items:center; gap:6px; padding:10px 8px;
+  border-bottom:1px solid var(--line);
+}
+.nav-row{display:flex; gap:6px; flex-wrap:wrap; justify-content:center; align-items:center}
+.nav-lab{font-size:.78em; letter-spacing:.25em; margin-right:2px; font-weight:700}
+.nav-lab.t{color:var(--gold)} .nav-lab.r{color:var(--jade)}
+nav button{
+  color:var(--muted); background:transparent; padding:6px 14px;
+  border:1px solid var(--line); border-radius:20px; font-size:.95em; cursor:pointer;
+  font-family:inherit;
+}
+nav button:hover{color:var(--gold); border-color:var(--gold)}
+nav button.on{color:var(--gold); background:color-mix(in srgb, var(--gold) 16%, transparent); border-color:var(--gold); font-weight:700}
+nav button.rule{border-color:color-mix(in srgb, var(--jade) 45%, var(--line))}
+nav button.rule:hover{color:var(--jade); border-color:var(--jade)}
+nav button.rule.on{color:var(--jade); background:color-mix(in srgb, var(--jade) 16%, transparent); border-color:var(--jade); font-weight:700}
+main{max-width:860px; margin:0 auto; padding:0 14px}
+section{margin-top:26px; display:none}
+section.active{display:block}
+h2{
+  font-family:"Noto Serif TC","Songti TC",serif; color:var(--gold);
+  font-size:1.35em; letter-spacing:.14em; margin-bottom:16px;
+  display:flex; align-items:center; gap:12px;
+}
+h2::after{content:""; flex:1; height:1px; background:var(--line)}
+.card{
+  background:var(--card); border:1px solid var(--line); border-radius:12px;
+  padding:18px 20px; margin-bottom:14px;
+}
+/* ── 計算機 ── */
+.calc input{
+  width:100%; padding:12px 14px; font-size:1.15em; letter-spacing:.1em;
+  background:var(--card2); color:var(--text); border:1px solid var(--line);
+  border-radius:10px; outline:none;
+}
+.calc input:focus{border-color:var(--gold)}
+.calc .hint{color:var(--muted); font-size:.88em; margin-top:6px}
+.calc button.go{
+  margin-top:12px; width:100%; padding:12px; font-size:1.1em; letter-spacing:.3em;
+  background:var(--cinnabar); color:#fff; border:none; border-radius:10px;
+  cursor:pointer; font-weight:700;
+}
+.steps{margin-top:16px; display:none; gap:12px}
+.steps.show{display:grid; grid-template-columns:1fr 1fr}
+.stepbox{background:var(--card2); border:1px solid var(--line); border-radius:10px; padding:12px 14px; font-size:.95em}
+.stepbox b{color:var(--gold)}
+.gua-result{display:none; margin-top:14px; text-align:center}
+.gua-result.show{display:block}
+.gua-stack{
+  display:inline-flex; flex-direction:column; align-items:center;
+  border:1px solid var(--gold); border-radius:12px; padding:14px 30px; background:var(--card2);
+}
+.gua-stack .tri{font-size:2em; line-height:1.15; color:var(--gold)}
+.gua-stack .lab{font-size:.8em; color:var(--muted)}
+.gua-stack hr{width:100%; border:none; border-top:1px dashed var(--line); margin:6px 0}
+#calcCard{margin-top:14px}
+/* ── 規則 ── */
+.rule-flow{display:grid; gap:10px}
+.rule-flow .step{display:flex; gap:12px; align-items:flex-start}
+.rule-flow .n{
+  flex:none; width:28px; height:28px; border-radius:50%;
+  border:1px solid var(--gold); color:var(--gold);
+  display:flex; align-items:center; justify-content:center; font-weight:700; margin-top:3px;
+}
+table{width:100%; border-collapse:collapse; margin-top:10px}
+th,td{border:1px solid var(--line); padding:8px 6px; text-align:center; font-size:.98em}
+th{background:var(--card2); color:var(--gold); letter-spacing:.1em}
+.ex{border-left:3px solid var(--gold); padding-left:14px; margin-top:14px}
+.ex h4{color:var(--gold); letter-spacing:.08em}
+.ex .math{font-family:ui-monospace,Menlo,Consolas,monospace; background:var(--card2); border-radius:8px; padding:10px 12px; margin-top:8px; font-size:.92em; line-height:1.9; overflow-x:auto}
+/* ── 64卦 ── */
+.searchbar{display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap}
+.searchbar input{
+  flex:1; min-width:200px; padding:10px 14px; font-size:1em;
+  background:var(--card2); color:var(--text); border:1px solid var(--line); border-radius:10px; outline:none;
+}
+.searchbar input:focus{border-color:var(--gold)}
+.filters{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px}
+.filters button{
+  background:var(--card); color:var(--muted); border:1px solid var(--line);
+  border-radius:16px; padding:5px 14px; cursor:pointer; font-size:.92em;
+}
+.filters button.on{color:var(--gold); border-color:var(--gold)}
+.gua-card{
+  background:var(--card); border:1px solid var(--line); border-radius:12px;
+  padding:16px 18px; margin-bottom:12px;
+}
+.gua-head{display:flex; align-items:center; gap:12px; flex-wrap:wrap; cursor:pointer}
+.gua-head .code{
+  font-family:ui-monospace,Menlo,monospace; font-size:1.25em; font-weight:700;
+  color:var(--gold); min-width:44px;
+}
+.gua-head .tris{font-size:1.35em; letter-spacing:2px; color:var(--muted)}
+.gua-head .name{font-family:"Noto Serif TC","Songti TC",serif; font-size:1.15em; font-weight:700; letter-spacing:.06em}
+.gua-head .sub{color:var(--muted); font-size:.88em}
+.badge{
+  margin-left:auto; padding:3px 14px; border-radius:14px; font-weight:700;
+  font-size:.92em; letter-spacing:.15em; color:#fff;
+}
+.b-大吉{background:linear-gradient(135deg,#d4a94e,#c8483a); color:#fff; box-shadow:0 0 6px rgba(212,169,78,.5)}
+.b-吉{background:var(--ji)} .b-中吉{background:var(--zhongji)}
+.b-吉凶參半{background:var(--ban)} .b-中凶{background:var(--zhongxiong)} .b-凶{background:var(--xiong)}
+.gua-body{display:none; margin-top:12px; border-top:1px dashed var(--line); padding-top:12px}
+.gua-card.open .gua-body{display:block}
+.gua-motto{color:var(--gold); font-family:"Noto Serif TC",serif; letter-spacing:.08em; margin-bottom:10px}
+.qa{display:grid; grid-template-columns:auto 1fr; gap:4px 12px}
+.qa dt{color:var(--cinnabar); font-weight:700; white-space:nowrap}
+.qa dd{color:var(--text)}
+.appendix .row{display:grid; grid-template-columns:96px 1fr; gap:8px; padding:6px 0; border-bottom:1px dashed var(--line)}
+.appendix .row:last-child{border-bottom:none}
+.appendix .k{color:var(--gold); font-weight:700; letter-spacing:.1em}
+.chip{display:inline-block;padding:2px 10px;border-radius:12px;font-size:.85em;font-weight:700;margin:2px 3px 2px 0;border:1px solid transparent}
+.c-吉{background:transparent;color:var(--ji);border-color:var(--ji)}
+.c-平{background:transparent;color:var(--ban);border-color:var(--ban)}
+.c-凶{background:transparent;color:var(--xiong);border-color:var(--xiong)}
+.plate-item{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.plate-item .pno{font-family:ui-monospace,Menlo,monospace;font-size:1.2em;font-weight:700;letter-spacing:.1em;color:var(--gold)}
+.plate-item .pgua{font-size:.9em;color:var(--muted);margin:2px 0 4px}
+.num-in{flex:1;width:100%;padding:11px 14px;letter-spacing:.08em;background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:10px;outline:none;font-family:ui-monospace,Menlo,monospace}
+.num-in:focus{border-color:var(--gold)}
+.add-btn{margin-top:8px;width:100%;padding:9px;background:var(--card2);color:var(--gold);border:1px dashed var(--gold);border-radius:10px;cursor:pointer;font-size:1em;font-family:inherit}
+.clear-btn{margin-top:8px;width:100%;padding:9px;background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:.95em;font-family:inherit}
+.clear-btn:hover{color:var(--xiong);border-color:var(--xiong)}
+.go-jade{background:var(--jade) !important; color:#0d1a15 !important}
+html[data-theme="light"] .go-jade{color:#fff !important}
+.del-btn{padding:0 14px;background:var(--card2);color:var(--xiong);border:1px solid var(--line);border-radius:10px;cursor:pointer}
+.star-chip{background:var(--card2);color:var(--muted);border:1px solid var(--line);border-radius:16px;padding:5px 15px;cursor:pointer;font-size:.95em;font-family:inherit}
+.star-chip.on{color:var(--ji);border-color:var(--ji);font-weight:700}
+.star-chip.ban.on{color:var(--xiong);border-color:var(--xiong)}
+footer{text-align:center; color:var(--muted); margin-top:50px; font-size:.85em; letter-spacing:.1em}
+.sheet{background:var(--card); border:1px solid var(--gold); border-radius:12px; padding:26px 24px; margin-top:14px}
+.sheet h3{font-family:"Noto Serif TC","Songti TC",serif; color:var(--gold); text-align:center; letter-spacing:.25em; font-size:1.3em}
+.sheet .meta{display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px; color:var(--muted); font-size:.92em; margin-top:8px; border-bottom:1px solid var(--line); padding-bottom:10px}
+.sheet .total{text-align:center; margin:16px 0}
+.sheet .total .n{font-size:2.4em; font-weight:700; color:var(--gold); font-family:ui-monospace,monospace}
+.sheet table{margin-top:6px}
+.sheet .rx{border:1px dashed var(--gold); border-radius:10px; padding:12px 14px; margin-top:14px}
+.sheet .rx h4{color:var(--gold); letter-spacing:.15em; margin-bottom:6px}
+.sheet .sign{margin-top:22px; display:flex; justify-content:space-between; color:var(--muted); font-size:.9em; border-top:1px solid var(--line); padding-top:10px}
+.sheet.editing{outline:2px dashed var(--gold); outline-offset:4px}
+.sheet.editing:focus{outline-color:var(--cinnabar)}
+.sheet[contenteditable="true"] *{cursor:text}
+@media print{
+  @page{size:A4; margin:10mm}
+  nav,.ctrl,header,.no-print,footer{display:none !important}
+  body{background:#fff; color:#1a1a1a; padding-bottom:0; font-size:12px; line-height:1.5}
+  html{color-scheme:light}
+  main>section{display:none !important}
+  main>section.active{display:block !important}
+  main>section.active{margin-top:0}
+  main>section.active > *:not(.sheet-wrap){display:none !important}
+  .sheet{border:1px solid #bbb; background:#fff; padding:12px 16px; margin-top:0; border-radius:6px}
+  .sheet h3{font-size:1.15em; letter-spacing:.2em}
+  .sheet .meta{margin-top:4px; padding-bottom:6px}
+  .sheet .total{margin:8px 0}
+  .sheet .total .n{font-size:1.7em}
+  .sheet th,.sheet td{padding:4px 5px; font-size:.95em}
+  .sheet .rx{padding:8px 10px; margin-top:8px}
+  .sheet .rx p{margin-top:2px !important}
+  .sheet .sign{margin-top:12px; padding-top:6px}
+  .sheet h3,.sheet .total .n,.sheet .rx h4{color:#8a6420}
+  .badge{padding:1px 8px !important}
+}
+@media (max-width:620px){
+  .steps.show{grid-template-columns:1fr}
+  .qa{grid-template-columns:1fr}
+  .qa dt{margin-top:6px}
+  .badge{margin-left:0}
+  header{padding:24px 12px 14px}
+  header h1{font-size:1.45em; letter-spacing:.12em}
+  main{padding:0 10px}
+  .card{padding:14px 14px}
+  nav{gap:6px; padding:8px 6px}
+  nav button{padding:6px 11px; font-size:.9em}
+  th,td{padding:7px 5px; font-size:.88em}
+  td:last-child{word-spacing:2px; line-height:1.9}
+  .ex .math{font-size:.85em; padding:8px 10px}
+  .gua-head{gap:8px}
+  .gua-head .code{font-size:1.1em; min-width:38px}
+  .gua-head .name{font-size:1.05em}
+  .gua-stack{padding:12px 22px}
+  .rule-flow .step{gap:9px}
+  .appendix .row{grid-template-columns:74px 1fr}
+  .plate-item .pno{font-size:1.1em}
+}
+/* 手機輸入框固定 16px，避免 iOS 點擊自動放大 */
+input, textarea, select{font-size:16px !important}
+</style>
+</head>
+<body>
+<div class="ctrl">
+  <button id="themeBtn" title="切換深淺色">🌗</button>
+  <button id="fontBtn" title="切換字級">A+</button>
+</div>
+
+<header>
+  <h1 class="serif">易經六十四卦</h1>
+  <p>數字取卦 × 吉凶速查</p>
+  <div class="warn" style="text-align:left;line-height:1.9">
+    ★ 卜卦只給對方「吉凶」，不要給卦象內容<br>
+    ★ <b>不能改的號碼建議不要起卦</b>——起卦即入卦，凶則越用越凶、吉則越用越吉；身分證、生日等先天數僅在「人生總評」作基準分析一次即可，一般不建議算
+  </div>
+</header>
+
+<nav>
+  <div class="nav-row">
+    <span class="nav-lab t">工具</span>
+    <button data-tab="calc">取卦計算機</button>
+    <button data-tab="compare">號碼評比</button>
+    <button data-tab="personal">個人搭配</button>
+    <button data-tab="audit">人生總評</button>
+    <button data-tab="plate">車牌選號</button>
+  </div>
+  <div class="nav-row">
+    <span class="nav-lab r">規則</span>
+    <button class="rule" data-tab="rules">取卦規則</button>
+    <button class="rule" data-tab="energy">數字能量</button>
+    <button class="rule" data-tab="gua64">64卦速查</button>
+    <button class="rule" data-tab="appendix">八卦附錄</button>
+  </div>
+</nav>
+
+<main>
+
+<!-- ══ 取卦計算機 ══ -->
+<section id="calc">
+  <h2>取卦計算機</h2>
+  <div class="card calc">
+    <input id="calcInput" placeholder="輸入銀行帳號／電話／車牌，例：ABF-3399" autocomplete="off">
+    <div class="hint">英文字母自動換算數字；符號與空格自動忽略；奇數位數自動在最前補 0。</div>
+    <button class="go" id="calcBtn">起　卦</button>
+    <div class="steps" id="steps">
+      <div class="stepbox" id="stepDown"></div>
+      <div class="stepbox" id="stepUp"></div>
+    </div>
+    <div class="gua-result" id="guaResult">
+      <div class="gua-stack">
+        <div class="lab">上掛</div>
+        <div class="tri" id="triUp"></div>
+        <hr>
+        <div class="tri" id="triDown"></div>
+        <div class="lab">下掛</div>
+      </div>
+    </div>
+    <button class="clear-btn" id="calcClear">🗑 清空重填</button>
+    <div id="calcCard"></div>
+    <div id="magCard"></div>
+    <div id="verdictCard"></div>
+  </div>
+</section>
+
+<!-- ══ 取卦規則 ══ -->
+<section id="rules">
+  <h2>取卦規則</h2>
+  <div class="card">
+    <div class="rule-flow">
+      <div class="step"><div class="n">1</div><div>將號碼<b>對半分成兩段</b>：前段為<b style="color:var(--cinnabar)">下掛</b>，後段為<b style="color:var(--cinnabar)">上掛</b>。<br><span style="color:var(--muted)">★ 若號碼是奇數無法對分，在號碼最前面<b>加 0</b> 再對分。</span></div></div>
+      <div class="step"><div class="n">2</div><div>英文字母依下方對照表<b>換算成數字</b>後一併計算。</div></div>
+      <div class="step"><div class="n">3</div><div>各段數字<b>相加求總和</b>：總和不足 8 → 直接取該數；總和大於 8 → <b>除以 8 取餘數</b>；可被 8 整除 → <b>取 8</b>。</div></div>
+      <div class="step"><div class="n">4</div><div>得出上掛、下掛兩個數字，組合成卦象編號（<b>上掛在前、下掛在後</b>），查對應卦象吉凶。</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="color:var(--gold); letter-spacing:.1em; margin-bottom:4px">英文字母換數對照表</h3>
+    <table>
+      <tr><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th></tr>
+      <tr><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td><td>G</td><td>H</td></tr>
+      <tr><td>I</td><td>J</td><td>K</td><td>L</td><td>M</td><td>N</td><td>O</td><td>P</td></tr>
+      <tr><td>Q</td><td>R</td><td>S</td><td>T</td><td>U</td><td>V</td><td>W</td><td>X</td></tr>
+      <tr><td>Y</td><td>Z</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3 style="color:var(--gold); letter-spacing:.1em">取卦範例</h3>
+    <div class="ex">
+      <h4>① 銀行帳號：020310002844</h4>
+      <div class="math">對分 → 020310（下掛）｜002844（上掛）<br>下掛 0+2+0+3+1+0 = 6，不足 8 → 取 <b>6</b><br>上掛 0+0+2+8+4+4 = 18，18÷8 = 2 餘 2 → 取 <b>2</b><br>卦象得 上2／下6 → 查編號 <b>26</b>（澤水困）</div>
+    </div>
+    <div class="ex">
+      <h4>② 電話選號：0906 887 377</h4>
+      <div class="math">對分 → 09068（下掛）｜87377（上掛）<br>下掛 0+9+0+6+8 = 23，23÷8 = 2 餘 7 → 取 <b>7</b><br>上掛 8+7+3+7+7 = 32，可被 8 整除 → 取 <b>8</b><br>卦象得 上8／下7 → 查編號 <b>87</b>（地山謙）</div>
+    </div>
+    <div class="ex">
+      <h4>③ 車牌選號：ABF-3399</h4>
+      <div class="math">英文換數 A=1、B=2、F=6；7 位為奇數 → 前補 0<br>對分 → 0ABF（下掛）｜3399（上掛）<br>下掛 0+1+2+6 = 9，9÷8 = 1 餘 1 → 取 <b>1</b><br>上掛 3+3+9+9 = 24，可被 8 整除 → 取 <b>8</b><br>卦象得 上8／下1 → 查編號 <b>81</b>（地天泰）</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 數字能量磁場 ══ -->
+<section id="energy">
+  <h2>數字能量磁場</h2>
+  <div class="card">
+    <p>源自八宅遊年卦的<b style="color:var(--gold)">八星磁場</b>派：不成卦，而是把號碼<b>相鄰兩碼一組</b>對應八星，論這組號碼長期帶的能量。英文依同一張換數表換算；<b>0、5 視為中性略過</b>（各派處理略有差異，可依師承調整）。</p>
+    <table>
+      <tr><th>星</th><th>屬性</th><th>主應</th><th>個性特質</th><th>數字組合</th></tr>
+      <tr><td style="color:var(--ji);font-weight:700">天醫</td><td>吉</td><td>財富・姻緣・健康</td><td>善良大方、樂於付出</td><td>13 31 68 86 49 94 27 72</td></tr>
+      <tr><td style="color:var(--ji);font-weight:700">生氣</td><td>吉</td><td>貴人・人緣・機會</td><td>樂天隨和、步調偏慢</td><td>14 41 67 76 39 93 28 82</td></tr>
+      <tr><td style="color:var(--ji);font-weight:700">延年</td><td>吉</td><td>事業・領導・專業</td><td>責任感重、工作狂</td><td>19 91 78 87 34 43 26 62</td></tr>
+      <tr><td style="color:var(--ban);font-weight:700">伏位</td><td>平</td><td>穩定・蓄勢・等待</td><td>謹慎忍耐、猶豫被動</td><td>11 22 33 44 66 77 88 99</td></tr>
+      <tr><td style="color:var(--xiong);font-weight:700">絕命</td><td>凶</td><td>極端・投機・破財</td><td>敢衝敢賭、大起大落</td><td>12 21 69 96 48 84 37 73</td></tr>
+      <tr><td style="color:var(--xiong);font-weight:700">五鬼</td><td>凶</td><td>多變・小人・暗耗</td><td>點子多、多疑善變</td><td>18 81 79 97 36 63 24 42</td></tr>
+      <tr><td style="color:var(--xiong);font-weight:700">六煞</td><td>凶</td><td>糾纏・情緒・桃色</td><td>異性緣好、情緒起伏</td><td>16 61 47 74 38 83 29 92</td></tr>
+      <tr><td style="color:var(--xiong);font-weight:700">禍害</td><td>凶</td><td>口舌・是非・病符</td><td>口才好、好辯嘴硬</td><td>17 71 89 98 46 64 23 32</td></tr>
+    </table>
+    <p style="color:var(--muted);font-size:.9em;margin-top:10px">解讀原則：出現次數多的星＝性格主軸；<b style="color:var(--gold)">越靠前段＝過往與底層慣性，越靠尾段＝近期與未來走勢</b>，尾組磁場為當前主導。在「取卦計算機」輸入號碼即可看到完整的性格、現況、提醒解讀。</p>
+  </div>
+
+  <div class="card">
+    <h3 style="color:var(--gold); letter-spacing:.1em; margin-bottom:8px">先天數與後天數</h3>
+    <div class="rule-flow">
+      <div class="step"><div class="n">體</div><div><b style="color:var(--cinnabar)">身分證字號＝先天數</b>：出生登記即定、終身不換，看的是天生性格、命底與原生慣性——論命時當「體」。計算機可直接輸入身分證分析（英文自動換數）。</div></div>
+      <div class="step"><div class="n">用</div><div><b style="color:var(--cinnabar)">手機／車牌／密碼＝後天數</b>：可自選可更換，影響當下與未來走勢——當「用」。先天不能改，後天可以調，這正是磁場改善的施力點。</div></div>
+      <div class="step"><div class="n">力</div><div><b>使用頻率＝影響力</b>：越常用、越貼身的號碼作用越強。一般排序：手機號碼 ＞ 常用密碼 ＞ 車牌 ＞ 門牌。身分證雖屬先天，因常填寫仍持續發揮底層作用。</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="color:var(--gold); letter-spacing:.1em; margin-bottom:8px">磁場改善與運用</h3>
+    <p style="margin-bottom:8px"><b>原則：缺什麼補什麼、改尾不改頭、一次只補一個主軸。</b>尾段主導近期運勢，改號優先改尾段；同時補太多星磁場反而混亂。</p>
+    <table>
+      <tr><th>需求</th><th>補星</th><th>完整組合</th></tr>
+      <tr><td>求財・姻緣・健康</td><td style="color:var(--ji);font-weight:700">天醫</td><td>13 31 68 86 27 72 49 94</td></tr>
+      <tr><td>求貴人・人緣・機會</td><td style="color:var(--ji);font-weight:700">生氣</td><td>14 41 67 76 39 93 28 82</td></tr>
+      <tr><td>求事業・升遷・專業</td><td style="color:var(--ji);font-weight:700">延年</td><td>19 91 78 87 34 43 26 62</td></tr>
+      <tr><td>求安定・守成</td><td style="color:var(--ban);font-weight:700">伏位</td><td>11 22 33 44 66 77 88 99</td></tr>
+    </table>
+    <div class="rule-flow" style="margin-top:14px">
+      <div class="step"><div class="n">1</div><div><b>生活補數字（主力）</b>：大部分號碼改不了，補星從生活下手——鬧鐘與提醒時間、轉帳金額尾數、紅包與定價、樓層座位、運動組數次數、擇日日期，這些每天都在選的小數字，全部可以放吉星組合。再搭配對應的人事物：補天醫→布施付出、親近療癒之人；補生氣→早起運動、親近自然與樂觀朋友；補延年→固定作息、跟隨專業前輩。</div></div>
+      <div class="step"><div class="n">2</div><div><b>可換的才換</b>：密碼、LINE ID、桌布這些自己能改的，放吉星組合或用 <b style="color:var(--gold)">0／5 截斷</b>凶星；手機門號、車牌真要換再換，不必為了改號而改號。</div></div>
+      <div class="step"><div class="n">3</div><div><b>凶星也能用</b>：知其性而駕馭——絕命敢衝，適合業務短期衝刺、開拓期；五鬼點子多，適合創意企劃；六煞異性緣，適合公關銷售。凶星怕的是不自知，不是存在本身。</div></div>
+      <div class="step"><div class="n">4</div><div><b>驗證節奏</b>：改號後以 3～6 個月為觀察期，對照「現況與過往」欄的變化；先天數（身分證）作為對照基準不動。</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 號碼評比 ══ -->
+<section id="compare">
+  <h2>號碼評比</h2>
+  <div class="card calc">
+    <p style="margin-bottom:10px">手機門號、銀行帳號、任意號碼皆可。<b style="color:var(--gold)">一格填一個號碼</b>，需要更多就按「＋新增一格」，自動評估好壞、可能發生的狀況、解決方法，並排序出最優先的選擇。</p>
+    <div id="cmpFields" style="display:grid;gap:8px">
+      <div style="display:flex;gap:8px"><input class="cmp-in" placeholder="號碼 1" style="flex:1;padding:11px 14px;font-size:1.05em;letter-spacing:.08em;background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:10px;outline:none;font-family:ui-monospace,Menlo,monospace"></div>
+      <div style="display:flex;gap:8px"><input class="cmp-in" placeholder="號碼 2" style="flex:1;padding:11px 14px;font-size:1.05em;letter-spacing:.08em;background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:10px;outline:none;font-family:ui-monospace,Menlo,monospace"></div>
+      <div style="display:flex;gap:8px"><input class="cmp-in" placeholder="號碼 3" style="flex:1;padding:11px 14px;font-size:1.05em;letter-spacing:.08em;background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:10px;outline:none;font-family:ui-monospace,Menlo,monospace"></div>
+    </div>
+    <button id="cmpAdd" style="margin-top:8px;width:100%;padding:9px;background:var(--card2);color:var(--gold);border:1px dashed var(--gold);border-radius:10px;cursor:pointer;font-size:1em">＋ 新增一格</button>
+    <button class="go" id="cmpBtn">評估排序</button>
+    <button class="clear-btn" id="cmpClear">🗑 一鍵清空重填</button>
+
+    <div class="gua-card" id="rulesCmp">
+      <div class="gua-head" onclick="this.parentNode.classList.toggle('open')">
+        <span class="name serif" style="color:var(--gold)">計分規則與評級建議</span>
+        <span class="sub" style="margin-left:auto">點開查看</span>
+      </div>
+      <div class="gua-body">
+        <dl class="qa">
+          <dt style="color:var(--gold);font-weight:700;white-space:nowrap">卦象分</dt><dd>大吉 50｜吉 40｜中吉 30｜吉凶參半 20｜中凶 10｜凶 0</dd>
+          <dt style="color:var(--gold);font-weight:700;white-space:nowrap">磁場分</dt><dd>每組吉星 +2、伏位 +1、凶星 −2，加總後 ×4 併入總分</dd>
+          <dt style="color:var(--gold);font-weight:700;white-space:nowrap">評級</dt><dd>依號碼長度換算百分制：<b style="color:var(--ji)">特優 ≥85</b> 放心啟用｜<b style="color:var(--ji)">優 70–84</b> 可用，小缺點以吉星補強｜<b style="color:var(--ban)">中上 55–69</b> 依用途取捨｜<b style="color:var(--ban)">普通 40–54</b> 需化解或改碼輔助｜<b style="color:var(--xiong)">弱 &lt;40</b> 建議直接換號</dd>
+          
+        </dl>
+      </div>
+    </div>
+    <div id="cmpList" style="margin-top:14px"></div>
+  </div>
+</section>
+
+<!-- ══ 個人搭配 ══ -->
+<section id="personal">
+  <h2>個人組合搭配</h2>
+  <div class="card calc">
+    <p style="margin-bottom:10px">先填<b style="color:var(--gold)">你的底數</b>（生日、身分證、常用號碼），系統會診斷你缺什麼、偏重什麼；再填<b style="color:var(--gold)">候選號碼</b>——排序時不只看號碼本身好壞，還加計「適配分」：<b>最好的不一定最適合你，補到你缺口的才是</b>。</p>
+    <p style="color:var(--gold);font-weight:700;letter-spacing:.1em">我的底數</p>
+    <div id="perFields" style="display:grid;gap:8px;margin-top:6px">
+      <div style="display:flex;gap:8px"><input class="per-in num-in" placeholder="生日（西元年月日，例：19910217）"></div>
+      <div style="display:flex;gap:8px"><input class="per-in num-in" placeholder="身分證字號"></div>
+      <div style="display:flex;gap:8px"><input class="per-in num-in" placeholder="其他常用號碼（手機／慣用密碼，可留空）"></div>
+    </div>
+    <button class="add-btn" id="perAdd">＋ 再加一個底數</button>
+    <p style="color:var(--gold);font-weight:700;letter-spacing:.1em;margin-top:16px">候選號碼</p>
+    <div id="candFields" style="display:grid;gap:8px;margin-top:6px">
+      <div style="display:flex;gap:8px"><input class="cand-in num-in" placeholder="候選 1"></div>
+      <div style="display:flex;gap:8px"><input class="cand-in num-in" placeholder="候選 2"></div>
+      <div style="display:flex;gap:8px"><input class="cand-in num-in" placeholder="候選 3"></div>
+    </div>
+    <button class="add-btn" id="candAdd">＋ 再加一個候選</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+      <input id="perName" class="num-in" placeholder="客人姓名／稱呼（產報告用）" style="flex:2;min-width:170px;font-family:inherit">
+      <input id="perTeacher" class="num-in" placeholder="鑑定老師" style="flex:1;min-width:110px;font-family:inherit">
+    </div>
+    <button class="go" id="perBtn">分析我的最適組合（老師分析版）</button>
+    <button class="go go-jade" id="perRpBtn">🧾 產出選號適配報告（乾淨交件版）</button>
+    <button class="clear-btn" id="perClear">🗑 一鍵清空重填</button>
+
+    <div class="gua-card" id="rulesPer">
+      <div class="gua-head" onclick="this.parentNode.classList.toggle('open')">
+        <span class="name serif" style="color:var(--gold)">計分規則與評級建議</span>
+        <span class="sub" style="margin-left:auto">點開查看</span>
+      </div>
+      <div class="gua-body">
+        <dl class="qa">
+          <dt style="color:var(--gold);font-weight:700;white-space:nowrap">卦象分</dt><dd>大吉 50｜吉 40｜中吉 30｜吉凶參半 20｜中凶 10｜凶 0</dd>
+          <dt style="color:var(--gold);font-weight:700;white-space:nowrap">磁場分</dt><dd>每組吉星 +2、伏位 +1、凶星 −2，加總後 ×4 併入總分</dd>
+          <dt style="color:var(--gold);font-weight:700;white-space:nowrap">評級</dt><dd>依號碼長度換算百分制：<b style="color:var(--ji)">特優 ≥85</b> 放心啟用｜<b style="color:var(--ji)">優 70–84</b> 可用，小缺點以吉星補強｜<b style="color:var(--ban)">中上 55–69</b> 依用途取捨｜<b style="color:var(--ban)">普通 40–54</b> 需化解或改碼輔助｜<b style="color:var(--xiong)">弱 &lt;40</b> 建議直接換號</dd>
+          <dt style="color:var(--gold);font-weight:700;white-space:nowrap">適配分</dt><dd>本分頁另加：補你缺的吉星每組 +8｜強化偏弱吉星每組 +4｜加重你偏多的凶星每組 −4；排序以「本身分＋適配分」為準，評級仍看本身分</dd>
+        </dl>
+      </div>
+    </div>
+    <div id="perDiag" style="margin-top:14px"></div>
+    <div id="perList"></div>
+    <div id="perSheet" class="sheet-wrap"></div>
+    <div class="no-print" style="display:flex;gap:8px">
+      <button id="perEdit" class="go" style="display:none;margin-top:10px;background:var(--card2);color:var(--gold);border:1px solid var(--gold)">✏️ 編輯報告</button>
+      <button id="perPrint" class="go" style="display:none;margin-top:10px">🖨 列印／存 PDF</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 人生總評 ══ -->
+<section id="audit">
+  <h2>人生號碼綜合評比</h2>
+  <div class="card calc">
+    <p style="margin-bottom:10px">把你<b style="color:var(--gold)">身上所有的號碼</b>都填進來——手機、身分證、生日、車牌、銀行帳號、門牌——一次總體檢：目前是什麼狀況、哪顆星主導你的人生、缺什麼、哪個號碼在扯後腿。</p>
+    <div id="auditFields" style="display:grid;gap:8px">
+      <div style="display:flex;gap:8px"><select class="au-type" style="padding:0 8px;background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:10px"><option selected>手機</option><option>身分證</option><option>生日</option><option>IG帳號</option><option>車牌</option><option>銀行帳號</option><option>工作號碼</option><option>家用電話</option><option>門牌</option><option>其他</option></select><input class="au-in num-in" placeholder="號碼"></div>
+      <div style="display:flex;gap:8px"><select class="au-type" style="padding:0 8px;background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:10px"><option>手機</option><option selected>身分證</option><option>生日</option><option>IG帳號</option><option>車牌</option><option>銀行帳號</option><option>工作號碼</option><option>家用電話</option><option>門牌</option><option>其他</option></select><input class="au-in num-in" placeholder="號碼"></div>
+      <div style="display:flex;gap:8px"><select class="au-type" style="padding:0 8px;background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:10px"><option>手機</option><option>身分證</option><option selected>生日</option><option>IG帳號</option><option>車牌</option><option>銀行帳號</option><option>工作號碼</option><option>家用電話</option><option>門牌</option><option>其他</option></select><input class="au-in num-in" placeholder="號碼"></div>
+      <div style="display:flex;gap:8px"><select class="au-type" style="padding:0 8px;background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:10px"><option>手機</option><option>身分證</option><option>生日</option><option selected>IG帳號</option><option>車牌</option><option>銀行帳號</option><option>工作號碼</option><option>家用電話</option><option>門牌</option><option>其他</option></select><input class="au-in num-in" placeholder="號碼"></div>
+      <div style="display:flex;gap:8px"><select class="au-type" style="padding:0 8px;background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:10px"><option>手機</option><option>身分證</option><option>生日</option><option>IG帳號</option><option selected>車牌</option><option>銀行帳號</option><option>工作號碼</option><option>家用電話</option><option>門牌</option><option>其他</option></select><input class="au-in num-in" placeholder="號碼"></div>
+    </div>
+    <button class="add-btn" id="auAdd">＋ 再加一個號碼</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+      <input id="rpName" class="num-in" placeholder="客人姓名／稱呼（產報告用）" style="flex:2;min-width:170px;font-family:inherit">
+      <input id="rpTeacher" class="num-in" placeholder="鑑定老師" style="flex:1;min-width:110px;font-family:inherit">
+    </div>
+    <button class="go" id="auBtn">開始總體檢（老師分析版）</button>
+    <button class="go go-jade" id="rpBtn">🧾 產出客人報告（乾淨交件版）</button>
+    <button class="clear-btn" id="auClear">🗑 一鍵清空重填</button>
+    <div id="auResult" style="margin-top:14px"></div>
+    <div id="rpSheet" class="sheet-wrap"></div>
+    <div class="no-print" style="display:flex;gap:8px">
+      <button id="rpEdit" class="go" style="display:none;margin-top:10px;background:var(--card2);color:var(--gold);border:1px solid var(--gold)">✏️ 編輯報告</button>
+      <button id="rpPrint" class="go" style="display:none;margin-top:10px">🖨 列印／存 PDF</button>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ 車牌大吉選號 ══ -->
+<section id="plate">
+  <h2>車牌大吉選號</h2>
+  <div class="card calc">
+    <p style="margin-bottom:10px">輸入監理站給定的<b style="color:var(--gold)">英文字首</b>，自動列出卦象為<b style="color:var(--gold)">大吉</b>的所有數字組合，並附磁場評分，雙吉優先排序。</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <input id="platePrefix" placeholder="英文字首，例：ABF" style="flex:2;min-width:140px;padding:12px 14px;font-size:1.1em;letter-spacing:.15em;background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:10px;outline:none;text-transform:uppercase">
+      <select id="plateLen" style="flex:1;min-width:110px;padding:12px;background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:10px;font-size:1em">
+        <option value="4" selected>4 位數字</option>
+        <option value="3">3 位數字</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;font-size:.95em;align-items:center">
+      <label style="cursor:pointer"><input type="checkbox" id="optNo4" checked> 排除含 4</label>
+      <select id="optGua" style="padding:6px 10px;background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:8px">
+        <option value="all">全部大吉卦</option>
+        <option value="13">13 天火同人</option>
+        <option value="27">27 澤山咸</option>
+        <option value="35">35 火風鼎</option>
+        <option value="38">38 火地晉</option>
+        <option value="45">45 雷風恆</option>
+        <option value="53">53 風火家人</option>
+        <option value="54">54 風雷益</option>
+        <option value="82">82 地澤臨</option>
+      </select>
+    </div>
+    <div style="margin-top:12px">
+      <span style="color:var(--ji);font-weight:700;letter-spacing:.1em">必含吉星</span>
+      <span style="color:var(--muted);font-size:.85em">（點選，可複選）</span><br>
+      <span id="mustStars" style="display:inline-flex;gap:6px;flex-wrap:wrap;margin-top:6px">
+        <button class="star-chip" data-s="天醫">天醫</button>
+        <button class="star-chip" data-s="生氣">生氣</button>
+        <button class="star-chip" data-s="延年">延年</button>
+        <button class="star-chip" data-s="伏位">伏位</button>
+      </span>
+    </div>
+    <div style="margin-top:10px">
+      <span style="color:var(--xiong);font-weight:700;letter-spacing:.1em">排除凶星</span>
+      <span style="color:var(--muted);font-size:.85em">（預設全排，點掉可放寬；只檢查可選的數字段）</span><br>
+      <span id="banStars" style="display:inline-flex;gap:6px;flex-wrap:wrap;margin-top:6px">
+        <button class="star-chip ban on" data-s="絕命">絕命</button>
+        <button class="star-chip ban on" data-s="五鬼">五鬼</button>
+        <button class="star-chip ban on" data-s="六煞">六煞</button>
+        <button class="star-chip ban on" data-s="禍害">禍害</button>
+      </span>
+    </div>
+    <button class="go" id="plateBtn">找出大吉車牌</button>
+    <button class="clear-btn" id="plateClear">🗑 一鍵清空重填</button>
+    <div id="plateStats" style="margin-top:14px;color:var(--muted);font-size:.95em"></div>
+    <div id="plateList" style="margin-top:10px;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px"></div>
+    <button id="plateMore" style="display:none;margin-top:12px;width:100%;padding:10px;background:var(--card2);color:var(--gold);border:1px solid var(--gold);border-radius:10px;cursor:pointer;font-size:1em">顯示更多</button>
+  </div>
+</section>
+
+<!-- ══ 64卦速查 ══ -->
+<section id="gua64">
+  <h2>六十四卦速查</h2>
+  <div class="searchbar">
+    <input id="searchInput" placeholder="輸入編號（如 26）或卦名（如 澤水困）搜尋…">
+  </div>
+  <div class="filters" id="filters">
+    <button data-f="all" class="on">全部</button>
+    <button data-f="大吉">大吉</button>
+    <button data-f="吉">吉</button>
+    <button data-f="中吉">中吉</button>
+    <button data-f="吉凶參半">吉凶參半</button>
+    <button data-f="中凶">中凶</button>
+    <button data-f="凶">凶</button>
+  </div>
+  <div id="guaList"></div>
+</section>
+
+<!-- ══ 附錄 ══ -->
+<section id="appendix" class="appendix">
+  <h2>八卦附錄</h2>
+  <div class="card">
+    <div class="row"><div class="k">八卦</div><div>乾 ☰、兌 ☱、離 ☲、震 ☳、巽 ☴、坎 ☵、艮 ☶、坤 ☷</div></div>
+    <div class="row"><div class="k">代表</div><div>天、澤、火、雷、風、水、山、地</div></div>
+    <div class="row"><div class="k">數序</div><div>乾1、兌2、離3、震4、巽5、坎6、艮7、坤8</div></div>
+    <div class="row"><div class="k">八門</div><div>天門、驚門、景門、傷門、杜門、休門、生門、鬼門</div></div>
+    <div class="row"><div class="k">卦形歌</div><div>乾三連、兌上缺、離中虛、震仰盂、巽下斷、坎中滿、艮覆碗、坤六斷</div></div>
+  </div>
+</section>
+
+<footer>神奇身心靈學苑 × 靈應壇 ｜ 內部教學參考</footer>
+</main>
+
+<script>
+/* ── 主題／字級（依 K 標準：localStorage + color-scheme 同步）── */
+const htmlEl = document.documentElement;
+function applyTheme(t){
+  htmlEl.setAttribute('data-theme', t);
+  htmlEl.style.colorScheme = t;
+  localStorage.setItem('yijing_theme', t);
+}
+function applyFont(big){
+  htmlEl.style.setProperty('--fs', big ? '17px' : '15px');
+  localStorage.setItem('yijing_font', big ? '1' : '0');
+}
+applyTheme(localStorage.getItem('yijing_theme') || 'dark');
+applyFont(localStorage.getItem('yijing_font') === '1');
+document.getElementById('themeBtn').onclick = () =>
+  applyTheme(htmlEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+document.getElementById('fontBtn').onclick = () =>
+  applyFont(localStorage.getItem('yijing_font') !== '1');
+
+/* ── 八卦資料 ── */
+const TRI = {1:['乾','☰','天'],2:['兌','☱','澤'],3:['離','☲','火'],4:['震','☳','雷'],5:['巽','☴','風'],6:['坎','☵','水'],7:['艮','☶','山'],8:['坤','☷','地']};
+
+/* ── 64卦資料 [編號, 序卦, 卦名, 吉凶, 象語, 愛情, 婚姻, 願望, 考試, 求職, 糾紛] ── */
+const G = [
+[11,'第一卦','乾為天','吉','顛峰之象・無形的主宰','可成功，但自私心過強可能招致破裂。','可成。然而男女往往好高騖遠，理想過高以致失敗。','可成，仍必須虛心處事。','成績優秀，但切勿大意失荊州。','有貴人提拔。','有理可勝，然強權奪理後果堪慮。'],
+[12,'第十卦','天澤履','中吉','化險為夷之象・克己復禮之道','障礙多，需要努力方能成功。','雖是良緣，但障礙多不容易成就。','不能達成。','成績剛好及格。','無法馬上找到。','不利，最好採取和平解決的方式。'],
+[13,'第十三卦','天火同人','大吉','同心協力之象・通天下之志','倆相思，必成功。','為和好之良緣。','可以達成。','成績好。','可以找到。','可以和解。'],
+[14,'第二十五卦','天雷無妄','吉凶參半','無妄之象・至誠合天德','真誠相處，即可成功。','真誠相待即可獲得永久幸福。','真誠以赴即可成功，否則會失敗。','認真用功必得良好成績；投機取巧必會失敗。','真誠為之必可獲得。','理直氣壯的爭執必勝；無理即敗。'],
+[15,'第四十四卦','天風姤','凶','邂逅之象・防微於陰始明','障礙多，而不能成功。','為徒勞無功之凶緣。','因阻礙而歸於失敗。','成績差。','不能謀就。','不利，宜和解。'],
+[16,'第六卦','天水訟','凶','相爭之象・作事謀始以防訟','失敗不如意。','不吉利，不成功。','無法達成。','成績差。','不成功。','不利，委託長輩和解較為有利。'],
+[17,'第三十三卦','天山遯','凶','隱遁之象・退避自保以待時','不能有結局。','為無法撮合，或別離之象。','不能順遂。','名落孫山。','不順利。','失敗不利。'],
+[18,'第十二卦','天地否','中凶','閉塞不通之象','被拒於千里之外。','不能成功。','不能達成。','成績不如意。','沒有希望。','失敗之象。'],
+[21,'第四十三卦','澤天夬','凶','決斷之象・決去其所當決','不成功或以悲劇收場。','不成功，阻礙多。','可以成功，但必須誠實努力推展。','成績差。','不能謀得好職位。','失敗或不利。'],
+[22,'第五十八卦','兌為澤','吉','喜悅之象・悅順之道','可成功。','為幸福美滿之良緣。','可成功。','成績好。','可成功。','可和解。'],
+[23,'第四十九卦','澤火革','中吉','革新之象・革故鼎新之道','可成功。','未婚者宜另找對象。','可實現，但有困難。','成績良好，但不是很理想。','目前不能謀得好職位。','唯有以強硬態度進行，方可獲得有利的解決。'],
+[24,'第十七卦','澤雷隨','吉','隨和之象・隨緣不變，不變隨緣','可成就，但過分沉溺於情慾的滿足則會破裂。','可成功，但婚後必須嚴守夫婦之道，否則會有不幸之惡果。','能得到他人的幫助而實現。','成績良好。','有上司提拔。','不利，和解為有利。'],
+[25,'第二十八卦','澤風大過','凶','過度之象・獨立不懼、避世無悶','沒有成功的希望。','不相稱，無法撮合；或感情不合，生離死別之凶象。','期望過高以至於不能有所成就。','必須努力用功，方有好成績。','困難多多，須盡力謀取方可成功。','發生嚴重的困難，和解不易。'],
+[26,'第四十七卦','澤水困','凶','困頓之象・處困而致命遂志','不能成功。','為勞苦不幸之凶緣。','不成功，須等待時機。','成績差。','無望。','不易解決。'],
+[27,'第三十一卦','澤山咸','大吉','交感共鳴之象・交感而生化不息','可成功。','為順利之良緣，大吉大利。','能達成。','成績良好。','順利。','不利，冷靜和解為宜。'],
+[28,'第四十五卦','澤地萃','吉','聚集之象・聚集歸附之象','可成功。','為和好幸福之良緣。','可實現。','成績好。','可以找到。','宜趁早和解，不宜爭吵。'],
+[31,'第十四卦','火天大有','吉','盛運之象・文明富足之象','成功不成問題，然而不能太驕傲，否則會失敗。','吉祥如意。','可達成，但須謹慎為要。','成績優良，但要繼續努力。','順利。','圓滿解決。'],
+[32,'第三十八卦','火澤睽','凶','相乖不和之象・乖違隔離之象','不成功。','不成功，為生離死別之象。','小願望可達成，大願望則不能實現。','成績差。','無望。','不利，應以和解息事寧人。'],
+[33,'第三十卦','離為火','吉','明智之象・明德照四方','性急或衝動則失敗。','是為良緣，大吉大利。','以誠待人必能如願。','成績好。','等待時機成熟，就能獲得很好的職位。','須以冷靜的態度和平解決才有利；意氣用事則招致不利。'],
+[34,'第二十一卦','火雷噬嗑','凶','含剛之象・治獄之道','有人從中阻礙，但只要有耐心追求終可成功。','最初阻礙多、意見不合，以後逐漸一致，但不一定會成就。','阻礙多，不易達成目的。','成績平平。','困難多多，唯有堅忍積極方可成功。','以強硬的態度處理，一切困難即可解決。'],
+[35,'第五十卦','火風鼎','大吉','協力之象・凝重安定以新命','可成功。','幸福繁榮之良緣。','能達成。','成績優良。','可謀就。','絕對勝利。'],
+[36,'第六十四卦','火水未濟','中吉','希望之象・貞上啟元，生生不息','只要以誠待人、耐心等待，可成功。','先勞苦後幸福之象。','暫時無望，但只要沉著忍耐，亦可獲得成功。','成績好。','暫時無望，但耐心等待、努力尋找，能得到意外的好職位。','和解為有利。'],
+[37,'第五十六卦','火山旅','中凶','流浪不安之象・居不安而道不廢','會失敗。','為不如意、不穩定之凶緣。','小願望可達成，宏遠則沒有希望。','成績差。','不能謀就。','宜和睦，不和睦則有災。'],
+[38,'第三十五卦','火地晉','大吉','晉升之象・光明磊落，奮發以進','成功無疑。','大吉大利。','可獲圓滿達成。','成績優良。','得長輩之提拔，可得好職業。','獲得有利之解決。'],
+[41,'第三十四卦','雷天大壯','吉','崛起壯大之象・正大壯盛之態勢','可成功。','能成功，且為繁榮幸福之良緣。','可達成目的，但切忌貪得無厭。','可得良好成績，但不可過份驕傲。','沒有問題。','和解為宜，不可發生爭執。'],
+[42,'第五十四卦','雷澤歸妹','凶','注意進退之象・婚姻與人生','此為孽緣，最後會以悲劇收場。','為不幸之凶緣。','不能實現。','成績差。','不能謀就。','無理取鬧，注定失敗。'],
+[43,'第五十五卦','雷火豐','吉','盈虛之象・日中則昃，月盈則蝕','可成功。','幸福美滿之良緣。','能順利達成目的。','成績優秀。','可謀得好職位。','能獲勝或得到有利的解決。'],
+[44,'第五十一卦','震為雷','中吉','震驚激動之象・震起以除逸惰','雖有波瀾與阻礙，但終能成功。','最初有阻礙，但會成功。','可獲得成功。','成績良好。','有困難。','宜和解，否則有大害。'],
+[45,'第三十二卦','雷風恆','大吉','恆久安定之象・立不易方之恆德','可成功。','長久和好、順利撮合，大吉大利之良緣。','能達成。','成績良好。','可得到良好之職業。','大凶，冷靜和解方為有利。'],
+[46,'第四十卦','雷水解','吉','解困之象・舒解和暢之象','不能猶豫不決，應加緊努力，以獲取成功。','初為辛勞與艱苦，以後慢慢開運而幸福美滿。','可達成，但勿躊躇以失良機。','成績良好。','可獲得圓滿之職位，但必須把握機會。','可得到有力的解決。'],
+[47,'第六十二卦','雷山小過','凶','過度之象・過與不及調適之道','對方可能會變心，而沒結果。','為不和或別離之凶緣。','小願望可成，大願望不成。','成績差，不及格。','無望。','不利，宜和解。'],
+[48,'第十六卦','雷地豫','吉','喜悅之象・豫樂的人生','可成功，但我行我素則失敗。','能順利撮合，美滿幸福。','可成就。','成績良好。','能得上司的提拔而上進。','和解為有利。'],
+[51,'第九卦','風天小畜','凶','養精蓄銳之象・畜小而未見大用','障礙多，不易成功。','不和睦，阻礙多。','有阻礙不能達成。','成績差。','暫時不能找到職業。','時間拉長而困難多端，不易解決。'],
+[52,'第六十一卦','風澤中孚','吉','誠意互信之象・誠信感物之道','以誠待之會成功。','為和好繁榮之良緣。','可以順利達成，但缺乏誠意即敗。','成績良好。','順利。','誠意和解會成功。'],
+[53,'第三十七卦','風火家人','大吉','倫理齊家之象・齊家之道','可成功。','為大吉大利之良緣。','可達成。','成績良好。','順利。','不利，以溫和的態度和解為吉。'],
+[54,'第四十二卦','風雷益','大吉','順益之象・損上益下之象','可成功。','能百年好合。','可達成。','成績特優。','可得到好職位。','可以獲勝。'],
+[55,'第五十七卦','巽為風','吉','順從隱忍之象・柔弱之道','不要盲目，可成功。','有波瀾，須委託有力人士做媒，當可成功。','性急不成功，沉著進行可也。','成績中等。','應請有力人士介紹方可成功。','障礙與困難多，應委託有力人士出面調解。'],
+[56,'第五十九卦','風水渙','中吉','渙散之象・舒散消解之道','最初難免有所阻礙，但只要有始有終定可成功。','初難免勞苦，但將來必定幸福美滿。','可成功。','成績良好。','可成就。','可緩不可急。'],
+[57,'第五十三卦','風山漸','中吉','進展之象・遠行自近，登高自卑','可成功。','為幸福之良緣。','目前不能實現，需等待時機。','成績漸有進步。','可謀得好職位，但頗費時間。','爭吵即不利，和解為宜。'],
+[58,'第二十卦','風地觀','凶','靜觀之象・省察周遍以正風氣','困難多，成功難。','困難多，成功難。','看起來好像有希望，其實不能達成。','成績差。','困難多端，不易成就，必須等待機會之來臨。','不宜爭吵，否則不利。'],
+[61,'第五卦','水天需','中凶','等待之象・飲食宴樂以待時','不能操之過急，需忍耐接觸與誠實待之，方能有所獲。','始為徒勞無功，中為煩惱阻礙眾多，但只要有恆心努力下去，必能有好結果。','無法立即實現，要有耐心繼續努力方可成功。','不如意，成績差。','無法立即找到職業，需耐心尋找方可有良好職位。','不利，停止或和解為宜。'],
+[62,'第六十卦','水澤節','吉凶參半','節制之象・調和節制之道','有耐心則可成功，否則失敗。','不可操之過急，耐心進行即可成功。','暫時無望，需耐心等待有利時機的降臨。','成績良好。','暫時無望，需耐心等待機會。','要耐心交涉，衝動則失敗。'],
+[63,'第六十三卦','水火既濟','吉凶參半','維持安定之象・思守成而豫防之','有一時的成功，但終究歸於失敗。','最初為和好，但須提防婚變解除婚姻。','不能太大意，否則功敗垂成。','成績良好。','可能有臨時性的工作或不成功。','最初好像對我方有利，其實到最後適得其反，宜和解。'],
+[64,'第三卦','水雷屯','凶','艱難之象・創發之艱難','障礙多多，要有耐心，方有成功希望。','好事多磨，要有耐心與毅力方能得良緣。','要容忍方有成功希望。','成績差。','障礙多，不易找到；依賴長輩的關係，耐心去應徵方有所獲。','爭吵勢必不利，應心平氣和處理。'],
+[65,'第四十八卦','水風井','中凶','付出之象・民生相養之道','操之過急必遭失敗，應聽其自然、以誠待之方能成功。','為平安幸福之良緣。','目前無望，唯有努力方可達成目的。','成績平平。','暫時不能謀就，委託長輩代為尋找方可成功。','不利，宜和解。'],
+[66,'第二十九卦','坎為水','凶','艱難之象・處險習教之道','有成功希望，但波折多。','障礙多，難成立。','不易達成，宜待時機。','成績差。','暫時無望，需等待一個時期。','不利，宜和解。'],
+[67,'第三十九卦','水山蹇','凶','躊躇艱難之象・克難匡時之道','不成功。','不成功，為多勞苦、多阻礙之凶緣。','成功無望。','成績差，不及格。','必須全權委託長輩等待時機方可求得好職位，否則無望。','不易處理，會拖延。'],
+[68,'第八卦','水地比','吉','親和之象・相輔相親之道','彼此相思而必成之象。','大吉，如意吉祥。','可成。','成績好。','有人提拔，前途光明。','爭執為凶；以溫和的態度和解，既容易解決又可得利。'],
+[71,'第二十六卦','山天大畜','中吉','勤勉致富之象・畜德養賢之道','阻礙與困難重重，但真誠以待，必能成功。','有障礙，但以真誠之心待之即可成功，是幸福。','不易達成，但誠實努力仍可成功。','成績優良。','謀職費時，但可找到好職業。','有困難，要花費長時間方可解決。'],
+[72,'第四十一卦','山澤損','中吉','謹言慎行之象・損下益上之象','下決心，以誠待之可成功。','是良緣，但阻礙多。','不能立即達成，須多用心努力往前推進才能達成。','成績差。','暫時無法獲得理想職位。','不利，和解為宜。'],
+[73,'第二十二卦','山火賁','吉','粉飾之象・文飾與文明','能成功，但因情況不明，估計對方過高而失望。','雙方必須以誠相待，避免虛榮與奢侈方為良緣。','可達成。','得到理想的好成績。','可以謀就。','不利。'],
+[74,'第二十七卦','山雷頤','中吉','養身之象・慎言語、節飲食','此為意亂情迷、錯估對方之象，必須冷靜評估方為吉。','成敗繫於彼此間的誠意與努力，不可狂傲。','用心與努力不懈而為方可成功，否則失敗。','須加強用功才可得到好成績，但要注意身體的健康。','不能立刻謀就，須待時機。','不利，應和平解決為上策。'],
+[75,'第十八卦','山風蠱','凶','蠱惑廢弛之象・整飭振興之道','關係複雜、苦惱繁多，不宜繼續往來。','為多障礙之孽緣。','得不到結果。','成績差。','不易成功。','時間拖長，不易解決。'],
+[76,'第四卦','山水蒙','中凶','啟蒙之象・啟蒙的教育','因缺乏勇氣與決斷而失敗。','成功的機會渺茫，要等待。','很難達成。','成績不如意。','不可能立刻謀得職業，需要耐心等待與尋找。','徒勞無功，拖延時間為不吉。'],
+[77,'第五十二卦','艮為山','中凶','停滯阻止之象・知止與安養之道','為單相思而不能成功。','有阻礙，或為勞苦不和之凶緣。','不能實現。','成績差。','不能謀就。','宜正直處事。'],
+[78,'第二十三卦','山地剝','凶','脫序之象・外華內虛之勢','被拒於外，不能成功。','被拒於外，不能成功。','不能達成。','成績差，名落孫山。','不能找到職業。','慘敗而陷於極端苦難中。'],
+[81,'第十一卦','地天泰','吉','安泰之象・通泰安福的現象','情投意合，但不可太大意，否則會破壞姻緣。','和好幸福。','可達成。','成績良好，如意。','順利。','和解較為有利。'],
+[82,'第十九卦','地澤臨','大吉','更生發揚之象・至誠臨民教民','可成就。','百年好合之良緣。','可達成。','成績良好。','一切順利。','和解就有利。'],
+[83,'第三十六卦','地火明夷','凶','晦暗之象・黑暗憂患之世','阻礙大，不成功。','為勞苦與障礙多之凶緣。','不得要領，須等待時機的到來方可達成。','成績差。','暫時無望，等候一段時間方可謀就。','失敗或招致不利。'],
+[84,'第二十四卦','地雷復','吉','復甦回春之象・復見天地之心','性急即敗；以有恆與誠實待之即能成功。','為逐漸邁向幸福之境的良緣。','可成功，然而性急即敗。','有進步，成績較好。','沒有問題，但要有恆心才能成功。','能得到有利的解決。'],
+[85,'第四十六卦','地風升','吉','上昇之象・積小以致高大','可成功，但不可操之過急。','為幸福和好之良緣。','可達成，但不可操之過急。','成績良好。','可謀就。','可獲勝或得到有利的解決。'],
+[86,'第七卦','地水師','凶','征戰之象・領導統御之學','不成功。','不吉。','困難重重，毫無成就；耐心努力奮鬥，將來方有希望。','成績不如意。','沒有希望。','諸多困難，要以強硬果斷對付方可取勝。'],
+[87,'第十五卦','地山謙','吉','謙虛之象・內蘊其德以自牧','可成功。','和好順利，幸福美滿。','誠實待人，一切可成就，不可一意孤行。','成績良好。','沒有問題。','宜早和解。'],
+[88,'第二卦','坤為地','吉','保守之象・造化的根源','能成功，但不能意氣用事，否則會失敗。','有成功希望。','不可性急，只要按部就班、有恆地做下去，必有成功的一天。','成績平凡。','須等待時機到來，方可找到職業。','不利，宜和解。']
+];
+
+/* ── 大吉理由（斷語全順、且核心問事出現最強字眼） ── */
+const DAJI = {
+13:'天火同人：上下同心、通天下之志。六項斷語全順無一警語，倆相思必成、可和解，人和之極。',
+27:'澤山咸：少男少女交感相應。婚姻明言「大吉大利」，感應相通、有求必應。',
+35:'火風鼎：鼎新安定、三足承天。糾紛「絕對勝利」為全書最強斷語，六項全吉。',
+38:'火地晉：如日初出地上、光明上進。「成功無疑」「大吉大利」，晉升之勢不可擋。',
+45:'雷風恆：恆久安定、立不易方。婚姻「大吉大利之良緣」，吉在長久（唯訟事例外，宜冷靜和解）。',
+53:'風火家人：齊家之道、內外有序。婚姻「大吉大利之良緣」，家和則萬事興。',
+54:'風雷益：損上益下、天施地生。考試特優、糾紛可獲勝，六項全部無條件正面。',
+82:'地澤臨：陽氣浸長、君臨萬物。婚姻「百年好合」，一切順利、事事可成。'
+};
+
+/* ── 渲染64卦 ── */
+const CATS = ['愛情','婚姻','願望','考試','求職','糾紛'];
+const listEl = document.getElementById('guaList');
+function render(){
+  const kw = document.getElementById('searchInput').value.trim();
+  const f = document.querySelector('#filters .on').dataset.f;
+  listEl.innerHTML = G.filter(g=>{
+    if(f!=='all' && g[3]!==f) return false;
+    if(!kw) return true;
+    return String(g[0]).includes(kw) || g[2].includes(kw) || g[1].includes(kw);
+  }).map(g=>{
+    const up = TRI[Math.floor(g[0]/10)], dn = TRI[g[0]%10];
+    return `<div class="gua-card" data-id="${g[0]}">
+      <div class="gua-head" onclick="this.parentNode.classList.toggle('open')">
+        <span class="code">${g[0]}</span>
+        <span class="tris">${up[1]}${dn[1]}</span>
+        <span>
+          <span class="name serif">${g[2]}</span><br>
+          <span class="sub">${g[1]}・${up[0]}上${dn[0]}下</span>
+        </span>
+        <span class="badge b-${g[3]}">${g[3]}</span>
+      </div>
+      <div class="gua-body">
+        <div class="gua-motto">${g[4]}</div>
+        ${DAJI[g[0]] ? `<div style="border:1px solid var(--gold);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:.93em"><b style="color:var(--gold)">為何大吉</b>｜${DAJI[g[0]]}</div>` : ''}
+        <dl class="qa">${CATS.map((c,i)=>`<dt>${c}</dt><dd>${g[5+i]}</dd>`).join('')}</dl>
+      </div>
+    </div>`;
+  }).join('') || '<div class="card" style="text-align:center;color:var(--muted)">查無符合的卦象</div>';
+}
+document.getElementById('searchInput').addEventListener('input', render);
+document.querySelectorAll('#filters button').forEach(b=>{
+  b.onclick = ()=>{ document.querySelector('#filters .on').classList.remove('on'); b.classList.add('on'); render(); };
+});
+render();
+
+/* ── 取卦計算機 ── */
+function letterVal(ch){ return (ch.charCodeAt(0)-65)%8+1; }
+function reduce8(sum){
+  if(sum===0) return null;
+  if(sum<8) return {v:sum, note:`${sum} 不足 8 → 取 ${sum}`};
+  const r = sum%8;
+  if(r===0) return {v:8, note:`${sum} 可被 8 整除 → 取 8`};
+  return {v:r, note:`${sum} ÷ 8 = ${Math.floor(sum/8)} 餘 ${r} → 取 ${r}`};
+}
+function calc(){
+  const raw = document.getElementById('calcInput').value.toUpperCase();
+  let chars = raw.replace(/[^A-Z0-9]/g,'').split('');
+  const out = document.getElementById('calcCard');
+  if(!chars.length){ out.innerHTML=''; return; }
+  let padded = false;
+  if(chars.length%2===1){ chars.unshift('0'); padded = true; }
+  const half = chars.length/2;
+  const front = chars.slice(0,half), back = chars.slice(half);
+  const expand = seg => seg.map(c => /[A-Z]/.test(c) ? letterVal(c) : +c);
+  const fv = expand(front), bv = expand(back);
+  const fSum = fv.reduce((a,b)=>a+b,0), bSum = bv.reduce((a,b)=>a+b,0);
+  const dn = reduce8(fSum), up = reduce8(bSum);
+  const steps = document.getElementById('steps');
+  const res = document.getElementById('guaResult');
+  if(!dn || !up){
+    steps.classList.remove('show'); res.classList.remove('show');
+    out.innerHTML = '<div class="card" style="color:var(--xiong)">段落總和為 0，無法取卦，請確認號碼。</div>';
+    return;
+  }
+  const letterNote = raw.match(/[A-Za-z]/) ? '（英文已依對照表換算）' : '';
+  document.getElementById('stepDown').innerHTML =
+    `<b>下掛</b>（前段 ${front.join('')}）${padded?'<br>奇數位數，前補 0':''}<br>${fv.join('+')} = ${fSum}<br>${dn.note} → 下掛 <b>${dn.v}</b>`;
+  document.getElementById('stepUp').innerHTML =
+    `<b>上掛</b>（後段 ${back.join('')}）${letterNote}<br>${bv.join('+')} = ${bSum}<br>${up.note} → 上掛 <b>${up.v}</b>`;
+  steps.classList.add('show');
+  document.getElementById('triUp').textContent = TRI[up.v][1]+' '+TRI[up.v][0];
+  document.getElementById('triDown').textContent = TRI[dn.v][1]+' '+TRI[dn.v][0];
+  res.classList.add('show');
+  const id = up.v*10 + dn.v;
+  const g = G.find(x=>x[0]===id);
+  out.innerHTML = `<div class="gua-card open">
+    <div class="gua-head">
+      <span class="code">${id}</span>
+      <span class="tris">${TRI[up.v][1]}${TRI[dn.v][1]}</span>
+      <span><span class="name serif">${g[2]}</span><br><span class="sub">${g[1]}・${TRI[up.v][0]}上${TRI[dn.v][0]}下</span></span>
+      <span class="badge b-${g[3]}">${g[3]}</span>
+    </div>
+    <div class="gua-body" style="display:block">
+      <div class="gua-motto">${g[4]}</div>
+      ${DAJI[g[0]] ? `<div style="border:1px solid var(--gold);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:.93em"><b style="color:var(--gold)">為何大吉</b>｜${DAJI[g[0]]}</div>` : ''}
+      <dl class="qa">${CATS.map((c,i)=>`<dt>${c}</dt><dd>${g[5+i]}</dd>`).join('')}</dl>
+      <p style="margin-top:10px;color:var(--cinnabar);font-weight:700">★ 提醒：對客只報吉凶，不給卦象內容</p>
+    </div>
+  </div>`;
+}
+document.getElementById('calcBtn').onclick = calc;
+document.getElementById('calcInput').addEventListener('keydown', e=>{ if(e.key==='Enter') calc(); });
+
+/* ══ 數字能量：八星磁場 ══ */
+const STARS = {
+  '天醫':{t:'吉',d:'財富姻緣',p:'心地善良、樂於付出、對錢不計較',x:'財源順、貴人多、感情有緣分',w:'易被借錢不還、當爛好人'},
+  '生氣':{t:'吉',d:'貴人人緣',p:'樂天隨和、人緣好、樂於助人',x:'機會與貴人多，但步調偏慢、容易安逸',w:'計畫多執行少、慢半拍錯失時機'},
+  '延年':{t:'吉',d:'事業領導',p:'責任感重、專業強、有領導格局',x:'工作狂、凡事親力親為、說到做到',w:'固執勞碌、壓力大不易放鬆'},
+  '伏位':{t:'平',d:'穩定蓄勢',p:'謹慎保守、有耐性、忍功一流',x:'處於等待蓄勢期、變動少、按兵不動',w:'猶豫不決、過於被動而錯失時機'},
+  '絕命':{t:'凶',d:'極端破財',p:'敢衝敢賭、決斷極端、大起大落',x:'投資投機性強、財來財去、行動派',w:'易破財、意外、衝動下重大決策'},
+  '五鬼':{t:'凶',d:'小人暗耗',p:'鬼點子多、聰明多疑、心思不定',x:'收入不穩、變動頻繁（換工作、搬遷）、有偏財也有暗耗',w:'小人是非、想太多失眠、易被騙'},
+  '六煞':{t:'凶',d:'糾纏情緒',p:'異性緣好、感性重情、情緒起伏大',x:'人際與感情糾纏、內耗猶疑、為情所困',w:'爛桃花、情緒化消費、心情左右決策'},
+  '禍害':{t:'凶',d:'口舌是非',p:'口才好、好辯、嘴硬心軟',x:'口舌是非不斷、健康小毛病多',w:'禍從口出、合約糾紛、注意脾胃與慢性病'}
+};
+const PAIR = {};
+[['天醫','13 31 68 86 49 94 27 72'],['生氣','14 41 67 76 39 93 28 82'],
+ ['延年','19 91 78 87 34 43 26 62'],['伏位','11 22 33 44 66 77 88 99'],
+ ['絕命','12 21 69 96 48 84 37 73'],['五鬼','18 81 79 97 36 63 24 42'],
+ ['六煞','16 61 47 74 38 83 29 92'],['禍害','17 71 89 98 46 64 23 32']
+].forEach(([s,ks])=>ks.split(' ').forEach(k=>PAIR[k]=s));
+
+function toDigits(raw){
+  return raw.toUpperCase().replace(/[^A-Z0-9]/g,'').split('')
+    .map(c=>/[A-Z]/.test(c)?letterVal(c):+c);
+}
+function magAnalyze(raw){
+  const all = toDigits(raw);
+  const seq = all.filter(d=>d!==0&&d!==5);
+  const pairs=[];
+  for(let i=0;i<seq.length-1;i++){
+    const key=''+seq[i]+seq[i+1];
+    pairs.push({key, star:PAIR[key]});
+  }
+  let good=0,bad=0,flat=0,score=0;
+  pairs.forEach(p=>{
+    const t=STARS[p.star].t;
+    if(t==='吉'){good++;score+=2}
+    else if(t==='平'){flat++;score+=1}
+    else{bad++;score-=2}
+  });
+  return {pairs,good,bad,flat,score,skipped:all.length-seq.length};
+}
+function magChips(m){
+  return m.pairs.map(p=>`<span class="chip c-${STARS[p.star].t}">${p.key} ${p.star}</span>`).join('');
+}
+
+/* 純函式起卦：回傳 {id, up, dn} */
+function guaOf(raw){
+  let c = raw.toUpperCase().replace(/[^A-Z0-9]/g,'').split('');
+  if(!c.length) return null;
+  if(c.length%2) c.unshift('0');
+  const h=c.length/2, ex=s=>s.map(x=>/[A-Z]/.test(x)?letterVal(x):+x);
+  const f=ex(c.slice(0,h)).reduce((a,b)=>a+b,0), b=ex(c.slice(h)).reduce((a,b)=>a+b,0);
+  if(f===0||b===0) return null;
+  const r8=s=>{const r=s%8;return s<8?s:(r===0?8:r)};
+  const dn=r8(f), up=r8(b);
+  return {id:up*10+dn, up, dn};
+}
+
+/* 綜合評估：接在 calc() 之後跑 */
+const _calcOld = calc;
+calc = function(){
+  _calcOld();
+  const raw = document.getElementById('calcInput').value;
+  const magEl = document.getElementById('magCard');
+  const vEl = document.getElementById('verdictCard');
+  const gua = guaOf(raw);
+  if(!gua){ magEl.innerHTML=''; vEl.innerHTML=''; return; }
+  const m = magAnalyze(raw);
+  const g = G.find(x=>x[0]===gua.id);
+  /* 解讀：出現過的星去重統計；前段=過往底色、尾組=近期主導 */
+  const found = {};
+  m.pairs.forEach((p,i)=>{ (found[p.star]=found[p.star]||{n:0,idx:[]}).n++; found[p.star].idx.push(i); });
+  const order = Object.keys(found).sort((a,b)=>found[b].n-found[a].n);
+  const lastStar = m.pairs.length ? m.pairs[m.pairs.length-1].star : null;
+  let readHtml = '';
+  if(order.length){
+    const pLines = order.map(s=>`<dt style="color:${STARS[s].t==='凶'?'var(--xiong)':STARS[s].t==='平'?'var(--ban)':'var(--ji)'};font-weight:700;white-space:nowrap">${s}×${found[s].n}</dt><dd>${STARS[s].p}</dd>`).join('');
+    const xLines = order.map(s=>`<dt style="color:var(--muted);font-weight:700;white-space:nowrap">${s}</dt><dd>${STARS[s].x}</dd>`).join('');
+    const wStars = order.filter(s=>STARS[s].t==='凶').concat(order.filter(s=>STARS[s].t!=='凶'));
+    const wLines = wStars.map(s=>`<dt style="color:var(--cinnabar);font-weight:700;white-space:nowrap">${s}</dt><dd>${STARS[s].w}</dd>`).join('');
+    readHtml = `
+      <div style="border-top:1px dashed var(--line);margin-top:12px;padding-top:12px">
+        <p style="color:var(--gold);font-weight:700;letter-spacing:.1em">性格底色</p>
+        <dl class="qa" style="margin-top:6px">${pLines}</dl>
+        <p style="color:var(--gold);font-weight:700;letter-spacing:.1em;margin-top:12px">現況與過往</p>
+        <dl class="qa" style="margin-top:6px">${xLines}</dl>
+        <p style="color:var(--gold);font-weight:700;letter-spacing:.1em;margin-top:12px">可能發生・提醒</p>
+        <dl class="qa" style="margin-top:6px">${wLines}</dl>
+        ${lastStar?`<p style="margin-top:12px;font-size:.92em;color:var(--muted)">※ 尾組磁場 <b style="color:${STARS[lastStar].t==='凶'?'var(--xiong)':'var(--ji)'}">${lastStar}</b> 為近期主導能量；越靠前段代表越底層／過往的慣性。</p>`:''}
+      </div>`;
+  }
+  magEl.innerHTML = `<div class="gua-card open" style="margin-top:12px">
+    <div class="gua-head"><span class="name serif" style="color:var(--gold)">數字能量磁場</span>
+      <span class="badge ${m.bad===0?(m.good>0?'b-吉':'b-吉凶參半'):'b-凶'}">${m.bad===0?(m.good>0?'磁場全吉':'平穩'):'含凶星'}</span></div>
+    <div class="gua-body" style="display:block">
+      <div>${magChips(m) || '<span style="color:var(--muted)">有效數字不足兩碼，無法成組</span>'}</div>
+      <p style="color:var(--muted);font-size:.9em;margin-top:8px">吉星 ${m.good}｜伏位 ${m.flat}｜凶星 ${m.bad}${m.skipped?`｜略過 0/5 共 ${m.skipped} 碼`:''}</p>
+      ${readHtml}
+    </div></div>`;
+  const guaGood = g[3]==='大吉'||g[3]==='吉';
+  let verdict, cls;
+  if(g[3]==='大吉' && m.bad===0){ verdict='雙料大吉 —— 卦象大吉、磁場無凶，可放心取用'; cls='b-大吉'; }
+  else if(guaGood && m.bad===0){ verdict='兩派皆吉 —— 卦象吉、磁場乾淨，屬上選'; cls='b-吉'; }
+  else if(guaGood && m.bad>0){ verdict=`卦吉但磁場帶 ${m.bad} 組凶星 —— 問事可用，長期持有再斟酌`; cls='b-吉凶參半'; }
+  else if(!guaGood && m.bad===0){ verdict='磁場乾淨但卦象不吉 —— 養運尚可，問此事不宜'; cls='b-吉凶參半'; }
+  else { verdict='卦象與磁場皆不理想 —— 建議換號'; cls='b-凶'; }
+  vEl.innerHTML = `<div class="card" style="margin-top:12px;text-align:center">
+    <span class="badge ${cls}" style="font-size:1.05em">綜合評估</span>
+    <p style="margin-top:10px;font-weight:700">${verdict}</p></div>`;
+};
+document.getElementById('calcBtn').onclick = calc;
+document.getElementById('calcInput').addEventListener('keydown', e=>{ if(e.key==='Enter'){e.preventDefault();calc();} });
+
+/* ══ 車牌大吉選號 ══ */
+const DAJI_IDS = new Set([13,27,35,38,45,53,54,82]);
+let plateResults = [], plateShown = 0;
+function genPlates(){
+  const prefix = document.getElementById('platePrefix').value.toUpperCase().replace(/[^A-Z0-9]/g,'');
+  const len = +document.getElementById('plateLen').value;
+  const no4 = document.getElementById('optNo4').checked;
+  const guaSel = document.getElementById('optGua').value;
+  const must = [...document.querySelectorAll('#mustStars .star-chip.on')].map(b=>b.dataset.s);
+  const ban  = new Set([...document.querySelectorAll('#banStars .star-chip.on')].map(b=>b.dataset.s));
+  const stats = document.getElementById('plateStats');
+  if(!prefix){ stats.textContent='請先輸入英文字首'; return; }
+  plateResults = [];
+  const max = Math.pow(10,len);
+  // 先掃可達卦象：字首＋位數若使下掛固定，可能整批與大吉無緣
+  const reach = new Set();
+  for(let n=0;n<max;n++) { const g=guaOf(prefix+String(n).padStart(len,'0')); if(g) reach.add(g.id); }
+  let tier='大吉', targetIds=new Set([...DAJI_IDS].filter(id=>reach.has(id))), downgraded=false;
+  if(guaSel!=='all'){ targetIds = new Set([+guaSel]); }
+  else if(targetIds.size===0){
+    // 降級：找可達的「吉」卦
+    tier='吉'; downgraded=true;
+    targetIds = new Set(G.filter(g=>g[3]==='吉' && reach.has(g[0])).map(g=>g[0]));
+  }
+  for(let n=0;n<max;n++){
+    const num = String(n).padStart(len,'0');
+    if(no4 && num.includes('4')) continue;
+    const gua = guaOf(prefix+num);
+    if(!gua || !targetIds.has(gua.id)) continue;
+    const m = magAnalyze(prefix+num);
+    // 排除凶星只看「可選擇的數字段」：字首最後一碼＋數字（字首固有磁場無法改變）
+    const mChoice = magAnalyze(prefix.slice(-1)+num);
+    if(ban.size && mChoice.pairs.some(p=>ban.has(p.star))) continue;
+    // 必含吉星看整面車牌（字首帶到也算）
+    if(must.length){
+      const has = new Set(m.pairs.map(p=>p.star));
+      if(!must.every(s=>has.has(s))) continue;
+    }
+    const g = G.find(x=>x[0]===gua.id);
+    plateResults.push({plate:`${prefix}-${num}`, id:gua.id, name:g[2], lv:g[3], m});
+  }
+  plateResults.sort((a,b)=>b.m.score-a.m.score || a.plate.localeCompare(b.plate));
+  plateShown = 0;
+  document.getElementById('plateList').innerHTML='';
+  const pm = magAnalyze(prefix);
+  const pNote = pm.bad>0 ? `<br><span style="font-size:.88em">※ 字首 ${prefix} 本身帶 ${pm.pairs.filter(p=>STARS[p.star].t==='凶').map(p=>p.key+p.star).join('、')}（固定無法避開，已排除在篩選外）</span>` : '';
+  const dgNote = downgraded ? `<br><span style="font-size:.88em;color:var(--cinnabar)">※ 此字首＋${len}位數的「下掛」被字首鎖死，數學上組不出大吉卦，已自動改列「吉」級最佳組合</span>` : '';
+  stats.innerHTML = plateResults.length
+    ? `共找到 <b style="color:var(--gold)">${plateResults.length}</b> 組「<b style="color:var(--gold)">${tier}</b>」級車牌，依磁場評分排序：${dgNote}${pNote}`
+    : '沒有符合條件的組合——試著減少「必含吉星」、放寬「排除凶星」或取消「排除含4」。';
+  showMorePlates();
+}
+document.querySelectorAll('.star-chip').forEach(b=>{
+  b.addEventListener('click', ()=>b.classList.toggle('on'));
+});
+function showMorePlates(){
+  const list = document.getElementById('plateList');
+  const batch = plateResults.slice(plateShown, plateShown+60);
+  list.insertAdjacentHTML('beforeend', batch.map(r=>`
+    <div class="plate-item">
+      <div class="pno">${r.plate}</div>
+      <div class="pgua">卦 ${r.id}・${r.name}<span class="badge b-${r.lv}" style="margin-left:8px;font-size:.8em;padding:1px 10px">${r.lv}</span></div>
+      <div>${magChips(r.m) || '<span class="chip c-平">磁場中性</span>'}</div>
+    </div>`).join(''));
+  plateShown += batch.length;
+  document.getElementById('plateMore').style.display = plateShown < plateResults.length ? 'block' : 'none';
+}
+document.getElementById('plateBtn').onclick = genPlates;
+document.getElementById('plateMore').onclick = showMorePlates;
+document.getElementById('platePrefix').addEventListener('keydown', e=>{ if(e.key==='Enter') genPlates(); });
+
+/* ══ 號碼評比：多號碼綜合計分排序 ══ */
+const TIER_W = {'大吉':50,'吉':40,'中吉':30,'吉凶參半':20,'中凶':10,'凶':0};
+function verdictOf(lv, m){
+  const good = lv==='大吉'||lv==='吉';
+  if(lv==='大吉' && m.bad===0) return ['雙料大吉，放心取用','b-大吉'];
+  if(good && m.bad===0) return ['兩派皆吉，屬上選','b-吉'];
+  if(good && m.bad>0) return [`卦吉但帶 ${m.bad} 組凶星，可用但需留意`, 'b-吉凶參半'];
+  if(!good && m.bad===0) return ['磁場乾淨但卦象不吉，次選','b-吉凶參半'];
+  return ['卦象與磁場皆不理想，建議避用','b-凶'];
+}
+function evalNumber(raw){
+  const gua = guaOf(raw);
+  if(!gua) return null;
+  const m = magAnalyze(raw);
+  const g = G.find(x=>x[0]===gua.id);
+  const score = TIER_W[g[3]] + m.score*4;
+  const lastStar = m.pairs.length ? m.pairs[m.pairs.length-1].star : null;
+  return {raw:raw.trim(), id:gua.id, name:g[2], lv:g[3], m, score, lastStar, motto:g[4]};
+}
+function runCompare(){
+  const lines = [...document.querySelectorAll('.cmp-in')]
+    .map(i=>i.value.trim()).filter(s=>s.replace(/[^A-Za-z0-9]/g,'').length>=2);
+  const el = document.getElementById('cmpList');
+  if(!lines.length){ el.innerHTML='<div class="card" style="color:var(--muted);text-align:center">請至少填一格號碼</div>'; return; }
+  const rows = lines.map(evalNumber).filter(Boolean);
+  rows.sort((a,b)=>b.score-a.score);
+  const medal = i => i===0?'🥇 最優先':i===1?'🥈 次選':i===2?'🥉 第三':`第 ${i+1} 名`;
+  el.innerHTML = rows.map((r,i)=>{
+    const [v,cls] = verdictOf(r.lv, r.m);
+    const badStars = [...new Set(r.m.pairs.filter(p=>STARS[p.star].t==='凶').map(p=>p.star))];
+    const happen = badStars.length
+      ? badStars.map(s=>`<dt style="color:var(--xiong);font-weight:700;white-space:nowrap">${s}</dt><dd>${STARS[s].w}</dd>`).join('')
+      : `<dt style="color:var(--ji);font-weight:700;white-space:nowrap">無凶星</dt><dd>磁場乾淨，順著吉星走即可</dd>`;
+    return `<div class="gua-card${i===0?' open':''}" style="${i===0?'border-color:var(--gold);':''}">
+      <div class="gua-head" onclick="this.parentNode.classList.toggle('open')">
+        <span class="code" style="min-width:auto">${medal(i)}</span>
+        <span>
+          <span class="name serif" style="font-family:ui-monospace,Menlo,monospace">${r.raw}</span><br>
+          <span class="sub">卦 ${r.id}・${r.name}｜綜合分 ${r.score}（${rateScore(r.score,r.m.pairs.length).pct} 分評級）${r.lastStar?`｜近期主導：${r.lastStar}`:''}</span>
+        </span>
+        <span class="badge ${rateScore(r.score,r.m.pairs.length).cls}">${rateScore(r.score,r.m.pairs.length).label}</span>
+        <span class="badge b-${r.lv}">${r.lv}</span>
+      </div>
+      <div class="gua-body">
+        <p style="margin-bottom:8px"><span class="badge ${cls}" style="font-size:.85em">綜合</span> <b>${v}</b></p>
+        <p style="margin-bottom:8px;font-size:.95em">評級建議：<b style="color:var(--gold)">${rateScore(r.score,r.m.pairs.length).label}（${rateScore(r.score,r.m.pairs.length).pct}／100）</b>——${rateScore(r.score,r.m.pairs.length).adv}</p>
+        <div>${magChips(r.m) || '<span class="chip c-平">有效數字不足</span>'}</div>
+        <p style="color:var(--gold);font-weight:700;letter-spacing:.1em;margin-top:10px">可能發生的狀況</p>
+        <dl class="qa" style="margin-top:6px">${happen}</dl>
+        ${fixHtml(r)}
+        <p style="color:var(--muted);font-size:.9em;margin-top:8px">吉星 ${r.m.good}｜伏位 ${r.m.flat}｜凶星 ${r.m.bad}｜卦象：${r.motto}</p>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── 共用：找單一號碼的最佳一碼改善 ── */
+function bestVariant(raw, lockN){
+  const chars = raw.replace(/[^A-Za-z0-9]/g,'').toUpperCase().split('');
+  if(lockN===undefined) lockN = /^09\d{8}$/.test(chars.join('')) ? 2 : 0; // 手機 09 字首鎖定
+  const base = evalNumber(raw); if(!base) return null;
+  let best=null;
+  chars.forEach((ch,pos)=>{
+    if(pos<lockN) return;
+    if(!/[0-9]/.test(ch)) return;
+    for(let d=0; d<=9; d++){
+      if(String(d)===ch) continue;
+      const alt=chars.slice(); alt[pos]=String(d);
+      const ev=evalNumber(alt.join(''));
+      if(ev && ev.score>base.score && (!best||ev.score>best.score))
+        best={...ev,pos:pos+1,from:ch,to:String(d)};
+    }
+  });
+  return best;
+}
+
+/* ── 換號建議：滿分手機示範號（09 開頭、卦大吉＋磁場全吉星） ── */
+function bestPhones(nOut){
+  const next={};
+  Object.keys(PAIR).forEach(k=>{ if(STARS[PAIR[k]].t==='吉') (next[k[0]]=next[k[0]]||[]).push(k[1]); });
+  const out=[];
+  (function dfs(path){
+    if(out.length>=60) return;
+    if(path.length===9){
+      const num='09'+path.slice(1).join('');
+      const ev=evalNumber(num);
+      if(ev && ev.lv==='大吉') out.push(ev);
+      return;
+    }
+    (next[path[path.length-1]]||[]).forEach(d=>dfs(path.concat(d)));
+  })(['9']);
+  if(!out.length) return [];
+  const pick=[0, Math.floor(out.length/2), out.length-1].filter((v,i,a)=>a.indexOf(v)===i);
+  return pick.slice(0,nOut||3).map(i=>out[i]);
+}
+/* ── 換牌建議：同字首找最佳數字組合（排除含4） ── */
+function bestPlateSug(val){
+  const clean=val.toUpperCase().replace(/[^A-Z0-9]/g,'');
+  const prefix=(clean.match(/^[A-Z]+/)||[''])[0];
+  if(!prefix) return null;
+  const dlen=Math.min(Math.max(clean.length-prefix.length,3),4);
+  let best=null;
+  const max=Math.pow(10,dlen);
+  for(let n=0;n<max;n++){
+    const num=String(n).padStart(dlen,'0');
+    if(num.includes('4')) continue;
+    const ev=evalNumber(prefix+num);
+    if(ev && (!best||ev.score>best.score)) best={...ev, plate:prefix+'-'+num};
+  }
+  return best;
+}
+
+/* ── 解方引擎：一碼救號＋化解建議 ── */
+function fixHtml(r){
+  const perfect = (r.lv==='大吉'||r.lv==='吉') && r.m.bad===0;
+  let html = `<p style="color:var(--gold);font-weight:700;letter-spacing:.1em;margin-top:12px">解決方法</p>`;
+  if(perfect){
+    return html + `<p style="margin-top:6px">此號已屬上選，無需調整。可在密碼、ID 等處延用其吉星組合強化磁場。</p>`;
+  }
+  /* 一碼救號：逐位換數字，找分數最高且明顯改善的變體 */
+  const chars = r.raw.replace(/[^A-Za-z0-9]/g,'').toUpperCase().split('');
+  const cands = [];
+  chars.forEach((ch,pos)=>{
+    if(!/[0-9]/.test(ch)) return; // 英文段通常固定，不動
+    for(let d=0; d<=9; d++){
+      if(String(d)===ch) continue;
+      const alt = chars.slice(); alt[pos]=String(d);
+      const ev = evalNumber(alt.join(''));
+      if(ev && ev.score > r.score) cands.push({...ev, pos:pos+1, from:ch, to:String(d)});
+    }
+  });
+  cands.sort((a,b)=>b.score-a.score);
+  const top = cands.slice(0,3);
+  if(top.length){
+    html += `<p style="margin-top:6px;font-size:.95em;color:var(--muted)">一碼之差的更佳選擇（挑號時優先找這些）：</p>` +
+      top.map(c=>`<div class="stepbox" style="margin-top:6px">第 ${c.pos} 碼 ${c.from}→${c.to}：<b style="font-family:ui-monospace,monospace">${c.raw}</b>　卦 ${c.id}・${c.name} <span class="badge b-${c.lv}" style="font-size:.78em;padding:1px 8px">${c.lv}</span>　凶星 ${c.m.bad}｜分數 ${r.score} → <b style="color:var(--gold)">${c.score}</b></div>`).join('');
+  } else {
+    html += `<p style="margin-top:6px">改任何一碼都救不起來，此號建議直接換掉。</p>`;
+  }
+  /* 不能換號時的化解 */
+  const badStars = [...new Set(r.m.pairs.filter(p=>STARS[p.star].t==='凶').map(p=>p.star))];
+  if(r.m.bad>0){
+    const need = badStars.includes('絕命')||badStars.includes('五鬼') ? '天醫（13 31 68 86 27 72 49 94）' :
+                 badStars.includes('六煞') ? '延年（19 91 78 87 34 43 26 62）' : '生氣（14 41 67 76 39 93 28 82）';
+    const needStar = need.split('（')[0];
+    html += `<p style="margin-top:8px;font-size:.95em">無法換號時，從生活補 <b style="color:var(--ji)">${need}</b>：${LIFE[needStar]}；日常小數字（${LIFE_NUM}）多用其組合即可，不必硬改號碼。</p>`;
+  }
+  if(!(r.lv==='大吉'||r.lv==='吉')){
+    html += `<p style="margin-top:6px;font-size:.95em">卦象不吉的部分只能靠<b>換號或改碼</b>調整（卦由全號加總決定，無法用外掛化解）；此號若必須沿用，重要事項另擇吉號辦理。</p>`;
+  }
+  return html;
+}
+document.getElementById('cmpBtn').onclick = runCompare;
+
+/* ══ 共用：號碼群星象輪廓 ══ */
+const JI_STARS=['天醫','生氣','延年'], XIONG_STARS=['絕命','五鬼','六煞','禍害'];
+const COMBO={天醫:'13 31 68 86 27 72 49 94',生氣:'14 41 67 76 39 93 28 82',延年:'19 91 78 87 34 43 26 62',伏位:'11 22 33 44 66 77 88 99'};
+const RESOLVE={
+  絕命:{med:'天醫',digits:'12 21 69 96 48 84 37 73',use:'敢衝的能量導向業務衝刺、開拓新市場',beh:'大額決策設三天冷靜期、遠離投機賭博、資產分散放'},
+  五鬼:{med:'天醫',digits:'18 81 79 97 36 63 24 42',use:'點子多導向創意企劃、行銷發想',beh:'想法白紙黑字寫下、重要事務留憑證、睡前離線收心、勤查證防詐'},
+  六煞:{med:'延年',digits:'16 61 47 74 38 83 29 92',use:'人緣異性緣導向公關、銷售',beh:'情緒上頭時不決策不消費、設好人際界線、運動流汗排解'},
+  禍害:{med:'生氣',digits:'17 71 89 98 46 64 23 32',use:'口才導向教學、主持、談判',beh:'說話慢半拍、合約逐條看、守口德、規律飲食顧脾胃'}
+};
+const LIFE={
+  天醫:'布施捐款、照顧健康、主動付出關懷；多親近醫護、療癒、給你溫暖的人',
+  生氣:'早起運動、親近大自然、主動社交參加聚會；多接觸樂觀有人脈的朋友',
+  延年:'固定作息、深耕專業、說到做到；跟隨專業前輩學習',
+  伏位:'靜坐、儲蓄、維持穩定慣例'
+};
+const LIFE_NUM='鬧鐘提醒時間、轉帳金額尾數、紅包與定價、樓層座位、運動組數次數、擇日日期';
+function aggProfile(raws){
+  const counts={天醫:0,生氣:0,延年:0,伏位:0,絕命:0,五鬼:0,六煞:0,禍害:0};
+  let total=0;
+  raws.forEach(r=>{ magAnalyze(r).pairs.forEach(p=>{counts[p.star]++; total++;}); });
+  return {counts,total};
+}
+function starChipN(s,n){ return `<span class="chip c-${STARS[s].t}">${s} ×${n}</span>`; }
+function addRow(containerId, cls, ph){
+  const row=document.createElement('div');
+  row.style.cssText='display:flex;gap:8px';
+  row.innerHTML=`<input class="${cls} num-in" placeholder="${ph}"><button class="del-btn" onclick="this.parentNode.remove()">✕</button>`;
+  document.getElementById(containerId).appendChild(row);
+  row.querySelector('input').focus();
+}
+
+/* ══ 個人組合搭配 ══ */
+function runPersonal(){
+  const mine=[...document.querySelectorAll('.per-in')].map(i=>i.value.trim()).filter(v=>v.replace(/[^A-Za-z0-9]/g,'').length>=2);
+  const cands=[...document.querySelectorAll('.cand-in')].map(i=>i.value.trim()).filter(v=>v.replace(/[^A-Za-z0-9]/g,'').length>=2);
+  const diag=document.getElementById('perDiag'), list=document.getElementById('perList');
+  if(!mine.length){ diag.innerHTML='<div class="card" style="color:var(--muted);text-align:center">請先填至少一個底數（生日或身分證）</div>'; list.innerHTML=''; return; }
+  const prof=aggProfile(mine);
+  const lacking=JI_STARS.filter(s=>prof.counts[s]===0);
+  const present=JI_STARS.filter(s=>prof.counts[s]>0).sort((a,b)=>prof.counts[a]-prof.counts[b]);
+  const weak=(!lacking.length&&present.length)?[present[0]]:[];
+  const heavyBad=XIONG_STARS.filter(s=>prof.counts[s]>=2);
+  const anyBad=XIONG_STARS.filter(s=>prof.counts[s]>0);
+  diag.innerHTML=`<div class="gua-card open">
+    <div class="gua-head"><span class="name serif" style="color:var(--gold)">你的底數診斷</span></div>
+    <div class="gua-body" style="display:block">
+      <div>${Object.keys(prof.counts).filter(s=>prof.counts[s]>0).map(s=>starChipN(s,prof.counts[s])).join('')||'<span style="color:var(--muted)">有效磁場不足</span>'}</div>
+      <dl class="qa" style="margin-top:10px">
+        <dt style="color:var(--xiong);font-weight:700">你缺的</dt><dd>${lacking.length?lacking.map(s=>`<b style="color:var(--ji)">${s}</b>（${STARS[s].d}）`).join('、'):weak.length?`吉星俱全，但 <b style="color:var(--ji)">${weak[0]}</b> 偏弱`:'吉星俱全且均衡'}</dd>
+        <dt style="color:var(--xiong);font-weight:700">你偏重的</dt><dd>${heavyBad.length?heavyBad.map(s=>`<b style="color:var(--xiong)">${s}</b>（${STARS[s].w}）`).join('、'):anyBad.length?anyBad.map(s=>`${s} 輕度`).join('、'):'無明顯凶星負擔'}</dd>
+      </dl>
+      <p style="color:var(--muted);font-size:.9em;margin-top:8px">適配加權：補到你缺的吉星 每組 +8｜強化偏弱吉星 每組 +4｜加重你已偏多的凶星 每組 −4</p>
+    </div></div>`;
+  if(!cands.length){ list.innerHTML='<div class="card" style="color:var(--muted);text-align:center">再填入候選號碼即可排出最適組合</div>'; return; }
+  const rows=cands.map(evalNumber).filter(Boolean).map(r=>{
+    const cc={}; r.m.pairs.forEach(p=>cc[p.star]=(cc[p.star]||0)+1);
+    let fit=0; const reasons=[];
+    lacking.forEach(s=>{ if(cc[s]){ fit+=8*cc[s]; reasons.push(`<span style="color:var(--ji)">補你缺的 ${s} ×${cc[s]}（+${8*cc[s]}）</span>`);} });
+    weak.forEach(s=>{ if(cc[s]){ fit+=4*cc[s]; reasons.push(`<span style="color:var(--ji)">強化偏弱的 ${s} ×${cc[s]}（+${4*cc[s]}）</span>`);} });
+    heavyBad.forEach(s=>{ if(cc[s]){ fit-=4*cc[s]; reasons.push(`<span style="color:var(--xiong)">加重你偏多的 ${s} ×${cc[s]}（−${4*cc[s]}）</span>`);} });
+    return {...r, fit, tot:r.score+fit, reasons};
+  }).sort((a,b)=>b.tot-a.tot);
+  const medal=i=>i===0?'🥇 最適合你':i===1?'🥈 次選':i===2?'🥉 第三':`第 ${i+1} 名`;
+  list.innerHTML=rows.map((r,i)=>`<div class="gua-card${i===0?' open':''}" style="${i===0?'border-color:var(--gold);':''}margin-top:12px">
+    <div class="gua-head" onclick="this.parentNode.classList.toggle('open')">
+      <span class="code" style="min-width:auto">${medal(i)}</span>
+      <span><span class="name serif" style="font-family:ui-monospace,Menlo,monospace">${r.raw}</span><br>
+        <span class="sub">本身 ${r.score} 分（評級 ${rateScore(r.score,r.m.pairs.length).label} ${rateScore(r.score,r.m.pairs.length).pct}）＋適配 ${r.fit>=0?'+':''}${r.fit} ＝ <b style="color:var(--gold)">${r.tot}</b>｜卦 ${r.id}・${r.name}</span></span>
+      <span class="badge b-${r.lv}">${r.lv}</span>
+    </div>
+    <div class="gua-body">
+      <div>${magChips(r.m)}</div>
+      <p style="color:var(--gold);font-weight:700;letter-spacing:.1em;margin-top:10px">適配理由</p>
+      <p style="margin-top:4px">${r.reasons.length?r.reasons.join('　'):'與你的缺口無直接互動，按本身分數計'}</p>
+      <p style="margin-top:8px;font-size:.95em">評級建議：<b style="color:var(--gold)">${rateScore(r.score,r.m.pairs.length).label}</b>——${rateScore(r.score,r.m.pairs.length).adv}</p>
+    </div></div>`).join('');
+}
+/* ══ 個人搭配：客用適配報告 ══ */
+function runPersonalReport(){
+  const name=(document.getElementById('perName').value||'').trim()||'貴客';
+  const teacher=(document.getElementById('perTeacher').value||'').trim();
+  const mine=[...document.querySelectorAll('.per-in')].map(i=>i.value.trim()).filter(v=>v.replace(/[^A-Za-z0-9]/g,'').length>=2);
+  const cands=[...document.querySelectorAll('.cand-in')].map(i=>i.value.trim()).filter(v=>v.replace(/[^A-Za-z0-9]/g,'').length>=2);
+  const sheet=document.getElementById('perSheet');
+  if(!mine.length||!cands.length){ sheet.innerHTML='<div class="card" style="color:var(--muted);text-align:center">需要至少一個底數與一個候選號碼</div>'; return; }
+  const prof=aggProfile(mine);
+  const lacking=JI_STARS.filter(s=>prof.counts[s]===0);
+  const present=JI_STARS.filter(s=>prof.counts[s]>0).sort((a,b)=>prof.counts[a]-prof.counts[b]);
+  const weak=(!lacking.length&&present.length)?[present[0]]:[];
+  const heavyBad=XIONG_STARS.filter(s=>prof.counts[s]>=2);
+  const rows=cands.map(evalNumber).filter(Boolean).map(r=>{
+    const cc={}; r.m.pairs.forEach(p=>cc[p.star]=(cc[p.star]||0)+1);
+    let fit=0; const why=[];
+    lacking.forEach(s=>{ if(cc[s]){ fit+=8*cc[s]; why.push(`補足您欠缺的${STARS[s].d}能量`);} });
+    weak.forEach(s=>{ if(cc[s]){ fit+=4*cc[s]; why.push(`強化您偏弱的${STARS[s].d}能量`);} });
+    heavyBad.forEach(s=>{ if(cc[s]){ fit-=4*cc[s]; why.push(`與您偏多的${s}能量疊加，須留意`);} });
+    return {...r, fit, tot:r.score+fit, why};
+  }).sort((a,b)=>b.tot-a.tot);
+  const label=i=>i===0?'最適合':i===1?'次選':i===2?'備選':'不建議優先';
+  const top=rows[0];
+  const today=new Date();
+  const dateStr=`${today.getFullYear()} 年 ${today.getMonth()+1} 月 ${today.getDate()} 日`;
+  sheet.innerHTML=`<div class="sheet">
+    <h3>個人選號適配報告</h3>
+    <div class="meta"><span>鑑定對象：${name}</span><span>鑑定日期：${dateStr}</span></div>
+    <div class="rx" style="margin-top:12px"><h4>個人磁場診斷</h4>
+      <p>${lacking.length?`您目前欠缺 <b style="color:var(--ji)">${lacking.map(s=>`${s}（${STARS[s].d}）`).join('、')}</b> 的能量`:'三大吉星俱全，磁場結構完整'}${heavyBad.length?`；同時 <b style="color:var(--cinnabar)">${heavyBad.join('、')}</b> 能量偏多，選號時宜避開疊加。`:'。'}</p>
+    </div>
+    <table>
+      <tr><th>排序</th><th>候選號碼</th><th>吉凶</th><th>評級</th><th>適配建議</th></tr>
+      ${rows.map((r,i)=>`<tr><td><b>${i+1}</b></td><td style="font-family:ui-monospace,monospace">${r.raw}</td><td><span class="badge b-${r.lv}" style="font-size:.85em;padding:1px 10px">${r.lv}</span></td><td>${rateScore(r.score,r.m.pairs.length).label}</td><td>${label(i)}</td></tr>`).join('')}
+    </table>
+    ${top?`<div class="rx"><h4>首選說明</h4>
+      <p><b style="font-family:ui-monospace,monospace">${top.raw}</b> 最適合您——${top.why.length?top.why.join('；')+'。':'號碼本身即屬吉配，與您的磁場無衝突。'}</p></div>`:''}
+    ${lacking.length?`<div class="rx"><h4>日常調理</h4>
+      ${lacking.map(s=>`<p style="margin-top:4px"><b style="color:var(--ji)">補${s}</b>：${LIFE[s]}。吉數 <b>${COMBO[s]}</b> 可用於${LIFE_NUM}。</p>`).join('')}</div>`:''}
+    <div class="rx"><h4>老師叮嚀</h4><p style="color:var(--muted)">（按「✏️ 編輯報告」後點此輸入個別叮嚀；整份報告皆可直接修改）</p></div>
+    <div class="sign"><span>鑑定老師：${teacher||'＿＿＿＿＿＿'}</span><span>神奇身心靈學苑・數字易經系統</span></div>
+  </div>`;
+  document.getElementById('perPrint').style.display='block';
+  document.getElementById('perEdit').style.display='block';
+  sheet.firstElementChild.contentEditable='false';
+  document.getElementById('perEdit').textContent='✏️ 編輯報告';
+}
+function bindSheetTools(editId, printId, sheetId){
+  document.getElementById(editId).onclick=()=>{
+    const sh=document.getElementById(sheetId).firstElementChild; if(!sh) return;
+    const on=sh.contentEditable!=='true';
+    sh.contentEditable=on?'true':'false'; sh.classList.toggle('editing',on);
+    document.getElementById(editId).textContent=on?'✔ 完成編輯':'✏️ 編輯報告';
+    if(on) sh.focus();
+  };
+  document.getElementById(printId).onclick=()=>{
+    const sh=document.getElementById(sheetId).firstElementChild;
+    if(sh){ sh.contentEditable='false'; sh.classList.remove('editing'); document.getElementById(editId).textContent='✏️ 編輯報告'; }
+    window.print();
+  };
+}
+bindSheetTools('perEdit','perPrint','perSheet');
+document.getElementById('perRpBtn').onclick=()=>{
+  runPersonalReport();
+  document.getElementById('perDiag').innerHTML='';
+  document.getElementById('perList').innerHTML='';
+  document.getElementById('perSheet').scrollIntoView({behavior:'smooth',block:'start'});
+};
+document.getElementById('perBtn').onclick=()=>{
+  runPersonal();
+  document.getElementById('perSheet').innerHTML='';
+  document.getElementById('perPrint').style.display='none';
+  document.getElementById('perEdit').style.display='none';
+  document.getElementById('perDiag').scrollIntoView({behavior:'smooth',block:'start'});
+};
+document.getElementById('perAdd').onclick=()=>addRow('perFields','per-in','其他底數');
+document.getElementById('candAdd').onclick=()=>addRow('candFields','cand-in','候選號碼');
+
+/* ══ 人生號碼綜合評比 ══ */
+function runAudit(){
+  const items=[...document.querySelectorAll('#auditFields > div')].map(d=>({
+    type:d.querySelector('select').value, val:(d.querySelector('input').value||'').trim()
+  })).filter(x=>x.val.replace(/[^A-Za-z0-9]/g,'').length>=2);
+  const el=document.getElementById('auResult');
+  if(!items.length){ el.innerHTML='<div class="card" style="color:var(--muted);text-align:center">請至少填一個號碼</div>'; return; }
+  const prof=aggProfile(items.map(x=>x.val));
+  const sorted=Object.keys(prof.counts).filter(s=>prof.counts[s]>0).sort((a,b)=>prof.counts[b]-prof.counts[a]);
+  const dom=sorted.slice(0,3);
+  const lacking=JI_STARS.filter(s=>prof.counts[s]===0);
+  const badTotal=XIONG_STARS.reduce((a,s)=>a+prof.counts[s],0);
+  const jiTotal=JI_STARS.reduce((a,s)=>a+prof.counts[s],0)+prof.counts['伏位'];
+  const evals=items.map(x=>({...x, ev:evalNumber(x.val)})).filter(x=>x.ev);
+  const FIXED=['身分證','生日'];
+  const changeable=evals.filter(x=>!FIXED.includes(x.type));
+  /* 只有評級落在「普通」以下（<55）或帶凶星且卦不吉的，才需要被點名 */
+  const needFix=changeable.filter(x=>{
+    const rt=rateScore(x.ev.score,x.ev.m.pairs.length);
+    const guaGood=x.ev.lv==='大吉'||x.ev.lv==='吉';
+    return rt.pct<55 || (x.ev.m.bad>0 && !guaGood);
+  });
+  const worst=needFix.length?[...needFix].sort((a,b)=>a.ev.score-b.ev.score)[0]:null;
+  const fixAdvice=x=>{
+    const bs=[...new Set(x.ev.m.pairs.filter(p=>STARS[p.star].t==='凶').map(p=>p.star))];
+    if(!bs.length) return '';
+    const need=bs.includes('絕命')||bs.includes('五鬼')?'天醫':bs.includes('六煞')?'延年':'生氣';
+    return `先天帶${bs.join('、')}，從生活補【${need}】平衡：${LIFE[need]}`;
+  };
+  el.innerHTML=`
+  <div class="gua-card open">
+    <div class="gua-head"><span class="name serif" style="color:var(--gold)">星象分布</span>
+      <span class="badge ${badTotal===0?'b-吉':badTotal*2>jiTotal?'b-凶':'b-吉凶參半'}">吉 ${jiTotal}：凶 ${badTotal}</span></div>
+    <div class="gua-body" style="display:block">
+      ${sorted.map(s=>starChipN(s,prof.counts[s])).join('')}
+    </div></div>
+  <div class="gua-card open">
+    <div class="gua-head"><span class="name serif" style="color:var(--gold)">目前狀況</span></div>
+    <div class="gua-body" style="display:block"><dl class="qa">
+      ${dom.map(s=>`<dt style="color:${STARS[s].t==='凶'?'var(--xiong)':STARS[s].t==='平'?'var(--ban)':'var(--ji)'};font-weight:700;white-space:nowrap">${s} ×${prof.counts[s]}</dt><dd><b>${STARS[s].p}</b>；${STARS[s].x}${STARS[s].t==='凶'?`。<span style="color:var(--xiong)">提醒：${STARS[s].w}</span>`:''}</dd>`).join('')}
+    </dl>
+    <p style="color:var(--muted);font-size:.9em;margin-top:8px">依出現次數排序，前段星＝人生底層慣性，凶星占比越高、生活越常出現對應狀況。</p></div></div>
+  <div class="gua-card open">
+    <div class="gua-head"><span class="name serif" style="color:var(--gold)">你缺什麼・怎麼化解</span></div>
+    <div class="gua-body" style="display:block">
+      ${(()=>{
+        const bads=XIONG_STARS.filter(s=>prof.counts[s]>0);
+        /* 統整處方：需要補的星 → 原因清單 */
+        const rx={};
+        lacking.forEach(s=>{(rx[s]=rx[s]||[]).push('缺'+s);});
+        bads.forEach(b=>{const m=RESOLVE[b].med;(rx[m]=rx[m]||[]).push('化'+b);});
+        const rxStars=Object.keys(rx);
+        let h='';
+        /* ① 缺口一句話 */
+        if(lacking.length){
+          h+=`<dl class="qa">${lacking.map(s=>`<dt style="color:var(--ji);font-weight:700;white-space:nowrap">缺${s}</dt><dd>${s==='天醫'?'錢財與感情少臨門一腳':s==='生氣'?'貴人與新機會進不來':'事業推進與定性不足'}</dd>`).join('')}</dl>`;
+        } else {
+          h+=`<p>三大吉星俱全，磁場結構完整。${bads.length?'重點放在化解凶星。':'維持現狀即可。'}</p>`;
+        }
+        /* ② 凶星行為化解一人一句 */
+        if(bads.length){
+          h+=`<p style="color:var(--gold);font-weight:700;letter-spacing:.1em;margin-top:12px">凶星行為化解</p>
+          <dl class="qa" style="margin-top:4px">${bads.map(s=>`<dt style="color:var(--xiong);font-weight:700;white-space:nowrap">${s} ×${prof.counts[s]}</dt><dd>${RESOLVE[s].beh}；能量可導向${RESOLVE[s].use}</dd>`).join('')}</dl>`;
+        }
+        /* ③ 補星處方統整：同星只寫一次 */
+        if(rxStars.length){
+          h+=`<p style="color:var(--gold);font-weight:700;letter-spacing:.1em;margin-top:12px">補星處方（統整）</p>
+          <dl class="qa" style="margin-top:4px">${rxStars.map(s=>`<dt style="color:var(--ji);font-weight:700;white-space:nowrap">補${s}</dt><dd><span style="color:var(--muted)">（${rx[s].join('、')}）</span>${LIFE[s]}｜數字 <b>${COMBO[s]}</b></dd>`).join('')}</dl>
+          <p style="color:var(--muted);font-size:.9em;margin-top:8px">以上數字用在：${LIFE_NUM}——這些每天自己選得了的地方。順序：行為 → 補星 → 小數字；一次處理一顆最重的凶星即可。</p>`;
+        }
+        return h;})()}
+    </div></div>
+  ${(()=>{const W={'手機':3,'IG帳號':2,'身分證':2,'車牌':2,'銀行帳號':2,'工作號碼':2,'其他':2,'家用電話':1,'門牌':1,'生日':1};
+    let sw=0,sp=0,ss=0;
+    evals.forEach(x=>{const w=W[x.type]||2,rt=rateScore(x.ev.score,x.ev.m.pairs.length);sw+=w;sp+=rt.pct*w;ss+=x.ev.score;});
+    const avg=Math.round(sp/sw), lbl=avg>=85?['特優','b-大吉']:avg>=70?['優','b-吉']:avg>=55?['中上','b-吉凶參半']:avg>=40?['普通','b-吉凶參半']:['弱','b-凶'];
+    window.__auTotal={ss,avg,lbl};return '';})()}
+  <div class="gua-card open">
+    <div class="gua-head"><span class="name serif" style="color:var(--gold)">各號碼體檢</span>
+      <span class="badge ${window.__auTotal.lbl[1]}" style="margin-left:auto">總評 ${window.__auTotal.avg}／100・${window.__auTotal.lbl[0]}</span></div>
+    <div class="gua-body" style="display:block">
+      <p style="color:var(--muted);font-size:.92em;margin-bottom:6px">原始分加總 ${window.__auTotal.ss}｜加權總評依使用頻率計權：手機×3，IG帳號・身分證・車牌・銀行・工作號碼・其他×2，家用電話・門牌・生日×1｜<b style="color:var(--gold)">標準 70 以上、最理想 85 以上</b></p>
+      ${evals.map(x=>{
+        const innate=FIXED.includes(x.type);
+        const isWorst=x===worst;
+        const tail=isWorst?'　<b style="color:var(--xiong)">← 可換的裡最拖後腿，建議優先換掉</b>'
+          :innate?(x.ev.m.bad>0?`　<span style="color:var(--ban)">〔先天基準，不可改〕${fixAdvice(x)}`+'</span>':'　<span style="color:var(--muted)">〔先天基準〕</span>'):'';
+        const g=G.find(r=>r[0]===x.ev.id);
+        const TIER_WHY={'大吉':DAJI[x.ev.id]||'','吉':'六項問事大體皆順，正面能量之卦，可安心用事',
+          '中吉':'吉中帶條件——斷語多有「需努力、需耐心」的但書，順而非躺贏',
+          '吉凶參半':'成敗繫於作為，誠則吉、急則凶，此號放大使用者的態度',
+          '中凶':'阻滯待時之卦，事多費力延遲，非絕路但不宜擔重任',
+          '凶':'斷語多阻礙不成，此號承載的事容易生波折，重要事項避開'};
+        return `<div class="stepbox" style="margin-top:6px${isWorst?';border-color:var(--xiong)':innate?';border-style:dashed':''}">
+        <b>${x.type}</b>｜<span style="font-family:ui-monospace,monospace">${x.val}</span>　卦 ${x.ev.id}・${x.ev.name} <span class="badge b-${x.ev.lv}" style="font-size:.78em;padding:1px 8px">${x.ev.lv}</span>　凶星 ${x.ev.m.bad}｜分數 ${x.ev.score}・評級 <b>${rateScore(x.ev.score,x.ev.m.pairs.length).label}</b>${tail}
+        <div style="margin-top:6px;padding-top:6px;border-top:1px dashed var(--line);font-size:.93em;line-height:1.7">
+          <b style="color:var(--gold)">卦象</b>　${g[4]}<br>
+          <b style="color:var(--gold)">為何${x.ev.lv}</b>　${TIER_WHY[x.ev.lv]}<br>
+          <b style="color:var(--gold)">斷語參考</b>　願望：${g[7]}${x.ev.lastStar?`<br><b style="color:var(--gold)">磁場</b>　尾組 ${x.ev.lastStar} 主導近期——${STARS[x.ev.lastStar].x}`:''}
+        </div>
+      </div>`;}).join('')}
+      ${changeable.length?(window.__auTotal.avg>=85
+        ?`<p style="color:var(--ji);font-weight:700;margin-top:8px">✓ 總評達最理想線（85 以上），維持即可。</p>`
+        :window.__auTotal.avg>=70
+        ?`<p style="color:var(--ban);font-weight:700;margin-top:8px">△ 總評已達標（70 以上）但未到最理想的 85——照下面的升級建議可以再往上。</p>`
+        :`<p style="color:var(--xiong);font-weight:700;margin-top:8px">✗ 總評未達 70 分標準——優先照下面的升級建議處理。</p>`):''}
+      ${(()=>{
+        if(window.__auTotal.avg>=85) return '';
+        const W={'手機':3,'IG帳號':2,'身分證':2,'車牌':2,'銀行帳號':2,'工作號碼':2,'其他':2,'家用電話':1,'門牌':1,'生日':1};
+        const sw=evals.reduce((a,x)=>a+(W[x.type]||2),0);
+        const basePts=evals.map(x=>({x,w:W[x.type]||2,pct:rateScore(x.ev.score,x.ev.m.pairs.length).pct}));
+        const sp=basePts.reduce((a,p)=>a+p.pct*p.w,0);
+        const sugs=[], others=[];
+        changeable.forEach(x=>{
+          const rt=rateScore(x.ev.score,x.ev.m.pairs.length);
+          if(rt.pct>=85) return;
+          if(x.type==='手機'){
+            const ps=bestPhones(3);
+            if(ps.length){
+              const nrt=rateScore(ps[0].score,ps[0].m.pairs.length);
+              const proj=Math.round(basePts.reduce((a,p)=>a+(p.x===x?nrt.pct:p.pct)*p.w,0)/sw);
+              sugs.push({x,nrt,proj,gain:proj-window.__auTotal.avg,html:
+                `<b>手機</b>｜整支換號（09 開頭滿分示範，申辦時把電信給的候選貼進「號碼評比」挑）：<br>
+                ${ps.map(p=>`<b style="font-family:ui-monospace,monospace">${p.raw}</b>`).join('、')}<br>
+                卦 ${ps[0].id}・${ps[0].name} <span class="badge b-${ps[0].lv}" style="font-size:.78em;padding:1px 8px">${ps[0].lv}</span>　凶星 0　評級 ${rt.label} → <b style="color:var(--ji)">${nrt.label}</b>　整體總評 ${window.__auTotal.avg} → <b style="color:var(--gold)">約 ${proj}</b>`});
+            }
+          } else if(x.type==='車牌'){
+            const bp=bestPlateSug(x.val);
+            if(bp && bp.score>x.ev.score){
+              const nrt=rateScore(bp.score,bp.m.pairs.length);
+              const proj=Math.round(basePts.reduce((a,p)=>a+(p.x===x?nrt.pct:p.pct)*p.w,0)/sw);
+              sugs.push({x,nrt,proj,gain:proj-window.__auTotal.avg,html:
+                `<b>車牌</b>｜換牌時同字首最佳：<b style="font-family:ui-monospace,monospace">${bp.plate}</b>（更多選擇用「車牌選號」分頁）<br>
+                卦 ${bp.id}・${bp.name} <span class="badge b-${bp.lv}" style="font-size:.78em;padding:1px 8px">${bp.lv}</span>　凶星 ${bp.m.bad}　評級 ${rt.label} → <b style="color:var(--ji)">${nrt.label}</b>　整體總評 ${window.__auTotal.avg} → <b style="color:var(--gold)">約 ${proj}</b>`});
+            }
+          } else if(x.type==='IG帳號'){
+            others.push('IG帳號（帳號名可自訂——在名稱尾端加上吉星組合如 _1368，改完用「取卦計算機」驗證）');
+          } else {
+            others.push(x.type);
+          }
+        });
+        sugs.sort((a,b)=>b.gain-a.gain);
+        let h='';
+        if(sugs.length||others.length){
+          h+=`<p style="color:var(--gold);font-weight:700;letter-spacing:.1em;margin-top:12px">升級建議（可換的整支換成大吉）</p>`+
+          sugs.map(s=>`<div class="stepbox" style="margin-top:6px;border-color:var(--gold)">${s.html}</div>`).join('')+
+          (others.length?`<p style="color:var(--muted);font-size:.92em;margin-top:6px">※ ${[...new Set(others)].join('、')}：號碼由機構配發，換新時把拿到的候選清單貼進「號碼評比」挑大吉即可。</p>`:'');
+        }
+        /* 可換的都頂了（或改完仍不到85）→ 先天拖累，建議新增大吉號碼稀釋 */
+        const bestReach = sugs.length ? sugs[0].proj : window.__auTotal.avg;
+        if(bestReach < 85){
+          h+=`<p style="color:var(--gold);font-weight:700;letter-spacing:.1em;margin-top:12px">先天拖累・用新增號碼拉高</p>
+          <div class="stepbox" style="margin-top:6px;border-color:var(--jade)">
+            身分證、生日不能改，${sugs.length?'可換的升級完仍':'可換的已全數達標，'}到不了 85——改用<b>加法</b>：新增自己選得了的大吉號碼稀釋先天，例如<b>新開銀行帳戶</b>（可挑帳號）、<b>第二門號</b>、<b>換車時直選大吉車牌</b>。用「車牌選號」「號碼評比」分頁挑滿分組合。<br>
+            <b>稀釋預估</b>（每個滿分號碼權重2）：${[1,2,3,4,5].map(n=>`+${n}個→<b style="color:var(--gold)">${Math.round((sp+100*2*n)/(sw+2*n))}</b>`).join('　')}<br>
+            <span style="color:var(--muted);font-size:.92em">※ 分母越大先天占比越低，但效果遞減、永遠到不了 100——先天是壓艙石不是可以歸零的。且權重＝使用頻率：<b>只有真的會用的號碼才算數</b>，開了不用的帳戶是帳面稀釋，不是實質。</span>
+          </div>`;
+        }
+        return h;
+      })()}
+      ${evals.length>1?`<p style="color:var(--muted);font-size:.9em;margin-top:8px">優先處理原則：可換的號碼中，評級落在「普通」以下、或卦不吉又帶凶星的才會被點名；已達標的不會為了排名而被建議換掉。身分證、生日屬先天基準，虛線框標示，缺口用生活補星平衡。</p>`:''}
+    </div></div>`;
+}
+document.getElementById('auBtn').onclick=()=>{
+  runAudit();
+  document.getElementById('rpSheet').innerHTML='';
+  document.getElementById('rpPrint').style.display='none';
+  document.getElementById('rpEdit').style.display='none';
+  document.getElementById('auResult').scrollIntoView({behavior:'smooth',block:'start'});
+};
+
+/* 類型選「生日」→ 提示改西元年月日 */
+function syncBirthPh(sel){
+  const inp=sel.parentNode.querySelector('input');
+  if(inp) inp.placeholder = sel.value==='生日' ? '西元年月日，例：19910217' : '號碼';
+}
+document.getElementById('auditFields').addEventListener('change', e=>{
+  if(e.target.classList.contains('au-type')) syncBirthPh(e.target);
+});
+document.querySelectorAll('#auditFields .au-type').forEach(syncBirthPh);
+
+/* ══ 客人報告 ══ */
+function runReport(){
+  const name=(document.getElementById('rpName').value||'').trim()||'貴客';
+  const teacher=(document.getElementById('rpTeacher').value||'').trim();
+  const items=[...document.querySelectorAll('#auditFields > div')].map(d=>({
+    type:d.querySelector('select').value, val:(d.querySelector('input').value||'').trim()
+  })).filter(x=>x.val.replace(/[^A-Za-z0-9]/g,'').length>=2);
+  const sheet=document.getElementById('rpSheet');
+  if(!items.length){ sheet.innerHTML='<div class="card" style="color:var(--muted);text-align:center">請至少填一個號碼</div>'; return; }
+  const prof=aggProfile(items.map(x=>x.val));
+  const evals=items.map(x=>({...x, ev:evalNumber(x.val)})).filter(x=>x.ev);
+  const W={'手機':3,'IG帳號':2,'身分證':2,'車牌':2,'銀行帳號':2,'工作號碼':2,'其他':2,'家用電話':1,'門牌':1,'生日':1};
+  let sw=0,sp=0;
+  evals.forEach(x=>{const w=W[x.type]||2;sw+=w;sp+=rateScore(x.ev.score,x.ev.m.pairs.length).pct*w;});
+  const avg=Math.round(sp/sw);
+  const lvl=avg>=85?'最理想':avg>=70?'達標':'待調整';
+  const lacking=JI_STARS.filter(s=>prof.counts[s]===0);
+  const bads=XIONG_STARS.filter(s=>prof.counts[s]>0);
+  const rx={};
+  lacking.forEach(s=>{(rx[s]=rx[s]||[]).push('補足'+STARS[s].d.split('・')[0]);});
+  bads.forEach(b=>{const m=RESOLVE[b].med;(rx[m]=rx[m]||[]).push('化解'+b);});
+  const oneLine=x=>{
+    const good=x.ev.lv==='大吉'||x.ev.lv==='吉';
+    const rt=rateScore(x.ev.score,x.ev.m.pairs.length);
+    if(x.ev.lv==='大吉'&&x.ev.m.bad===0) return '上上之選，安心續用';
+    if(good&&x.ev.m.bad===0) return '吉利穩定，可放心使用';
+    if(good) return '大體吉利，依處方調和即可';
+    if(rt.pct>=55) return '尚可，建議依處方輔助';
+    return ['身分證','生日'].includes(x.type)?'先天基準，以生活處方平衡':'建議擇機更換為吉號';
+  };
+  const today=new Date();
+  const dateStr=`${today.getFullYear()} 年 ${today.getMonth()+1} 月 ${today.getDate()} 日`;
+  sheet.innerHTML=`<div class="sheet">
+    <h3>數字能量鑑定報告</h3>
+    <div class="meta"><span>鑑定對象：${name}</span><span>鑑定日期：${dateStr}</span></div>
+    <div class="total">
+      <div class="n">${avg}<span style="font-size:.4em;color:var(--muted)">／100</span></div>
+      <div><b>整體評定：${lvl}</b><span style="color:var(--muted);font-size:.9em">（70 以上達標・85 以上最理想）</span></div>
+    </div>
+    <table>
+      <tr><th>號碼</th><th>類別</th><th>吉凶</th><th>評級</th><th>建議</th></tr>
+      ${evals.map(x=>{const rt=rateScore(x.ev.score,x.ev.m.pairs.length);
+        return `<tr><td style="font-family:ui-monospace,monospace">${x.val}</td><td>${x.type}</td><td><span class="badge b-${x.ev.lv}" style="font-size:.85em;padding:1px 10px">${x.ev.lv}</span></td><td>${rt.label}</td><td style="text-align:left">${oneLine(x)}</td></tr>`;}).join('')}
+    </table>
+    ${(()=>{
+      const FIXED=['身分證','生日'];
+      const toChange=evals.filter(x=>!FIXED.includes(x.type)&&rateScore(x.ev.score,x.ev.m.pairs.length).pct<85);
+      if(!toChange.length) return `<div class="rx"><h4>換號建議</h4><p>現有可調整的號碼皆屬理想，無需重新選號。</p></div>`;
+      let adjSp=sp;
+      toChange.forEach(x=>{const w=W[x.type]||2;adjSp+=(100-rateScore(x.ev.score,x.ev.m.pairs.length).pct)*w;});
+      const maxProj=Math.round(adjSp/sw);
+      return `<div class="rx"><h4>換號建議</h4>
+        <p>以下號碼建議<b>重新選號</b>，請洽鑑定老師協助挑選吉號：<b style="color:var(--cinnabar)">${toChange.map(x=>`${x.type}（${x.val}）`).join('、')}</b>。</p>
+        <p style="margin-top:4px">全數調整完成後，整體評定最高可達 <b style="color:var(--gold);font-size:1.15em">${maxProj}／100</b>${maxProj>=85?'（最理想）':maxProj>=70?'（達標）':''}。</p></div>`;
+    })()}
+    ${Object.keys(rx).length?`<div class="rx"><h4>調理處方</h4>
+      ${Object.keys(rx).map(s=>`<p style="margin-top:4px"><b style="color:var(--ji)">補${s}</b><span style="color:var(--muted)">（${rx[s].join('、')}）</span>：${LIFE[s]}。吉數 <b>${COMBO[s]}</b> 可用於${LIFE_NUM}。</p>`).join('')}
+      ${bads.length?`<p style="margin-top:8px"><b style="color:var(--cinnabar)">日常留意</b>：${bads.map(s=>`${s}——${RESOLVE[s].beh.split('、')[0]}`).join('；')}。</p>`:''}
+    </div>`:`<div class="rx"><h4>調理處方</h4><p>磁場結構完整，維持現狀、善用吉星即可。</p></div>`}
+    <div class="rx"><h4>老師叮嚀</h4><p style="color:var(--muted)">（按「✏️ 編輯報告」後點此輸入給客人的個別叮嚀；整份報告的任何文字都可直接修改）</p></div>
+    <div class="sign"><span>鑑定老師：${teacher||'＿＿＿＿＿＿'}</span><span>神奇身心靈學苑・數字易經系統</span></div>
+  </div>`;
+  document.getElementById('rpPrint').style.display='block';
+  document.getElementById('rpEdit').style.display='block';
+  const sh=document.getElementById('rpSheet').firstElementChild;
+  sh.contentEditable='false';
+  document.getElementById('rpEdit').textContent='✏️ 編輯報告';
+}
+document.getElementById('rpBtn').onclick=()=>{
+  runReport();
+  document.getElementById('auResult').innerHTML='';   // 交件模式收起老師分析，畫面乾淨
+  document.getElementById('rpSheet').scrollIntoView({behavior:'smooth',block:'start'});
+};
+document.getElementById('rpPrint').onclick=()=>{
+  const sh=document.getElementById('rpSheet').firstElementChild;
+  if(sh){ sh.contentEditable='false'; sh.classList.remove('editing'); document.getElementById('rpEdit').textContent='✏️ 編輯報告'; }
+  window.print();
+};
+document.getElementById('rpEdit').onclick=()=>{
+  const sh=document.getElementById('rpSheet').firstElementChild;
+  if(!sh) return;
+  const on = sh.contentEditable!=='true';
+  sh.contentEditable = on ? 'true' : 'false';
+  sh.classList.toggle('editing', on);
+  document.getElementById('rpEdit').textContent = on ? '✔ 完成編輯' : '✏️ 編輯報告';
+  if(on) sh.focus();
+};
+
+document.getElementById('auAdd').onclick=()=>{
+  const row=document.createElement('div');
+  row.style.cssText='display:flex;gap:8px';
+  row.innerHTML=`<select class="au-type" style="padding:0 8px;background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:10px"><option>手機</option><option>身分證</option><option>生日</option><option>IG帳號</option><option>車牌</option><option>銀行帳號</option><option>工作號碼</option><option>家用電話</option><option>門牌</option><option selected>其他</option></select><input class="au-in num-in" placeholder="號碼"><button class="del-btn" onclick="this.parentNode.remove()">✕</button>`;
+  document.getElementById('auditFields').appendChild(row);
+  row.querySelector('input').focus();
+};
+let cmpCount = 3;
+document.getElementById('cmpAdd').onclick = ()=>{
+  cmpCount++;
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:8px';
+  row.innerHTML = `<input class="cmp-in" placeholder="號碼 ${cmpCount}" style="flex:1;padding:11px 14px;font-size:1.05em;letter-spacing:.08em;background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:10px;outline:none;font-family:ui-monospace,Menlo,monospace">
+    <button onclick="this.parentNode.remove()" style="padding:0 14px;background:var(--card2);color:var(--xiong);border:1px solid var(--line);border-radius:10px;cursor:pointer">✕</button>`;
+  document.getElementById('cmpFields').appendChild(row);
+  row.querySelector('input').focus();
+};
+
+/* ══ 評級引擎：依號碼長度換算百分制 ══ */
+function rateScore(score, pairCount){
+  const span = Math.max(pairCount,1)*8;           // 磁場分擺幅 ±pairs*2*4
+  const max = 50+span, min = 0-span;
+  const pct = Math.max(0, Math.min(100, Math.round((score-min)/(max-min)*100)));
+  if(pct>=85) return {pct, label:'特優', cls:'b-大吉', adv:'放心啟用，維持即可'};
+  if(pct>=70) return {pct, label:'優',   cls:'b-吉',   adv:'可用；小缺點以吉星補強'};
+  if(pct>=55) return {pct, label:'中上', cls:'b-吉凶參半', adv:'依用途取捨，重要用途再往上挑'};
+  if(pct>=40) return {pct, label:'普通', cls:'b-吉凶參半', adv:'需搭配化解或改碼輔助'};
+  return {pct, label:'弱', cls:'b-凶', adv:'建議直接換號'};
+}
+
+/* ══ 一鍵清空 ══ */
+function clearSection(ids, resultIds){
+  ids.forEach(sel=>document.querySelectorAll(sel).forEach(i=>i.value=''));
+  resultIds.forEach(id=>{const e=document.getElementById(id); if(e){e.innerHTML=''; e.classList&&e.classList.remove('show');}});
+}
+document.getElementById('calcClear').onclick = ()=>{
+  document.getElementById('calcInput').value='';
+  ['calcCard','magCard','verdictCard','stepDown','stepUp'].forEach(id=>document.getElementById(id).innerHTML='');
+  document.getElementById('steps').classList.remove('show');
+  document.getElementById('guaResult').classList.remove('show');
+  document.getElementById('calcInput').focus();
+};
+document.getElementById('cmpClear').onclick = ()=>clearSection(['.cmp-in'],['cmpList']);
+document.getElementById('perClear').onclick=()=>{
+  clearSection(['.per-in','.cand-in'],['perDiag','perList','perSheet']);
+  ['perName','perTeacher'].forEach(id=>{const e=document.getElementById(id); if(e) e.value='';});
+  ['perPrint','perEdit'].forEach(id=>{const e=document.getElementById(id); if(e) e.style.display='none';});
+};
+document.getElementById('auClear').onclick  = ()=>{
+  clearSection(['.au-in'],['auResult','rpSheet']);
+  ['rpName','rpTeacher'].forEach(id=>{const e=document.getElementById(id); if(e) e.value='';});
+  const p=document.getElementById('rpPrint'); if(p) p.style.display='none';
+};
+document.getElementById('plateClear').onclick = ()=>{
+  document.getElementById('platePrefix').value='';
+  ['plateStats','plateList'].forEach(id=>document.getElementById(id).innerHTML='');
+  document.getElementById('plateMore').style.display='none';
+  document.getElementById('platePrefix').focus();
+};
+const tabs = document.querySelectorAll('nav button');
+function switchTab(id){
+  document.querySelectorAll('main > section').forEach(s=>s.classList.toggle('active', s.id===id));
+  tabs.forEach(b=>b.classList.toggle('on', b.dataset.tab===id));
+  window.scrollTo(0,0);
+}
+tabs.forEach(b=>{ b.addEventListener('click', ()=>switchTab(b.dataset.tab)); });
+switchTab('calc');
+</script>
+</body>
+</html>
