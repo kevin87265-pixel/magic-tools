@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" style="color-scheme: dark;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark light">
+<title>塔羅靈數速查</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#14121d; --card:#1e1b2c; --card2:#26223a; --line:#37324e;
+  --text:#f0eef7; --muted:#a79fc4; --gold:#d4af6a; --gold-dim:#8a7448;
+  --good:#7fc4b0; --bad:#d99;
+  --fs:15px;
+}
+[data-theme="light"]{
+  --bg:#f4f1e8; --card:#ffffff; --card2:#f7f4ec; --line:#ddd5c2;
+  --text:#2a2438; --muted:#6f6787; --gold:#9a7628; --gold-dim:#b99b5e;
+  --good:#2e8a72; --bad:#b05565;
+}
+[data-fs="big"]{ --fs:18px; }
+*{box-sizing:border-box;margin:0;padding:0}
+html{color-scheme:dark}
+body{
+  background:var(--bg); color:var(--text);
+  font-family:'Noto Sans TC',"PingFang TC","Microsoft JhengHei",sans-serif;
+  font-size:var(--fs); line-height:1.7; min-height:100vh;
+}
+.serif{font-family:'Noto Serif TC',"PMingLiU",serif}
+header{
+  padding:20px 16px 12px; text-align:center;
+  border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(212,175,106,.07), transparent);
+}
+header h1{font-family:'Noto Serif TC',serif; font-size:1.5em; letter-spacing:.25em; color:var(--gold)}
+header p{color:var(--muted); font-size:.85em; letter-spacing:.15em; margin-top:2px}
+.toolbar{position:absolute; top:12px; right:12px; display:flex; gap:6px}
+.toolbar button{
+  background:var(--card); border:1px solid var(--line); color:var(--text);
+  border-radius:8px; padding:5px 9px; font-size:.85em; cursor:pointer;
+}
+.tabs{
+  display:flex; overflow-x:auto; gap:4px; padding:10px 12px;
+  position:sticky; top:0; background:var(--bg); z-index:10;
+  border-bottom:1px solid var(--line); -webkit-overflow-scrolling:touch;
+}
+.tabs button{
+  flex:0 0 auto; background:var(--card); color:var(--muted);
+  border:1px solid var(--line); border-radius:20px;
+  padding:7px 15px; font-size:.95em; cursor:pointer; font-family:inherit;
+}
+.tabs button.on{background:var(--gold); color:#1a1610; border-color:var(--gold); font-weight:700}
+main{max-width:680px; margin:0 auto; padding:16px 14px 60px}
+.panel{display:none}
+.panel.on{display:block}
+.box{
+  background:var(--card); border:1px solid var(--line); border-radius:14px;
+  padding:16px; margin-bottom:14px;
+}
+.box h2{font-size:1.05em; color:var(--gold); margin-bottom:10px; letter-spacing:.1em}
+label{display:block; font-size:.85em; color:var(--muted); margin-bottom:4px}
+.birth-row{display:flex; gap:8px}
+.birth-row>div{flex:1}
+input[type=number]{
+  width:100%; background:var(--card2); border:1px solid var(--line);
+  color:var(--text); border-radius:10px; padding:10px; font-size:1.1em;
+  text-align:center; font-family:inherit;
+}
+input:focus{outline:2px solid var(--gold); border-color:var(--gold)}
+.btn{
+  width:100%; margin-top:14px; padding:13px; border:none; border-radius:12px;
+  background:linear-gradient(135deg,var(--gold),var(--gold-dim));
+  color:#1a1610; font-size:1.05em; font-weight:700; letter-spacing:.3em;
+  cursor:pointer; font-family:inherit;
+}
+.err{color:var(--bad); font-size:.9em; margin-top:8px; display:none}
+/* 牌陣 */
+.spread{display:flex; gap:10px; margin:6px 0 14px}
+.tcard{
+  flex:1; background:var(--card2); border:1px solid var(--gold-dim);
+  border-radius:12px; padding:14px 6px 12px; text-align:center; cursor:pointer;
+  position:relative; transition:transform .15s;
+}
+.tcard:active{transform:scale(.97)}
+.tcard .role{font-size:.72em; color:var(--muted); letter-spacing:.15em}
+.tcard .num{font-family:'Noto Serif TC',serif; font-size:1.9em; color:var(--gold); line-height:1.2; margin:4px 0 2px}
+.tcard .nm{font-family:'Noto Serif TC',serif; font-size:1.02em; font-weight:700}
+.tcard .zo{font-size:.72em; color:var(--muted); margin-top:2px; min-height:1.2em}
+.calc-steps{font-size:.85em; color:var(--muted); background:var(--card2); border-radius:10px; padding:10px 12px; margin-bottom:12px}
+.calc-steps b{color:var(--gold)}
+/* 牌義卡 */
+.meaning{border-top:1px dashed var(--line); margin-top:10px; padding-top:10px}
+.meaning h3{font-size:.95em; margin-bottom:4px}
+.meaning h3.g{color:var(--good)} .meaning h3.b{color:var(--bad)}
+.meaning ul{list-style:none; margin-bottom:8px}
+.meaning li{padding-left:1.1em; position:relative; font-size:.95em; margin-bottom:3px}
+.meaning li::before{content:"◆"; position:absolute; left:0; font-size:.6em; top:.55em; color:var(--gold-dim)}
+/* 速配 */
+.match-line{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px}
+.pill{background:var(--card2); border:1px solid var(--line); border-radius:16px; padding:3px 12px; font-size:.9em}
+.pill.g{border-color:var(--good); color:var(--good)}
+.pill.b{border-color:var(--bad); color:var(--bad)}
+/* 22 牌格 */
+.grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:9px}
+.gcard{
+  background:var(--card); border:1px solid var(--line); border-radius:12px;
+  padding:12px 8px; text-align:center; cursor:pointer;
+}
+.gcard .num{font-family:'Noto Serif TC',serif; color:var(--gold); font-size:1.3em}
+.gcard .nm{font-family:'Noto Serif TC',serif; font-weight:700}
+.gcard .zo{font-size:.75em; color:var(--muted); min-height:1.3em}
+.detail{display:none}
+.detail.on{display:block}
+.backlink{color:var(--gold); cursor:pointer; font-size:.9em; margin-bottom:10px; display:inline-block}
+/* 表格 */
+table{width:100%; border-collapse:collapse; font-size:.92em}
+th,td{padding:9px 6px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top}
+th{color:var(--gold); font-weight:500; font-size:.88em; white-space:nowrap}
+td .g{color:var(--good)} td .b{color:var(--bad)}
+/* 流年 */
+.year-nav{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px}
+.year-nav button{
+  width:42px; height:42px; border-radius:50%; border:1px solid var(--line);
+  background:var(--card); color:var(--text); font-size:1.05em; cursor:pointer; font-family:'Noto Serif TC',serif;
+}
+.year-nav button.on{background:var(--gold); color:#1a1610; border-color:var(--gold); font-weight:700}
+.fy-aspect{margin-bottom:10px}
+.fy-aspect b{color:var(--gold)}
+.note{font-size:.82em; color:var(--muted); margin-top:10px}
+.rule-num{
+  display:inline-block; width:1.7em; height:1.7em; line-height:1.7em; text-align:center;
+  border:1px solid var(--gold); border-radius:50%; color:var(--gold);
+  font-family:'Noto Serif TC',serif; margin-right:8px; font-size:.9em;
+}
+footer{text-align:center; color:var(--muted); font-size:.78em; padding:20px; letter-spacing:.1em}
+/* 生命靈數九宮格 */
+.ng{display:grid; grid-template-columns:repeat(3,1fr); gap:6px; max-width:250px; margin:12px auto}
+.ng div{
+  aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  border:1px solid var(--line); border-radius:10px; background:var(--card2);
+  font-family:'Noto Serif TC',serif; font-size:1.25em; color:var(--muted);
+}
+.ng div.hit{border-color:var(--gold); color:var(--gold); font-weight:700}
+.ng .ct{font-size:.55em; color:var(--muted); font-family:'Noto Sans TC',sans-serif; letter-spacing:.1em}
+.line-list{margin-top:8px}
+.line-list .pill{margin:0 6px 6px 0; display:inline-block}
+.school{border-top:1px dashed var(--line); padding:10px 0}
+.school:first-of-type{border-top:none; padding-top:0}
+.school b{color:var(--gold)}
+.school p{font-size:.93em; color:var(--muted)}
+.tag{font-size:.72em; border:1px solid var(--gold-dim); color:var(--gold); border-radius:10px; padding:1px 8px; margin-left:6px; vertical-align:middle}
+.mode-row{display:flex; gap:8px; margin-bottom:14px}
+.mode-row button{
+  flex:1; padding:9px; border-radius:10px; border:1px solid var(--line);
+  background:var(--card2); color:var(--muted); cursor:pointer; font-family:inherit; font-size:.95em;
+}
+.mode-row button.on{border-color:var(--gold); color:var(--gold); font-weight:700}
+.copybtn{
+  margin:0 0 14px; width:100%; padding:12px; border-radius:12px;
+  border:1px solid var(--gold); background:transparent; color:var(--gold);
+  cursor:pointer; font-family:inherit; font-size:1em; letter-spacing:.2em;
+}
+.sw{display:inline-block; width:15px; height:15px; border-radius:50%; vertical-align:-2px; margin-right:7px; border:1px solid rgba(255,255,255,.3)}
+.score-wrap{text-align:center; padding:6px 0 2px}
+.score-num{font-family:'Noto Serif TC',serif; font-size:3em; color:var(--gold); line-height:1.1}
+.score-num small{font-size:.4em; color:var(--muted)}
+.score-br{font-size:.85em; color:var(--muted); margin-top:6px}
+.score-br span{display:inline-block; margin:2px 6px}
+.vs{display:flex; align-items:center; justify-content:center; font-family:'Noto Serif TC',serif; color:var(--gold); font-size:1.2em; padding:0 2px}
+/* 開頭動畫：正立→倒右→往左攤→中央凸出抽起→翻白光暈開進場 */
+#intro{position:fixed;inset:0;z-index:999;background:
+  radial-gradient(ellipse at 50% 30%,rgba(90,70,160,.35),transparent 55%),
+  radial-gradient(ellipse at 50% 45%,#232052,#100e26 78%);
+display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;animation:introOut .7s ease 5.3s forwards;cursor:pointer;overflow:hidden}
+.intro-title{font-family:'Noto Serif TC',serif;font-size:1.35em;color:#e8c87f;letter-spacing:.55em;text-indent:.55em;animation:introTitle .9s ease .15s both;text-shadow:0 0 22px rgba(212,175,106,.55)}
+.intro-sub{font-size:.75em;color:#9a90c0;letter-spacing:.3em;text-indent:.3em;animation:introTitle .9s ease .4s both}
+@keyframes introTitle{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.stage{position:relative;width:min(98vw,620px);height:340px;perspective:900px}
+/* 牌堆：正立現身 → 整疊倒向右邊 */
+.fan{position:absolute;inset:0;transform-origin:50% 405px;animation:fanGrow .5s cubic-bezier(.2,.7,.3,1.1) .05s both,fanTilt .55s cubic-bezier(.4,.1,.3,1) .8s both}
+@keyframes fanGrow{from{opacity:0;transform:scale(.75) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes fanTilt{from{transform:rotate(0)}to{transform:rotate(84deg)}}
+.fc{position:absolute;bottom:6px;left:50%;width:88px;height:142px;margin-left:-44px;border-radius:10px;border:1.5px solid rgba(212,175,106,.9);background:linear-gradient(165deg,#282456,#151130);box-shadow:0 4px 12px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;transform-origin:50% 150%;will-change:transform;backface-visibility:hidden;animation:fanOut .9s cubic-bezier(.3,.65,.25,1) calc(1.45s + var(--d)) both}
+.fc::before{content:"";position:absolute;inset:5px;border:1px solid rgba(212,175,106,.5);border-radius:7px}
+.fc::after{content:attr(data-s);color:#e2bd72;font-size:1.5em;text-shadow:0 0 8px rgba(212,175,106,.7)}
+.fc.alt{background:radial-gradient(circle at 50% 30%,rgba(212,175,106,.22),transparent 45%),linear-gradient(165deg,#2c265c,#151130)}
+.fc.alt2::before{border-style:double;border-width:3px;inset:4px}
+@keyframes fanOut{from{transform:rotate(0)}to{transform:rotate(calc(var(--a) - 84deg))}}
+/* 主牌：凸出→抽起放大→翻面成白光 */
+.hero{position:absolute;bottom:6px;left:50%;width:88px;height:142px;margin-left:-44px;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;z-index:6;will-change:transform;animation:heroGo 2.3s cubic-bezier(.35,.1,.3,1) 3.15s both}
+@keyframes heroGo{
+  0%{visibility:hidden;transform:translateY(30px) translateZ(0) scale(.8) rotateY(0)}
+  2%{visibility:visible;transform:translateY(24px) translateZ(0) scale(.83) rotateY(0)}
+  8%{visibility:visible;transform:translateY(-22px) translateZ(0) scale(1.05) rotateY(0)}
+  25%{transform:translateY(-22px) translateZ(0) scale(1.05) rotateY(0)}
+  45%{transform:translateY(-86px) translateZ(110px) scale(1.7) rotateY(0)}
+  75%{transform:translateY(-86px) translateZ(110px) scale(1.74) rotateY(180deg)}
+  100%{transform:translateY(-86px) translateZ(110px) scale(1.78) rotateY(180deg)}
+}
+.hface{position:absolute;inset:0;border-radius:10px;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;align-items:center;justify-content:center;border:1.5px solid rgba(212,175,106,.9)}
+.hback{transform:translateZ(.6px);background:radial-gradient(circle at 50% 32%,rgba(212,175,106,.3),transparent 46%),linear-gradient(165deg,#2b2547,#191536);box-shadow:0 6px 22px rgba(0,0,0,.5)}
+.hback::before{content:"";position:absolute;inset:7px;border:1px solid rgba(212,175,106,.6);border-radius:8px}
+.hback::after{content:"✶";color:#e2bd72;font-size:1.5em;text-shadow:0 0 12px rgba(212,175,106,.9)}
+/* 翻過來是半透明白光 */
+.hfront{transform:rotateY(180deg) translateZ(.6px);border:none;border-radius:50%;background:radial-gradient(ellipse at center,rgba(255,255,255,.95),rgba(255,255,255,.45) 42%,rgba(255,255,255,0) 70%);box-shadow:none}
+/* 白光暈染滿版 */
+.bloom{position:absolute;top:36%;left:50%;width:220px;height:220px;margin:-110px 0 0 -110px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.95),rgba(255,255,255,.5) 45%,rgba(255,255,255,0) 72%);z-index:7;pointer-events:none;animation:bloomUp 1.15s cubic-bezier(.3,.2,.4,1) 4.6s both}
+@keyframes bloomUp{from{opacity:0;transform:scale(.15)}45%{opacity:1}to{opacity:1;transform:scale(11)}}
+.glow{position:absolute;top:46%;left:50%;width:440px;height:440px;margin:-220px 0 0 -220px;border-radius:50%;background:radial-gradient(circle,rgba(212,175,106,.13),transparent 60%)}
+@keyframes introSpin{to{transform:rotate(360deg)}}
+@keyframes introOut{to{opacity:0;visibility:hidden}}
+@media (min-width:900px){
+  main{max-width:940px}
+  .tabs{justify-content:center}
+  header h1{font-size:1.9em}
+  .box{padding:22px 26px}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(175px,1fr))}
+  .spread{max-width:560px;margin-left:auto;margin-right:auto}
+  .birth-row{max-width:620px}
+}
+@media (max-width:430px){
+  .stage{height:280px}
+  .fan{transform-origin:50% 326px}
+  .fc{width:64px;height:104px;margin-left:-32px}
+  .fc::after{font-size:1.15em}
+  .hero{width:64px;height:104px;margin-left:-32px}
+}
+@media (prefers-reduced-motion:reduce){#intro{display:none}}
+</style>
+</head>
+<body>
+<div id="intro" onclick="this.remove()" aria-hidden="true">
+  <div class="intro-title">THE FATE RING</div>
+  <div class="intro-sub">選一張屬於你的命運之牌</div>
+  <div class="stage">
+    <div class="glow"></div>
+    <div class="fan">
+      <div class="fc " style="--a:-84deg;--d:0.95s" data-s="☀"></div>
+      <div class="fc alt" style="--a:-76deg;--d:0.9s" data-s="☽"></div>
+      <div class="fc alt2" style="--a:-68deg;--d:0.86s" data-s="✶"></div>
+      <div class="fc " style="--a:-60deg;--d:0.81s" data-s="✦"></div>
+      <div class="fc alt" style="--a:-52deg;--d:0.77s" data-s="◈"></div>
+      <div class="fc alt2" style="--a:-44deg;--d:0.72s" data-s="☉"></div>
+      <div class="fc " style="--a:-36deg;--d:0.68s" data-s="☾"></div>
+      <div class="fc alt" style="--a:-28deg;--d:0.63s" data-s="✧"></div>
+      <div class="fc alt2" style="--a:-20deg;--d:0.59s" data-s="⁂"></div>
+      <div class="fc " style="--a:-12deg;--d:0.54s" data-s="✺"></div>
+      <div class="fc alt" style="--a:-4deg;--d:0.5s" data-s="❂"></div>
+      <div class="fc alt2" style="--a:4deg;--d:0.45s" data-s="✵"></div>
+      <div class="fc " style="--a:12deg;--d:0.41s" data-s="✹"></div>
+      <div class="fc alt" style="--a:20deg;--d:0.36s" data-s="✷"></div>
+      <div class="fc alt2" style="--a:28deg;--d:0.32s" data-s="❉"></div>
+      <div class="fc " style="--a:36deg;--d:0.27s" data-s="✻"></div>
+      <div class="fc alt" style="--a:44deg;--d:0.23s" data-s="✼"></div>
+      <div class="fc alt2" style="--a:52deg;--d:0.18s" data-s="❈"></div>
+      <div class="fc " style="--a:60deg;--d:0.14s" data-s="❋"></div>
+      <div class="fc alt" style="--a:68deg;--d:0.09s" data-s="✽"></div>
+      <div class="fc alt2" style="--a:76deg;--d:0.05s" data-s="◇"></div>
+      <div class="fc " style="--a:84deg;--d:0.0s" data-s="✪"></div>
+    </div>
+    <div class="hero">
+      <div class="hface hback"></div>
+      <div class="hface hfront"></div>
+    </div>
+    <div class="bloom"></div>
+  </div>
+</div>
+<script>setTimeout(()=>{const i=document.getElementById('intro');if(i)i.remove()},6150);</script>
+<header>
+  <div class="toolbar">
+    <button id="themeBtn" onclick="toggleTheme()">☀️</button>
+    <button id="fsBtn" onclick="toggleFs()">A+</button>
+  </div>
+  <h1>塔羅靈數</h1>
+  <p>一分鐘讀懂人心 ─ 速查・計算</p>
+</header>
+
+<nav class="tabs">
+  <button class="on" onclick="go('calc',this)">✦ 計算</button>
+  <button onclick="go('cards',this)">22牌速查</button>
+  <button onclick="go('life',this)">生命靈數</button>
+  <button onclick="go('approach',this)">攻略</button>
+  <button onclick="go('match',this)">速配表</button>
+  <button onclick="go('flow',this)">流年</button>
+  <button onclick="go('color',this)">色彩</button>
+  <button onclick="go('schools',this)">流派</button>
+  <button onclick="go('rules',this)">規則</button>
+</nav>
+
+<main>
+<!-- ===== 計算 ===== -->
+<section id="calc" class="panel on">
+  <div class="box">
+    <div class="mode-row">
+      <button class="on" id="modeS" onclick="setMode('single')">單人測算</button>
+      <button id="modeP" onclick="setMode('pair')">兩人合盤</button>
+    </div>
+    <h2>輸入西元生日</h2>
+    <div class="birth-row">
+      <div><label>西元年</label><input type="number" id="by" placeholder="1990" min="1900" max="2100" inputmode="numeric"></div>
+      <div><label>月</label><input type="number" id="bm" placeholder="12" min="1" max="12" inputmode="numeric"></div>
+      <div><label>日</label><input type="number" id="bd" placeholder="4" min="1" max="31" inputmode="numeric"></div>
+    </div>
+    <div id="pairBox" style="display:none">
+      <h2 style="margin-top:14px">對方生日</h2>
+      <div class="birth-row">
+        <div><label>西元年</label><input type="number" id="by2" placeholder="1992" min="1900" max="2100" inputmode="numeric"></div>
+        <div><label>月</label><input type="number" id="bm2" placeholder="6" min="1" max="12" inputmode="numeric"></div>
+        <div><label>日</label><input type="number" id="bd2" placeholder="15" min="1" max="31" inputmode="numeric"></div>
+      </div>
+    </div>
+    <button class="btn" onclick="run()">排 牌</button>
+    <div class="err" id="err">請輸入完整且正確的西元生日</div>
+  </div>
+  <div id="result"></div>
+</section>
+
+<!-- ===== 22 牌 ===== -->
+<section id="cards" class="panel">
+  <div id="cardGrid" class="grid"></div>
+  <div id="cardDetail" class="detail"></div>
+</section>
+
+<!-- ===== 相處攻略 ===== -->
+<section id="approach" class="panel">
+  <div class="box">
+    <h2>相處攻略（對方的主命數）</h2>
+    <p class="note" style="margin:0 0 10px">先用「計算」頁算出對方生日的潛意識數（1–9），再來這裡查怎麼應對。</p>
+    <div class="year-nav" id="apNav"></div>
+    <div id="apDetail"></div>
+  </div>
+</section>
+
+<!-- ===== 速配 ===== -->
+<section id="match" class="panel">
+  <div class="box">
+    <h2>靈數速配表（1–9）</h2>
+    <table>
+      <thead><tr><th>你的靈數</th><th>最速配<br><span style="font-weight:400">同頻＋互補</span></th><th>容易摩擦<br><span style="font-weight:400">挑戰型</span></th></tr></thead>
+      <tbody id="matchBody"></tbody>
+    </table>
+    <p class="note">速配以「潛意識靈數」（1–9）對照。</p>
+  </div>
+</section>
+
+<!-- ===== 流年 ===== -->
+<section id="flow" class="panel">
+  <div class="box">
+    <h2>塔羅流年速查</h2>
+    <div class="year-nav" id="fyNav"></div>
+    <div id="fyDetail"></div>
+    <p class="note">算法：當下西元年＋生日月份＋生日，各數字加總至個位數。<br>例：12月4日生，2026年 → 2+0+2+6+1+2+4＝17 → 1+7＝<b style="color:var(--gold)">8</b></p>
+  </div>
+</section>
+
+<!-- ===== 生命靈數 ===== -->
+<section id="life" class="panel">
+  <div class="box">
+    <h2>生命靈數速查（主命數 1–9）</h2>
+    <div class="year-nav" id="lpNav"></div>
+    <div id="lpDetail"></div>
+    <p class="note">主命數＝西元生日各數字加總至個位數，與本課程「潛意識數」為同一算法。天賦數＝加總過程的組成數字（如 26 → 天賦 2、6）；生日數＝出生「日」加總至個位。</p>
+  </div>
+  <div class="box">
+    <h2>九宮格連線一覽</h2>
+    <div class="ng" style="max-width:200px">
+      <div>3</div><div>6</div><div>9</div>
+      <div>2</div><div>5</div><div>8</div>
+      <div>1</div><div>4</div><div>7</div>
+    </div>
+    <table><tbody id="lineBody"></tbody></table>
+    <p class="note">生日全部數字（0 不圈）＋天賦數＋主命數圈入九宮格；一條線三格都有數字即成連線。沒出現的數字為「空缺數」，代表較弱、需後天補強的面向。</p>
+  </div>
+</section>
+
+<!-- ===== 色彩靈數 ===== -->
+<section id="color" class="panel">
+  <div class="box">
+    <h2>色彩靈數速查（1–9）</h2>
+    <div id="colorList"></div>
+    <p class="note">以主命數對照代表色；流年數則是當年可多用的輔助色。色彩對應各流派略有差異，此為常見版本。</p>
+  </div>
+</section>
+
+<!-- ===== 流派 ===== -->
+<section id="schools" class="panel">
+  <div class="box">
+    <h2>同一套「加總化簡」的系統</h2>
+    <div id="schoolsSame"></div>
+  </div>
+  <div class="box">
+    <h2>相關但算法不同的系統</h2>
+    <div id="schoolsDiff"></div>
+  </div>
+</section>
+
+<!-- ===== 規則 ===== -->
+<section id="rules" class="panel">
+  <div class="box">
+    <h2>找出自己的塔羅靈數</h2>
+    <p style="margin-bottom:10px"><span class="rule-num">1</span><b>潛意識</b>：西元生日各數字總和，加到最後一位數（1–9）。</p>
+    <p style="margin-bottom:10px"><span class="rule-num">2</span><b>行為</b>：西元生日各數字總和 → ≤21 直接對應大牌；≥22 要減 22。</p>
+    <p style="margin-bottom:10px"><span class="rule-num">3</span><b>特質</b>：星座靈數（依生日星座對照下表）。</p>
+  </div>
+  <div class="box">
+    <h2>星座靈數對照表</h2>
+    <table><tbody id="zodiacBody"></tbody></table>
+  </div>
+  <div class="box">
+    <h2>塔羅流年</h2>
+    <p>當下西元年＋生日月份＋生日，各數字加總至個位數（1–9），對照「流年」分頁的九個年運。</p>
+  </div>
+</section>
+</main>
+<footer>神奇身心靈學苑 · 塔羅靈數</footer>
+
+<script>
+/* ================= 資料 ================= */
+const CARDS=[
+ {n:0,nm:"愚人",zo:"",good:["天真樂觀、勇於冒險，喜歡嘗試新事物","真誠浪漫、能為感情帶來驚喜與活力","創意豐富、思維靈活，敢打破框架","自由灑脫、不受拘束"],bad:["缺乏計劃，容易因衝動犯錯","感情不穩定，容易被新鮮感吸引分心","不注重細節，缺乏持續力與目標感","單純還有些幼稚，不夠成熟穩重"]},
+ {n:1,nm:"魔術師",zo:"天蠍座",good:["做事行動力很強，只要有了想法就能馬上開始","在感情裡主動又有熱情","工作上善於運用資源，把不同的能力結合起來，創造成果","聰明、靈活，會去找出解決辦法"],bad:["想法多卻不一定能持續執行到底","感情中容易因太快投入而忽略彼此的真實差異","做事時有時過於急躁，想一步到位","比較自我中心，喜歡按照自己的節奏來"]},
+ {n:2,nm:"女祭司",zo:"",good:["個性安靜沉穩，觀察力很強，常常能看出別人沒注意到的細節","細膩貼心，能察覺對方情緒變化，並給予分析","工作上思路清晰，善於在行動前先分析和規劃","在人群中給人神秘、聰慧又值得信賴的感覺"],bad:["想得多做得少，容易錯過行動的最佳時機","感情中不喜歡攤開說，常讓對方猜不透你的心","做事過於保守，不願冒險嘗試新方法","比較慢熟，需要一點時間才會願意敞開心房","有距離感，不容易親近"]},
+ {n:3,nm:"皇后",zo:"",good:["個性穩重有原則，做事踏實且有責任感","在感情中專一可靠，能給對方穩定的承諾","在人群中給人值得依靠、能撐起局面的大人感","工作上有領導力，擅長規劃與掌控全局","男生則比較陰柔、細膩"],bad:["太容易心軟，常為了別人的感受而委屈自己","感情中有時過度付出，導致失去平衡","工作上可能缺乏紀律，容易被情緒影響效率","在人家眼裡雖然溫柔，但有時顯得優柔寡斷、不夠果斷"]},
+ {n:4,nm:"皇帝",zo:"牡羊座",good:["個性穩重有原則，做事踏實且有責任感","在感情中專一可靠，能給對方穩定的承諾","工作上有領導力，擅長規劃與掌控全局","值得依靠、能撐起局面"],bad:["太過固執，容易聽不進不同意見","感情中有時過於理性，忽略對方的情緒需求","工作上可能太想掌控，讓團隊感到壓力","在人家眼裡雖然可靠，但有時顯得嚴肅、不易親近"]},
+ {n:5,nm:"教皇",zo:"金牛座",good:["個性溫和穩重，重視道德與價值觀，讓人信任","在感情中真誠專一，願意用行動守護承諾","工作上善於指導與分享知識，樂於幫助他人成長","在人群中給人智慧、可靠、值得請教的印象"],bad:["過於守舊，容易抗拒改變","感情中可能過度理性，缺乏浪漫與驚喜","工作上有時過於照規則行事，缺少靈活度","在人家眼裡雖然值得信賴，但可能顯得拘謹或保守"]},
+ {n:6,nm:"戀人",zo:"雙子座",good:["個性溫柔有親和力，懂得體諒與包容他人","在感情中投入且真心，願意為愛付出與承諾","工作上擅長合作，能與不同的人建立良好關係","好相處、貼心、懂人情世故"],bad:["容易猶豫不決，在選擇時拖延太久","感情中過度依賴對方，容易失去自我","工作上可能因顧慮人情而影響決策效率","比較溫和、但也優柔寡斷、缺乏主見"]},
+ {n:7,nm:"戰車",zo:"巨蟹座",good:["個性有衝勁、有目標感，遇到挑戰也不輕易退縮","在感情中主動積極，願意為了愛去爭取與突破","工作上行動力強，能快速推動計畫向前","做事果斷、有決心、充滿能量"],bad:["太急於達成目標，容易忽略過程中的細節","感情中控制欲較強，容易讓對方有壓力","工作上可能衝得太快，缺乏長遠規劃","雖然能幹，但好勝、固執己見"]},
+ {n:8,nm:"力量",zo:"獅子座",good:["個性溫柔卻有韌性，面對壓力能保持冷靜","在感情中耐心傾聽，懂得用溫和方式化解衝突","工作上穩定踏實，能一步步完成目標","溫暖可靠、外柔內剛"],bad:["過於壓抑情緒，不容易表達真實感受","感情中有時太遷就對方，忽略自己的需求","工作上可能過度保守，缺乏果斷突破","個性和善，但有時顯得被動、不夠有衝勁"]},
+ {n:9,nm:"隱者",zo:"處女座",good:["個性獨立內斂，喜歡在安靜中思考與沉澱","在感情中重視精神交流，偏好深度而真誠的關係","工作上分析能力強，擅長獨立完成需要專注的任務","有智慧、深思熟慮且值得信賴"],bad:["容易封閉自己，不願過多表達內心想法","感情中有時顯得冷淡，讓對方難以靠近","工作上可能過於獨來獨往，缺少團隊互動","很聰明，但有距離感，不好親近"]},
+ {n:10,nm:"命運之輪",zo:"摩羯座",good:["個性適應力強，能在變化中快速找到新的方向","在感情中隨和開放，願意接受不同的相處方式","工作上懂得把握時機，能在關鍵時刻做出有利決定","會臨機應變、懂得抓住機會"],bad:["容易隨波逐流，缺乏長期穩定的計劃","感情中情緒起伏大，關係狀態容易受環境影響","喜歡在舒適圈，不會成長","個性反覆、不夠穩定"]},
+ {n:11,nm:"正義",zo:"天秤座",good:["個性理性公平，做事講求原則與誠信","在感情中重視承諾與平等，願意用溝通解決問題","工作上分析能力強，能客觀評估事情利弊","正直、可靠、值得信任"],bad:["過於追求完美與公平，容易陷入糾結","感情中有時太理智，忽略情感表達","工作上可能過度挑剔，導致效率下降","在人家眼裡雖然公正，但有時顯得冷漠、不近人情"]},
+ {n:12,nm:"吊人",zo:"",good:["個性包容有耐心，能在困境中保持冷靜觀察","在感情中願意為對方付出與等待，不計較短暫得失","工作上能從不同角度思考問題，找到別人忽略的解法","溫和、懂事、能替他人著想"],bad:["容易過度忍讓，長期忽略自己的需求","感情中可能因退讓過多而失去主導權","工作上行動力不足，容易陷在觀望期太久","在人家眼裡雖然善良，但有時顯得消極、缺乏衝勁"]},
+ {n:13,nm:"死神",zo:"",good:["個性堅韌果斷，能在必要時做出重大改變","在感情中有勇氣結束不適合的關係，給自己重新開始的機會","工作上擅長在變動中找到新方向，具備重建能力","在人群中給人成熟、歷練豐富、能面對現實挑戰的印象"],bad:["面對改變時雖果斷，但過程可能過於激烈","感情中有時太快切斷連結，讓人難以挽回","工作上容易因環境壓力過大而情緒化","在人家眼裡雖然堅強，但有時顯得冷酷、難以接近"]},
+ {n:14,nm:"節制",zo:"射手座",good:["個性溫和穩定，懂得在不同立場間找到平衡","在感情中包容體貼，願意為了關係調整自己","工作上善於協調與整合資源，讓團隊運作順暢","溫暖、圓融、值得依賴"],bad:["過於追求和諧，容易忽略自己的立場","感情中可能因過度遷就而失去真實感","工作上缺乏果斷，容易陷入觀望與拖延","在人家眼裡雖然圓融，但有時顯得沒主見、太保守"]},
+ {n:15,nm:"惡魔",zo:"",good:["個性魅力十足，懂得運用自身特質吸引別人","在感情中熱情主動，能帶來強烈的吸引力與激情","工作上目標明確，願意為達成想要的結果全力以赴","在人群中給人神秘、有吸引力且影響力強"],bad:["容易被慾望或情感綁住，難以抽離","感情中可能過度佔有或依賴，導致關係失衡","工作上有時太重視結果而忽略過程與規則","控制慾強、不容易信任別人"]},
+ {n:16,nm:"高塔",zo:"",good:["個性果斷直接，遇到問題能立刻採取行動","在感情中真實坦率，不會長期隱忍不適合的關係","工作上能在混亂中迅速做出決定，重建局面","在人群中給人真誠直接、行事乾脆"],bad:["面對衝擊時情緒容易激烈，缺乏緩衝","感情中有時過於突然結束關係，讓對方措手不及","工作上可能因變動過快而造成後續混亂","雖然果斷，但有時顯得衝動、破壞力強"]},
+ {n:17,nm:"星星",zo:"水瓶座",good:["個性樂觀真誠，能在低潮時依然保持希望","在感情中溫柔體貼，願意陪伴對方走過難關","工作上充滿創意與靈感，能啟發團隊士氣","療癒、善良又充滿正能量"],bad:["過於理想化，容易忽略現實限制","感情中可能一味付出，卻忽略自己的需求","工作上想法多但落地不足，容易停留在構想階段","在人家眼裡雖然溫暖，但有時顯得不切實際"]},
+ {n:18,nm:"月亮",zo:"雙魚座",good:["個性敏感細膩，直覺力強，能察覺微小的情緒變化","在感情中感受力深，能與對方建立靈魂層面的連結","工作上具備洞察力，能看出他人忽略的細節與風險","神秘、有靈性且善於理解他人"],bad:["情緒起伏大，容易被不安感影響判斷","感情中有時過度多疑，讓對方感到壓力","工作上可能因想太多而錯過行動時機","直覺敏銳、敏感，有時顯得情緒化、不夠穩定"]},
+ {n:19,nm:"太陽",zo:"",good:["個性開朗熱情，充滿自信與活力，能帶動周圍氣氛","在感情中真誠坦率，願意全心全意付出愛","工作上積極主動，能用正能量影響團隊與結果","陽光、可靠又充滿魅力"],bad:["過於自信時容易忽略他人感受","感情中可能太直接，忽視對方需要的安全感","工作上有時衝勁過高，缺乏細節規劃","在人家眼裡雖然熱情，但有時顯得衝動或愛表現"]},
+ {n:20,nm:"審判",zo:"",good:["個性有責任感，懂得為自己的人生與選擇負責","在感情中重視承諾，願意修復與改善關係","成熟穩重、容易被依賴","工作上能統整全局，帶領團隊完成重要目標"],bad:["容易對自己要求過高，導致壓力過大","感情中可能過度糾結過去，影響當下的互動","工作上有時過於嚴肅，缺少彈性與創意","在人家眼裡雖然可靠，但有時顯得嚴厲、不易親近"]},
+ {n:21,nm:"世界",zo:"",good:["個性成熟穩重，視野開闊，能包容不同觀點與文化","在感情中穩定踏實，懂得經營並維護長久關係","圓融大氣、經驗豐富且值得依靠","工作上有全局觀，能協調資源完成大型目標"],bad:["容易因追求完美而延遲行動","感情中有時過於安於現狀，缺乏激情與變化","工作上可能分心於太多目標，導致推進速度變慢","在人家眼裡雖然穩重，但有時顯得保守、不夠靈活"]}
+];
+const ROMAN=["0","I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI"];
+/* 星座 → 靈數牌（依課程表）；含日期區間判斷 */
+const ZODIAC=[
+ {nm:"摩羯座",sym:"♑",card:10,from:[12,22],to:[1,19]},
+ {nm:"水瓶座",sym:"♒",card:17,from:[1,20],to:[2,18]},
+ {nm:"雙魚座",sym:"♓",card:18,from:[2,19],to:[3,20]},
+ {nm:"牡羊座",sym:"♈",card:4,from:[3,21],to:[4,19]},
+ {nm:"金牛座",sym:"♉",card:5,from:[4,20],to:[5,20]},
+ {nm:"雙子座",sym:"♊",card:6,from:[5,21],to:[6,21]},
+ {nm:"巨蟹座",sym:"♋",card:7,from:[6,22],to:[7,22]},
+ {nm:"獅子座",sym:"♌",card:8,from:[7,23],to:[8,22]},
+ {nm:"處女座",sym:"♍",card:9,from:[8,23],to:[9,22]},
+ {nm:"天秤座",sym:"♎",card:11,from:[9,23],to:[10,23]},
+ {nm:"天蠍座",sym:"♏",card:1,from:[10,24],to:[11,22]},
+ {nm:"射手座",sym:"♐",card:14,from:[11,23],to:[12,21]}
+];
+const MATCH={
+ 1:{g:[6,3],b:[4,8]}, 2:{g:[5,8],b:[1,7]}, 3:{g:[4,1],b:[5,7]},
+ 4:{g:[3,9],b:[1,6]}, 5:{g:[2,7],b:[3,6]}, 6:{g:[1,9],b:[4,7]},
+ 7:{g:[5,8],b:[2,6]}, 8:{g:[7,2],b:[1,3]}, 9:{g:[6,4],b:[5,7]}
+};
+const FLOW={
+ 1:{t:"開創年",kw:"開創、創新、新的機會",a:{流年:"新的機會、開啟新的思維，只要積極去執行，並說出自己的想法，就容易得到貴人相助跟支持。",挑戰:"獨自承擔責任，勇敢邁出第一步，克服對未知的恐懼，可能需要適應新的環境或技能。",工作:"在工作上會有更多新的想法或突破，但也有可能會經歷離職後才能遇到好的機遇。",感情:"有新桃花出現，或者現有的感情關係會有新的變化。會想在感情上得到新鮮感。",財務:"可能出現創業、投資或加薪機會，但需謹慎計畫以避免財務風險。",健康:"精力充沛，適合開啟健身計畫或養成健康習慣，但注意避免過度勞累。"}},
+ 2:{t:"合作年",kw:"合作、平衡、關係",a:{流年:"會有很多的合作機會，也可能想跟人合夥做事情，是個很容易增加人脈的一年。",挑戰:"學會妥協並處理依賴與獨立的平衡，避免過於依附他人或遭遇控制。",工作:"適合集中精力完成長期項目或建立穩固的工作基礎。合作和團隊工作會得到加強。",感情:"人際關係和感情穩定，適合深度交流和增進感情。若考慮結婚或穩定關係，這是個好時機。",財務:"財務狀況穩定，有機會進行投資或理財計劃。建議注重長期財務規劃。",健康:"注重心理健康，適合進行放鬆與冥想，釋放壓力並保持平和的心境。"}},
+ 3:{t:"計畫年",kw:"成長、規劃、團隊合作",a:{流年:"這一年適合吸收新知識和技能，也可能面臨一些挑戰。人際方面會經歷要與多人共事的狀況。",挑戰:"避免分散精力，過於關注表面而忽略內在，專注於有意義的目標。",工作:"工作環境可能會發生變化，如部門調整或新職位。是學習新技能和拓展專業領域的好時機。",感情:"如果這年跟另一半沒有共同目標，很容易理念不合而分開。建議找共同興趣或多出去玩，反而可以增進感情。",財務:"透過創意副業或人脈拓展財務機會，但需控制娛樂支出。",健康:"注意維持身心愉快，過度社交可能帶來壓力，適度休息尤為重要。"}},
+ 4:{t:"實踐年",kw:"穩固、實踐、系統",a:{流年:"過去所做的事已開始穩定，現在要開始建立流程及系統，讓事情能自動化，或讓你做事更輕鬆。",挑戰:"克服懶惰與過於保守的思維，接受必要的改變並靈活應對挑戰。",工作:"適合專注於長期計劃的實施和完善。這是建立穩固基礎和追求持續發展的時期。",感情:"感情生活較為穩定，適合加強家庭和伴侶之間的關係。可能有婚姻或家庭方面的正面進展。",財務:"財務狀況穩定，可能會看到之前投資或努力的成果。建議繼續保持理智的財務管理。",健康:"注意保持規律作息，適當運動，避免因壓力引發健康問題。"}},
+ 5:{t:"改變年",kw:"變化、自由、探索",a:{流年:"這是一個充滿變化與機會的年份，可能出現旅行、搬遷或轉換工作的情況。",挑戰:"學會適應變化，避免因追求自由而忽略長遠計畫。",工作:"可能會遇到較多的變化或挑戰，如工作調整或新的責任。適合尋求創新和突破，但需注意風險控制。",感情:"感情生活可能出現波動，需要應對挑戰和不確定性。可能經歷感情的重新定位或變化。",財務:"財務可能出現波動，需靈活應對新機會，謹防衝動消費。",健康:"保持身體的靈活性與耐力，應對生活中的頻繁改變與壓力。"}},
+ 6:{t:"付出年",kw:"關懷、責任、家庭",a:{流年:"注重家庭與責任的年份，適合關注親密關係與社會責任，可能有結婚或添丁的機會。付出不要求目的，容易不求自得。",挑戰:"平衡個人需求與對他人的付出，避免過於操心而耗盡自己。",工作:"工作環境和諧，有助於團隊合作和增強人際關係。適合進行合作和共同項目。",感情:"感情生活充滿和諧，有機會加深與伴侶的感情，或改善家庭關係。適合建立穩定的感情基礎。",財務:"財務狀況穩定，可能有與合作相關的收入或投資機會。建議注重理財和家庭財務規劃。",健康:"注意心理壓力管理，關注家庭可能帶來的身心負擔。"}},
+ 7:{t:"執行年",kw:"目標、執行、決策",a:{流年:"這是一個精神成長的年份，適合深度學習與反思，尋求內心的平靜與智慧。",挑戰:"避免過於孤立或沉迷於內省，學會接受外界的幫助與支持。",工作:"可能面臨需要重新評估和調整的工作情況。適合自我提升和技能學習，但要避免急功近利。",感情:"感情生活可能需要重新考慮和反思，適合處理舊有問題或加深理解。可能經歷感情上的深層變化。",財務:"財務增長可能緩慢，適合進行長期投資或儲蓄。",健康:"注意心理壓力和情緒管理。內省的過程可能影響身心狀態，建議保持積極的生活方式。"}},
+ 8:{t:"責任年",kw:"承擔責任、壓力、權力",a:{流年:"今年壓力會比較大，將扛起很多責任，需要和人頻繁溝通；只要能扛起這個壓力，你會得到很多收穫，而且被重用。",挑戰:"避免過於專注於物質目標而忽略內在需求，需保持平衡。",工作:"工作上的努力會得到回報，可能會有升遷或獎勵。適合慶祝成功並規劃下一步的發展。",感情:"感情生活穩定，可能有正面進展，如訂婚、結婚或家庭擴展。這是一個充滿喜悅的時期。",財務:"財務增長可能緩慢，適合進行長期投資或儲蓄。",健康:"保持健康生活方式，注意因壓力引發的身體不適。"}},
+ 9:{t:"收穫年",kw:"完成、放下、轉換",a:{流年:"過去如果做得好，今年將會蓬勃發展，獲得想要的結果，人財兩得。適合完成未完成的事並放下過去，為新開始鋪路。",挑戰:"學會接受改變，釋放對過去的執著，擁抱新生活的可能性。",工作:"可能經歷工作上的重大變化或結束某些項目。適合整理過去的工作，並為新的階段做準備。",感情:"感情生活可能出現結束或轉變；如果關係不好，可能結束不健康的關係，或迎來新的情感啟發。",財務:"可能有結算或調整，需要總結過去的財務狀況並規劃未來目標。適合償還債務或整理資產。",健康:"注意身體調整與恢復，適合進行排毒或健康檢查。"}}
+};
+
+/* ================= 生命靈數 ================= */
+const LIFE_ACT={
+ 1:{act:["直接認領一件沒人敢接的任務，用結果證明自己","做重大決定前，先問過一位信任的人再拍板","每週留一次「只聽不說」的場合，練習傾聽"],fix:"改善關鍵在「合作」：把身邊的人當隊友而不是部下，學會把功勞分出去，路才會越走越寬。"},
+ 2:{act:["每天練習說出一個自己的立場，不先問別人意見","接一件需要完全獨立完成的小任務","快內耗時把想法寫下來，而不是反覆在腦中轉"],fix:"改善關鍵在「界線」：先照顧自己的感受再照顧別人；敢說不，關係反而更穩。"},
+ 3:{act:["把點子寫進清單，一次只執行一個、做到完","作品定期公開發表，累積被看見的機會","設定完成日期並告訴別人，用承諾逼自己收尾"],fix:"改善關鍵在「聚焦」：你不缺創意，缺的是完成度；先求完成，再求完美。"},
+ 4:{act:["每月刻意嘗試一件沒做過的小事，練習離開舒適圈","計畫保留兩成彈性，不把行程排死","被變動打亂時，先問「最壞會怎樣」再反應"],fix:"改善關鍵在「彈性」：規則是工具不是目的；願意變，穩定才守得住。"},
+ 5:{act:["用專案制做事：短衝刺、明確終點，符合天性又能交付","收入進來先自動轉存兩成再花","承諾前想清楚，承諾後至少堅持九十天"],fix:"改善關鍵在「自律」：自由不是想做什麼就做什麼，而是能對自己說到做到。"},
+ 6:{act:["每週留一段完全屬於自己的時間，不服務任何人","幫忙前先問對方需不需要，不預設立場","把「我是為你好」換成「你想要的是什麼」"],fix:"改善關鍵在「放手」：照顧不等於扛下一切，允許別人用自己的方式長大。"},
+ 7:{act:["研究前先設行動截止日，時間到就出手","每週主動跟一個人分享你的想法或發現","有懷疑直接求證，不自己腦補劇情"],fix:"改善關鍵在「行動」：想清楚很好，但很多答案是做了之後才出現的。"},
+ 8:{act:["每週安排一次完全不談工作的休息","把一件事完整授權出去，只看結果不管過程","關心身邊人時談感受，不談表現"],fix:"改善關鍵在「授權與放鬆」：真正的力量，是讓事情沒有你也能運轉。"},
+ 9:{act:["幫人之前先確認自己的時間和金錢夠不夠","把理想拆成三個月內做得到的一小步","練習說「這次不行」，而且不用解釋太多"],fix:"改善關鍵在「務實」：先把自己過好，才有能力照亮更多人。"}
+};
+const GAP={
+ 1:"練習自己做小決定，從點餐、排行程開始",
+ 2:"練習傾聽，先聽完再回應",
+ 3:"多寫多說多分享，培養一個創作型興趣",
+ 4:"用清單和行事曆管理生活，養成固定作息",
+ 5:"定期嘗試新事物、新路線、新環境",
+ 6:"主動關心家人朋友，養寵物或植物練習照顧",
+ 7:"培養閱讀習慣，決定前多問一個為什麼",
+ 8:"設定目標並公開承諾，練習談錢談條件",
+ 9:"參與志工或公益，練習站在別人的角度想"
+};
+const REL={
+ 1:{t:"衝勁組合",d:"在一起火力全開、互相激勵，但都想當主導。",tip:"輪流做主、分工明確，別在同一件事上搶方向盤。",act:"一起運動、創業、挑戰新目標，共同衝一件事感情最好。",warn:"互不相讓、都要贏；一吵起來誰都不先道歉。"},
+ 2:{t:"互補組合",d:"溫和有默契、互相體貼，是能好好說話的關係。",tip:"怕的是都不做決定；重要的事設期限、輪流拍板。",act:"一起下廚、慢旅行、深度聊天，重質不重量的相處。",warn:"累積委屈不說，最後一次爆發。"},
+ 3:{t:"歡樂組合",d:"相處有趣、話題多，總能玩出新花樣。",tip:"正事也要一起面對，別把問題都用玩笑帶過。",act:"一起看展、聽音樂、辦聚會，共同創作最加溫。",warn:"把對方的認真當玩笑，笑點變淚點。"},
+ 4:{t:"穩定組合",d:"踏實長久、給彼此安全感的組合。",tip:"定期安排新鮮活動，別讓穩定變成一成不變。",act:"一起存錢置產、養成共同習慣、經營長期計畫。",warn:"無聊感；生活只剩例行公事。"},
+ 5:{t:"刺激組合",d:"充滿新鮮感與火花，感情來得快又熱烈。",tip:"給彼此自由但約好底線；聚少離多時更要主動報備。",act:"一起旅行冒險、嘗鮮踩點，保持關係的新鮮感。",warn:"管太緊；一被限制就想逃。"},
+ 6:{t:"家庭組合",d:"互相照顧、有家的感覺，適合走長遠。",tip:"別把愛變成義務清單，約會不是只有柴米油鹽。",act:"一起顧家、養寵物、照顧彼此的家人朋友。",warn:"付出被視為理所當然。"},
+ 7:{t:"心靈組合",d:"精神契合、聊得深，是靈魂層面的關係。",tip:"有情緒別冷處理，講出來比讓對方猜重要。",act:"一起進修上課、看書、聊深度話題。",warn:"冷處理；有事不說、各自關機。"},
+ 8:{t:"事業組合",d:"能一起打拼、互相成就的強強聯手。",tip:"帳算清楚、角色談明白，別讓利益蓋過感情。",act:"一起拼事業、理財投資、設定共同目標。",warn:"把關係當成績單，用成就衡量彼此。"},
+ 9:{t:"理想組合",d:"互相成就、一起追求更大目標的組合。",tip:"理想之外也要顧好眼前生活，記得慶祝小成果。",act:"一起做公益、追求共同理想、規劃人生大方向。",warn:"理想太大忘了生活，錢和家事沒人管。"}
+};
+const FLOW_ACT={
+ 1:"主動開口、先做再說；把想法說出來，貴人才找得到你。",
+ 2:"多參加聚會拓展人脈，重要的事找夥伴一起做。",
+ 3:"報名課程、學新技能，設定明確的學習目標。",
+ 4:"把重複的事寫成 SOP、建立系統，穩紮穩打。",
+ 5:"想轉換跑道或搬遷前先備好預備金，擁抱變化但控好風險。",
+ 6:"多陪家人、用心經營關係；付出時記得留一份給自己。",
+ 7:"安排獨處與進修時間，重大決定多想三天再定。",
+ 8:"敢扛就敢談：主動承接重任，同時談好對等的報酬。",
+ 9:"列出收尾清單逐一完成；該放下的關係與事務，做個了結。"
+};
+/* ================= 色彩靈數（1–9 對應色，流派略有差異） ================= */
+const COLOR={
+ 1:{c:"紅色",hex:"#d84a44",e:"行動力、熱情、生命力",use:"需要衝勁、面試、談判時穿紅或配紅色小物；工作區放一件紅色物件提醒自己行動。",bal:"急躁易怒時，用綠色系穿搭或多接觸植物緩和。"},
+ 2:{c:"橙色",hex:"#e6832a",e:"溫暖、合作、人際連結",use:"談合作、約會、修復關係時用橙色系；暖色燈光也能加分。",bal:"情緒被牽著走時，用藍色系幫自己冷靜。"},
+ 3:{c:"黃色",hex:"#e0bd2c",e:"創意、樂觀、表達",use:"提案、教學、需要靈感時用黃色；筆記本或手機殼換黃色最簡單。",bal:"想法太散時，用深紫或深藍收斂聚焦。"},
+ 4:{c:"綠色",hex:"#3fa860",e:"穩定、療癒、安全感",use:"想穩定軍心、建立習慣時用綠色；居家用綠植與大地色布置。",bal:"太保守停滯時，加一點紅色提醒自己行動。"},
+ 5:{c:"藍色",hex:"#3b82c4",e:"自由、溝通、變化",use:"溝通、演講、旅行時用藍色；先從配件下手最好搭。",bal:"漂太久定不下來時，用大地色系接地。"},
+ 6:{c:"靛色",hex:"#5c6bc0",e:"關懷、責任、直覺",use:"照顧家人、諮詢陪伴時用靛色或深藍系。",bal:"操心過度時，用黃色補回輕盈與快樂。"},
+ 7:{c:"紫色",hex:"#9057b5",e:"靈性、智慧、洞察",use:"靜心、進修、占卜諮詢時用紫色；可搭配水晶與香氛。",bal:"想太多不行動時，用紅色或金色補行動與自信。"},
+ 8:{c:"粉紅色",hex:"#df6f9e",e:"豐盛、愛的力量、人緣",use:"談錢、談案子、想旺人緣時用粉紅；金色配件也旺豐盛。",bal:"壓力大時用綠色放鬆，別再用深沉色系加壓。"},
+ 9:{c:"金色",hex:"#c9a227",e:"大愛、智慧、圓滿",use:"公開場合、帶領團體、祈福場合用金色；白金配色最大氣。",bal:"太理想化時，用大地色系務實接地。"}
+};
+/* ================= 靈數配對化學反應（45 組全對照，取小-大為鍵） ================= */
+const COMBO={
+ "1-1":"兩個火車頭，衝勁加倍，但誰都不想讓；約好各管一塊領土最和平。",
+ "1-2":"一衝一穩的經典配：1 帶方向、2 顧感受；1 記得回頭等人，2 記得說出需求。",
+ "1-3":"行動派遇上點子王，一拍即合、說做就做；缺的是收尾，找個 4 號朋友幫忙盯。",
+ "1-4":"油門遇上煞車：1 嫌 4 慢、4 嫌 1 莽；把「快」用在開創、「穩」用在守成就互補。",
+ "1-5":"兩個都愛新鮮，節奏超合拍；但家裡容易沒人顧，記得輪流當定海神針。",
+ "1-6":"1 往外衝、6 守著家，是能互相成就的分工；6 別把關心變控制，1 別把付出當理所當然。",
+ "1-7":"行動派配思考派：7 想好、1 去做是絕配；吵架時 1 嫌 7 拖、7 嫌 1 躁，先講清楚決策流程。",
+ "1-8":"兩個老大脾氣，強強對撞也強強聯手；事業上是猛將組合，感情裡要學會輪流低頭。",
+ "1-9":"1 顧自己的目標、9 顧大家的理想；9 給 1 格局、1 給 9 執行力，別在「先顧誰」上吵。",
+ "2-2":"超有默契的溫柔組合，什麼都好商量；問題是都不做決定，重要的事拖著不如丟銅板。",
+ "2-3":"2 當聽眾、3 當主角，相處輕鬆愉快；3 偶爾把舞台讓出來，2 偶爾說說自己的事。",
+ "2-4":"安穩踏實的長跑型組合，安全感滿分；小心日子過得太平淡，記得定期製造小驚喜。",
+ "2-5":"一個要陪伴、一個要自由，需求剛好相反；約好「自由的額度」和「陪伴的底線」就能長久。",
+ "2-6":"兩個都愛照顧人，溫暖到不行；比賽誰付出多沒有意義，練習「接受」對方的好。",
+ "2-7":"都是慢熟安靜型，懂彼此的沉默；但心事都不說出口，記得定期開口對頻。",
+ "2-8":"8 在外打拼、2 在後方支援，是可靠的分工；8 別忽略 2 的感受，2 別把委屈往肚裡吞。",
+ "2-9":"兩個都替別人著想，卻常忘了彼此；把對外的溫柔留一份回家。",
+ "3-3":"每天都像派對，笑點跟話題接不完；帳單和正事也要有人管，輪週值日。",
+ "3-4":"3 帶 4 玩、4 幫 3 收；4 別急著潑冷水，3 別嫌 4 無聊，剛好互補。",
+ "3-5":"玩心最重的組合，永遠有新計畫；感情濃度高但穩定度低，重要承諾要寫下來。",
+ "3-6":"3 負責快樂、6 負責照顧，家裡永遠熱熱鬧鬧；6 別碎念、3 別裝沒聽到。",
+ "3-7":"一個外放一個內斂，3 把 7 拉出門、7 幫 3 想深一點；尊重彼此的充電方式。",
+ "3-8":"3 有創意、8 有資源，是很強的商業組合；感情裡 8 要多點幽默，3 要多點靠譜。",
+ "3-9":"理想＋創意，聊未來可以聊整夜；記得也要有人管今天的晚餐。",
+ "4-4":"最穩的組合，規劃到退休都沒問題；小心把日子過成公式，每季排一次沒計畫的旅行。",
+ "4-5":"秩序遇上自由，互看不順眼也互相著迷；5 帶 4 看世界、4 幫 5 守底線。",
+ "4-6":"顧家指數爆表的組合，適合成家；別讓生活只剩責任，留點兩人時光。",
+ "4-7":"都是深思型，相處安靜舒服；決定都想很久，設個「想三天就要動」的規則。",
+ "4-8":"執行＋策略的事業黃金組合；感情中都不擅表達，行動之外也要練習說出口。",
+ "4-9":"4 務實、9 理想，一個管地基一個看星空；互相翻譯彼此的語言就無敵。",
+ "5-5":"自由靈魂 ×2，聚少離多也甘之如飴；只要記得回家的路，就是最快樂的組合。",
+ "5-6":"5 要飛、6 要守，最需要磨合的組合之一；6 練習放風箏而不是拉緊繩，5 練習報備。",
+ "5-7":"5 往外探索、7 往內探索，方向不同但都懂「探索」；分享各自的發現就很浪漫。",
+ "5-8":"5 帶來機會、8 抓住機會，商場上是快狠準組合；8 想定下來時，先跟 5 談好形式。",
+ "5-9":"都不愛被框住，關係自由開放；但自由不等於放生，重要時刻要在場。",
+ "6-6":"互相照顧到極致，像兩個媽媽照顧彼此；小心變成互相操心，練習說「我自己可以」。",
+ "6-7":"6 用行動關心、7 用理解關心；6 別嫌 7 冷、7 別嫌 6 煩，翻譯一下都是愛。",
+ "6-8":"6 顧內、8 攻外的經典分工；8 的成就要分享給 6，6 的付出要被 8 看見。",
+ "6-9":"小愛遇上大愛，都是奉獻型；先把彼此照顧好，再去照顧全世界。",
+ "7-7":"兩個安靜的靈魂，話不多但頻率對；冷戰是最大殺手，約好「不過夜」原則。",
+ "7-8":"7 出智囊、8 出執行，事業上互補；一個要深度一個要成就，記得欣賞彼此的追求。",
+ "7-9":"心靈層次最高的組合，聊哲學聊人生；記得偶爾下凡處理現實。",
+ "8-8":"權力 ×2，不是最強盟友就是最強對手；劃清楚地盤，就能一起打天下。",
+ "8-9":"8 給 9 資源、9 給 8 意義，是能成就大事的組合；別讓「賺錢」和「理想」變成對立面。",
+ "9-9":"兩個理想主義者，一起做夢一起燃燒；找個務實的軍師朋友，夢才落得了地。"
+};
+/* ================= 吵架模式與安撫法 ================= */
+const QUARREL={
+ 1:{q:"直球對決、講話大聲，氣來得快去得也快。",fix:"先肯定他的能力和出發點，再談事情本身。"},
+ 2:{q:"不吵，用沉默和委屈表達，累積到臨界點才爆。",fix:"主動問感受、給足安全感，別等他自己說。"},
+ 3:{q:"吵架很戲劇化，容易講氣話、放大情緒。",fix:"先讓情緒演完，事後再溫和講理，別當場辯。"},
+ 4:{q:"悶著不說，用固執和拖延抵抗。",fix:"給他時間消化，用事實和具體方案溝通。"},
+ 5:{q:"吵不贏就想離開現場，先閃再說。",fix:"給空間冷靜，但約好回來談的時間點。"},
+ 6:{q:"邊吵邊翻舊帳，核心是覺得付出沒被看見。",fix:"具體感謝他做過的事，讓付出被點名。"},
+ 7:{q:"直接關機冷戰，躲回自己的世界。",fix:"不逼問、不追擊，用文字留言給他台階。"},
+ 8:{q:"吵架一定要贏，講輸贏、講對錯。",fix:"不硬碰硬，公開場合給足面子，私下再談。"},
+ 9:{q:"吵架會上升到人生觀，道理講得很大。",fix:"把話題拉回具體事件，別跟他辯價值觀。"}
+};
+/* ================= 相處攻略（1–9 應對指南） ================= */
+const APPROACH={
+ 1:{inner:"表面強勢有自信，其實很怕被否定；他的兇通常是保護色，最需要的是被肯定「你很行」。",like:"喜歡乾脆、直接、有效率的人；欣賞敢表達意見但尊重他決定的人。",hate:"討厭拖泥帶水、講話繞圈、被質疑能力、被當眾糾正。",win:"請教他、給他表現的舞台；把「你決定」掛嘴邊，他很快把你當自己人。",talk:"講重點、給選項不給命令：「我覺得 A 比較好，你覺得呢？」比「你應該…」有效一百倍。",love:"感情裡吃「崇拜」這一套；欣賞他的努力、讓他保護你，但要保有自己的生活，太黏會被嫌。",work:"當主管：先執行再回報想法。當同事：分工清楚別搶功。當下屬：給目標和權限，別管過程。",no:"千萬別當眾讓他沒面子，也別跟他硬碰硬冷戰——他嘴硬心軟，給台階就下。"},
+ 2:{inner:"表面隨和好說話，其實內心很多小劇場；嘴上說「都可以」，心裡通常有答案，只是不敢說。",like:"喜歡溫柔、有耐心、會主動關心的人；欣賞記得小細節的人。",hate:"討厭被忽略、被大聲說話、被迫當場做決定、衝突的氣氛。",win:"主動問他的感受和想法，等他慢慢說；記住他提過的小事，下次提起他會超感動。",talk:"用「我們」開頭，先照顧情緒再講事情：「我知道你可能會擔心…」比直接切入有效。",love:"要的是安全感和陪伴；穩定報備、節日用心，吵架先安撫情緒再講道理。",work:"當主管：指示明確他做得又快又好。當同事：最可靠的救火隊，記得道謝。當下屬：私下給回饋，別公開批評。",no:"千萬別說「你想太多」——這句話對 2 號是核彈；他的敏感是天賦，不是毛病。"},
+ 3:{inner:"表面陽光搞笑，其實很需要被看見；越吵的 3 號，越怕被冷落。低潮時反而會躲起來裝沒事。",like:"喜歡有趣、會接梗、給他掌聲的人；欣賞願意聽他說話又真心捧場的人。",hate:"討厭無聊、被潑冷水、被嫌幼稚、講話被打斷。",win:"當他最好的觀眾：真心笑他的笑話、稱讚他的點子，他馬上把你當好朋友。",talk:"先肯定再建議：「這想法很有趣！如果再加上…會不會更強？」直接說缺點他會關機。",love:"保持新鮮感：變化約會方式、一起玩新東西；他要的是玩伴＋粉絲的綜合體。",work:"當主管：包容他的跳 tone，幫他把點子落地。當同事：發想找他就對了。當下屬：給舞台和截止日，盯收尾。",no:"千萬別在他興頭上潑冷水；也別把他難得的認真當玩笑——那個時刻要接住。"},
+ 4:{inner:"表面木訥無聊，其實是最可靠的人；他不說甜話，但答應的事一定做到。改變對他是壓力不是刺激。",like:"喜歡守時、守信、有計畫的人；欣賞講話有憑有據的人。",hate:"討厭臨時變動、畫大餅、不守承諾、被催快一點。",win:"守時守信用，說到做到幾次，他就把你放進信任名單——進了名單就是一輩子。",talk:"給數據、給步驟、給時間表：「第一步…第二步…預計三週」比「相信我，會很棒」有效。",love:"升溫慢但最長情；用穩定的行動證明，別測試他、別驚喜轟炸，安排要提前講。",work:"當主管：交付規則明確的任務。當同事：流程問題找他。當下屬：他是定海神針，變動要提早溝通。",no:"千萬別臨時改計畫又不解釋，也別嫌他無聊——他的無聊正是你的安全感來源。"},
+ 5:{inner:"表面瀟灑不在乎，其實怕無聊更怕被綁死；他不是不想定，是還沒遇到讓他自願定下來的理由。",like:"喜歡有趣、獨立、自己也有生活的人；欣賞帶他見識新事物的人。",hate:"討厭被查勤、被限制、一成不變、情緒勒索。",win:"當個有自己世界的人：你越精彩他越好奇；偶爾約他探索新地方，他會覺得你懂他。",talk:"給自由選擇權：「要不要一起？不勉強」比「你必須來」有效；他吃邀請不吃命令。",love:"風箏理論：線太緊會斷、放掉會飛走；約定底線內給最大自由，他反而黏你。",work:"當主管：接受彈性、只看結果。當同事：開拓型任務找他。當下屬：專案制短衝刺，別派重複性工作。",no:"千萬別奪命連環 call 查行蹤——你抓得越緊，他跑得越快。"},
+ 6:{inner:"表面熱心愛管事，其實是用付出換「被需要」的感覺；他最深的恐懼是「我對你沒有用了」。",like:"喜歡懂得感恩、會回應關心的人；欣賞重視家人朋友的人。",hate:"討厭付出被無視、被嫌囉嗦、忘恩負義、冷漠以對。",win:"具體感謝他做的事：「上次你幫我那個，真的救了我」，他會更心甘情願對你好。",talk:"先接收關心再表達立場：「謝謝你為我想，我想試試自己的方式」——不傷他也保住界線。",love:"回應他的照顧，並反過來照顧他——6 號習慣付出，被照顧時最感動；記得他家人的事。",work:"當主管：他會罩你，但別越界。當同事：團隊的黏著劑，多謝謝他。當下屬：交照顧型任務，提醒他別扛太多。",no:"千萬別把他的好視為理所當然；失望累積夠多，6 號轉身是最徹底的。"},
+ 7:{inner:"表面冷淡有距離，其實內心戲最多；他不是不在乎，是在觀察你值不值得信任。話少不等於沒想法。",like:"喜歡聰明、有深度、尊重隱私的人；欣賞能聊出新觀點的人。",hate:"討厭被逼問、被打探隱私、膚淺的社交、被催著做決定。",win:"不急著靠近，用一個有深度的問題開啟話題；他認可你的腦，才會打開他的心。",talk:"給他思考時間：「不急，你想想再跟我說」；當面問不出的，用文字訊息反而聊得深。",love:"慢熟界天花板：尊重他的獨處時間，精神交流比熱情攻勢有效；他一旦認定就極度忠誠。",work:"當主管：交研究分析型任務並給足時間。當同事：想不通的問題問他。當下屬：少開會多書面，成果會說話。",no:"千萬別逼他當場表態或連環逼問感受——他會直接關機，一關可能就是一週。"},
+ 8:{inner:"表面威嚴強勢，其實壓力大到不敢示弱；他用成就證明自己，最軟的一塊是「被真心關心而非有所圖」。",like:"喜歡有實力、有企圖心、講效率的人；欣賞能幫他解決問題的人。",hate:"討厭浪費時間、能力差還找藉口、動他的利益、挑戰他的權威。",win:"展現專業價值，幫他搞定一件事；8 號的信任是用實力換的，一次到位勝過十次討好。",talk:"講結果和利益：「這樣做可以省三成成本」比「這樣比較好」有效；數字是他的語言。",love:"欣賞他的成就，更要關心他這個人：「今天累不累」比「賺多少」更能走進他心裡；別跟他爭輸贏。",work:"當主管：帶方案來，別只帶問題來。當同事：利益談清楚就是最強盟友。當下屬：給權責和目標，他自己會跑。",no:"千萬別在利益上耍小聰明——8 號可以大方給，但不能接受被佔便宜。"},
+ 9:{inner:"表面博愛熱心，其實常委屈自己；他對全世界好，最需要的是有人反過來對他好、看見他的犧牲。",like:"喜歡善良、有理想、真誠的人；欣賞跟他一樣關心大局的人。",hate:"討厭自私自利、斤斤計較、嘲笑他的理想、現實得太赤裸。",win:"認同他的理想並具體支持：「你想做的這件事很有意義，我可以幫忙」，他會把你當同路人。",talk:"從意義切入：「這件事對大家的幫助是…」比「這對你有什麼好處」有效。",love:"欣賞他的大愛，也要提醒他照顧自己；主動照顧他的生活——9 號習慣給，最不會的是要。",work:"當主管：跟隨他的願景、幫他顧細節。當同事：他熱心但別濫用。當下屬：講清楚任務的意義，他會全力以赴。",no:"千萬別嘲笑他的理想不切實際——你可以幫他落地，但不能踩他的夢。"}
+};
+const APPROACH_LABEL={inner:"他其實是",like:"他喜歡",hate:"他討厭",win:"快速贏得好感",talk:"這樣說他聽得進",love:"感情相處",work:"職場應對",no:"千萬別做"};
+const LIFE={
+ 1:{t:"開創者",kw:"獨立、領導、行動",a:{性格:"有主見、企圖心強，習慣靠自己，是天生的開路者。",優勢:"行動力與決斷力強，敢做別人不敢做的事，適合開創與領導。",課題:"過度自我、固執，聽不進別人意見；學習合作與傾聽。",感情:"主動直接、追求快，但容易想主導關係，需給對方空間。",工作財務:"適合創業、業務、主管職；財務上敢衝敢投資，需控管風險。"}},
+ 2:{t:"協調者",kw:"合作、敏感、平衡",a:{性格:"溫和細膩，重視關係與和諧，善於察言觀色。",優勢:"傾聽與配合度高，能顧到別人沒注意的感受，是最好的輔佐者。",課題:"依賴、優柔寡斷、容易受情緒影響；學習獨立與表達立場。",感情:"體貼重陪伴，但容易患得患失、想太多。",工作財務:"適合幕僚、協調、客服、人資；理財偏保守穩健。"}},
+ 3:{t:"創意者",kw:"創意、表達、社交",a:{性格:"活潑樂觀、點子多，喜歡表現與被看見。",優勢:"表達力與感染力強，擅長創作、教學與行銷。",課題:"三分鐘熱度、情緒化、想法多落地少；學習聚焦與堅持。",感情:"浪漫愛玩，需要新鮮感與被欣賞的感覺。",工作財務:"適合創意、演藝、行銷、教學；花錢隨興，需預算控管。"}},
+ 4:{t:"建構者",kw:"穩定、務實、秩序",a:{性格:"踏實謹慎，重視安全感與規則，凡事按部就班。",優勢:"執行力與組織力強，交代的事使命必達，值得信賴。",課題:"固執保守、抗拒改變、容易想太多；學習彈性與適度冒險。",感情:"忠誠專一但不浪漫，習慣用行動表達愛。",工作財務:"適合工程、財會、行政、管理；擅長儲蓄與長期規劃。"}},
+ 5:{t:"自由者",kw:"自由、變化、冒險",a:{性格:"熱愛自由與新鮮，聰明靈活，靜不下來。",優勢:"適應力與學習力強，多才多藝，到哪都能生存。",課題:"缺乏定性、怕承諾、衝動；學習專注與自律。",感情:"熱情但怕被束縛，需要空間感的關係。",工作財務:"適合業務、旅遊、媒體、自由業；收入起伏大，需強制儲蓄。"}},
+ 6:{t:"照顧者",kw:"關懷、責任、療癒",a:{性格:"溫暖有責任感，重視家庭，是天生的照顧者。",優勢:"同理心與服務精神強，讓人安心依靠，有療癒能量。",課題:"過度付出、愛操心、容易變成控制式關心；學習先照顧好自己。",感情:"顧家深情，容易犧牲自己成全對方。",工作財務:"適合教育、醫護、餐飲、美的產業；為家人花錢不手軟。"}},
+ 7:{t:"探究者",kw:"思考、探究、靈性",a:{性格:"理性好奇，喜歡研究與獨處，追求事情背後的真相。",優勢:"分析力與洞察力強，適合深度專業與身心靈領域。",課題:"多疑、疏離、想太多不行動；學習信任與分享。",感情:"慢熟，重視心靈契合，不擅長表達情感。",工作財務:"適合研究、技術、顧問、身心靈；理財重分析，勿過度觀望錯失時機。"}},
+ 8:{t:"實現者",kw:"權力、成就、豐盛",a:{性格:"企圖心強，重視成就與資源，是天生的經營者。",優勢:"商業頭腦與統籌能力強，扛得起責任、成得了大事。",課題:"工作狂、控制慾、容易以成敗論人；學習放鬆與授權。",感情:"給得起承諾與物質，但容易忽略陪伴與情感交流。",工作財務:"適合經營管理、金融、投資；財運強，注意槓桿與風險。"}},
+ 9:{t:"智慧者",kw:"大愛、智慧、圓滿",a:{性格:"熱心且理想化，包容心強，關懷的對象是眾人。",優勢:"視野宏觀、有感召力，適合服務眾人的舞台。",課題:"濫好人、不切實際、忽略自身需求；學習界線與務實。",感情:"浪漫奉獻，容易把同情當成愛情。",工作財務:"適合公益、宗教身心靈、教育、國際事務；對錢看得淡，需紀律理財。"}}
+};
+const LINES=[
+ {k:"123",nm:"藝術線",d:"美感與表達力佳，有藝術天分"},
+ {k:"456",nm:"組織線",d:"有條理、擅長規劃與執行"},
+ {k:"789",nm:"權力線",d:"領導慾與企圖心強，目標導向"},
+ {k:"147",nm:"物質線",d:"務實重物質，理財有一套"},
+ {k:"258",nm:"感情線",d:"感受力強、重感情、人際佳"},
+ {k:"369",nm:"智慧線",d:"頭腦好、反應快、愛思考"},
+ {k:"159",nm:"事業線",d:"意志堅定、有始有終"},
+ {k:"357",nm:"人緣線",d:"桃花人緣好、擅長公關"}
+];
+const SCHOOLS_SAME=[
+ {nm:"畢達哥拉斯生命靈數",d:"西方主流靈數學，生日加總化為 1–9；部分流派遇 11、22、33 不化簡，視為「卓越數／大師數」。本工具的生命靈數即此系統。"},
+ {nm:"塔羅靈數／生日牌",d:"同樣加總生日，但對應 0–21 大阿爾卡那（≥22 減 22）。本課程系統屬此類；西方另有人格牌／靈魂牌的生日牌算法，概念相同。"},
+ {nm:"生命靈數九宮格（連線派）",d:"台灣流行的延伸玩法：把生日數字、天賦數、主命數圈入九宮格，看連線與空缺數解讀性格。"},
+ {nm:"個人流年／流月／流日",d:"生命靈數的時間延伸：當年（月、日）＋生日加總化簡。本工具的塔羅流年即同一算法，只是對應到牌義。"},
+ {nm:"姓名靈數",d:"把姓名字母（英文名）依對照表轉成數字後加總化簡，看表現數、靈魂數、人格數。"},
+ {nm:"卡巴拉靈數",d:"源自希伯來卡巴拉傳統的字母─數字對應（Gematria），市面上常與生命靈數混稱；化簡方式同為加總。"}
+];
+const SCHOOLS_DIFF=[
+ {nm:"迦勒底數字學（Chaldean）",d:"更古老的體系，字母只配 1–8（8 為神聖數不配字母），多用於姓名與門牌號碼；化簡邏輯類似但配數表不同。"},
+ {nm:"數字易經／號碼磁場",d:"手機、車牌等號碼以「兩兩相鄰數字」對應八星磁場（天醫、生氣、伏位、絕命…），不做加總化簡，是另一套組合邏輯。"},
+ {nm:"天使數字",d:"解讀重複出現的數字訊息（111、222、1234…），屬數字象徵系統，不用生日加總。"},
+ {nm:"色彩靈數",d:"把 1–9 對應九種顏色能量，用於穿搭、開運與商品設計；數字來源仍是生命靈數，但應用層不同。"},
+ {nm:"卓越數／大師數派",d:"生命靈數的分支：總和為 11、22、33 時不再化簡，視為帶特殊使命的數字。本課程系統一律化簡到個位，兩者結論會不同，帶學員時要先講清楚用哪一套。"}
+];
+
+/* ================= 主題 ================= */
+function applyTheme(t){
+  document.documentElement.dataset.theme=t;
+  document.documentElement.style.colorScheme=(t==="light"?"light":"dark");
+  document.getElementById("themeBtn").textContent=(t==="light"?"🌙":"☀️");
+}
+function toggleTheme(){applyTheme(document.documentElement.dataset.theme==="light"?"dark":"light")}
+function toggleFs(){
+  const big=document.documentElement.dataset.fs==="big";
+  document.documentElement.dataset.fs=big?"":"big";
+  document.getElementById("fsBtn").textContent=big?"A+":"A−";
+}
+applyTheme("dark");
+
+/* ================= 導覽 ================= */
+function go(id,btn){
+  document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("on",p.id===id));
+  document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("on",b===btn));
+  window.scrollTo(0,0);
+}
+
+/* ================= 計算 ================= */
+function digitSum(n){return String(n).split("").reduce((a,c)=>a+ +c,0)}
+function reduce1(n){while(n>9)n=digitSum(n);return n}
+function getZodiac(m,d){
+  for(const z of ZODIAC){
+    const[fm,fd]=z.from,[tm,td]=z.to;
+    if(fm<=tm){ if((m>fm||(m===fm&&d>=fd))&&(m<tm||(m===tm&&d<=td)))return z; }
+    else{ if((m===fm&&d>=fd)||(m===tm&&d<=td))return z; } /* 摩羯跨年 */
+  }
+  return null;
+}
+function cardHTML(c,role,numLabel,who=""){
+  const base=role.endsWith("sub")?"潛意識":role.endsWith("act")?"行為":"特質";
+  return `<div class="tcard" onclick="toggleMeaning('m-${role}')">
+    <div class="role">${who?who+"・":""}${base}</div>
+    <div class="num">${numLabel}</div>
+    <div class="nm">${c.nm}</div>
+    <div class="zo">${c.zo||"&nbsp;"}</div>
+  </div>`;
+}
+function meaningHTML(c,id,extra=""){
+  return `<div class="box detail" id="${id}">
+    <h2 class="serif">${ROMAN[c.n]}・${c.nm}${c.zo?`（${c.zo}）`:""}</h2>${extra}
+    <div class="meaning">
+      <h3 class="g">優點</h3><ul>${c.good.map(x=>`<li>${x}</li>`).join("")}</ul>
+      <h3 class="b">缺點</h3><ul>${c.bad.map(x=>`<li>${x}</li>`).join("")}</ul>
+    </div>
+  </div>`;
+}
+function toggleMeaning(id){
+  const el=document.getElementById(id);
+  if(el){el.classList.toggle("on"); if(el.classList.contains("on"))el.scrollIntoView({behavior:"smooth",block:"nearest"});}
+}
+let MODE="single", lastCopy="";
+function setMode(m){
+  MODE=m;
+  document.getElementById("modeS").classList.toggle("on",m==="single");
+  document.getElementById("modeP").classList.toggle("on",m==="pair");
+  document.getElementById("pairBox").style.display=(m==="pair"?"block":"none");
+  document.getElementById("result").innerHTML="";
+}
+function run(){ MODE==="pair"?calcPair():calc(); }
+function readBirth(sfx){
+  const y=+document.getElementById("by"+sfx).value,
+        m=+document.getElementById("bm"+sfx).value,
+        d=+document.getElementById("bd"+sfx).value;
+  if(!y||!m||!d||y<1900||y>2100||m<1||m>12||d<1||d>31)return null;
+  return {y,m,d};
+}
+function baseNums(y,m,d){
+  const digits=(String(y)+String(m)+String(d)).split("").map(Number);
+  const total=digits.reduce((a,b)=>a+b,0);
+  const sub=reduce1(total);
+  let act=total; while(act>21)act-=22;
+  return {digits,total,sub,act,z:getZodiac(m,d)};
+}
+function copyResult(btn){
+  const done=()=>{btn.textContent="已複製 ✓"; setTimeout(()=>btn.textContent="📋 複製結果文字",1500)};
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(lastCopy).then(done).catch(()=>fallbackCopy(done));
+  }else fallbackCopy(done);
+}
+function fallbackCopy(done){
+  const ta=document.createElement("textarea");
+  ta.value=lastCopy; ta.style.position="fixed"; ta.style.opacity="0";
+  document.body.appendChild(ta); ta.select();
+  try{document.execCommand("copy")}catch(e){}
+  ta.remove(); done();
+}
+function calc(){
+  const err=document.getElementById("err");
+  const b=readBirth("");
+  if(!b){err.style.display="block";return}
+  err.style.display="none";
+  const {y,m,d}=b;
+  const {digits,total,sub,act,z}=baseNums(y,m,d);
+  const trait=CARDS[z.card];
+
+  /* 流年（今年） */
+  const nowY=new Date().getFullYear();
+  const fyDigits=(String(nowY)+String(m)+String(d)).split("").map(Number);
+  const fySum=fyDigits.reduce((a,b)=>a+b,0);
+  const fy=reduce1(fySum);
+
+  const mt=MATCH[sub];
+  const pill=(n,cls)=>`<span class="pill ${cls}">${n} ${CARDS[n].nm}</span>`;
+  const LB=lifeBlock(digits,total,sub,d);
+
+  let html=`
+  <div class="calc-steps">
+    ${digits.join("+")} ＝ <b>${total}</b>
+    　→ 潛意識 <b>${sub}</b>${total>9?`（${String(total).split("").join("+")}＝${sub===digitSum(total)?sub:digitSum(total)+"→"+sub}）`:""}
+    　→ 行為 <b>${act}</b>${total>21?`（${total}−22${total-22>21?"−22":""}）`:""}
+  </div>
+  <div class="spread">
+    ${cardHTML(CARDS[sub],"sub",sub)}
+    ${cardHTML(CARDS[act],"act",act)}
+    ${cardHTML(trait,"tr",z.sym+" "+z.card)}
+  </div>
+  <p class="note" style="margin:-6px 0 12px;text-align:center">點牌卡展開優缺點</p>
+  ${meaningHTML(CARDS[sub],"m-sub")}
+  ${meaningHTML(CARDS[act],"m-act")}
+  ${meaningHTML(trait,"m-tr",`<p class="note" style="margin:0 0 4px">特質：${z.nm}星座靈數</p>`)}
+  <div class="box">
+    <h2>靈數速配（潛意識 ${sub}）</h2>
+    <div class="match-line">最速配　${mt.g.map(n=>pill(n,"g")).join("")}</div>
+    <div class="match-line">易摩擦　${mt.b.map(n=>pill(n,"b")).join("")}</div>
+  </div>
+  <div class="box">
+    <h2>${nowY} 塔羅流年 ─ ${fy}・${FLOW[fy].t}</h2>
+    <div class="calc-steps">${fyDigits.join("+")} ＝ ${fySum}${fySum>9?` → ${fy}`:""}</div>
+    <p style="color:var(--muted);margin-bottom:8px">${FLOW[fy].kw}</p>
+    ${Object.entries(FLOW[fy].a).map(([k,v])=>`<div class="fy-aspect"><b>${k}</b>｜${v}</div>`).join("")}
+    <div class="fy-aspect"><b>行動建議</b>｜${FLOW_ACT[fy]}</div>
+  </div>
+  ${LB.html}
+  ${colorBlock(sub,fy)}
+  <button class="copybtn" onclick="copyResult(this)">📋 複製結果文字</button>`;
+
+  lastCopy=`🔮 塔羅靈數測算\n生日：${y}/${m}/${d}\n潛意識：${sub} ${CARDS[sub].nm}\n行為：${act} ${CARDS[act].nm}\n特質：${z.nm} ${z.card} ${trait.nm}\n──\n主命數：${sub}・${LIFE[sub].t}（${LIFE[sub].kw}）\n天賦數：${LB.talent}｜生日數：${LB.bday}\n連線：${LB.lines}｜空缺：${LB.missing}\n代表色：${COLOR[sub].c}\n──\n${nowY} 流年：${fy}・${FLOW[fy].t}（${FLOW[fy].kw}）\n行動建議：${FLOW_ACT[fy]}\n如何改善：${LIFE_ACT[sub].fix}`;
+
+  document.getElementById("result").innerHTML=html;
+  document.getElementById("result").scrollIntoView({behavior:"smooth"});
+}
+
+/* ================= 兩人合盤 ================= */
+function calcPair(){
+  const err=document.getElementById("err");
+  const A=readBirth(""), B=readBirth("2");
+  if(!A||!B){err.style.display="block";return}
+  err.style.display="none";
+  const a=baseNums(A.y,A.m,A.d), b=baseNums(B.y,B.m,B.d);
+  const ga=gridData(a.digits,a.total,a.sub), gb=gridData(b.digits,b.total,b.sub);
+  const rel=reduce1(a.sub+b.sub), R=REL[rel];
+  const nowY=new Date().getFullYear();
+  const fyOf=p=>reduce1((String(nowY)+String(p.m)+String(p.d)).split("").map(Number).reduce((x,y)=>x+y,0));
+  const fyA=fyOf(A), fyB=fyOf(B);
+  const key=Math.min(a.sub,b.sub)+"-"+Math.max(a.sub,b.sub);
+
+  /* 速配判定（雙向） */
+  let verdict="中性組合", vCls="", vNote="不在速配表的兩端，關係好壞看經營，可塑性最高。";
+  if(MATCH[a.sub].g.includes(b.sub)||MATCH[b.sub].g.includes(a.sub)){verdict="最速配";vCls="g";vNote="同頻＋互補，天生合拍的組合。"}
+  else if(MATCH[a.sub].b.includes(b.sub)||MATCH[b.sub].b.includes(a.sub)){verdict="容易摩擦";vCls="b";vNote="挑戰型組合，磨合期比較有感，但也最能互相成長。"}
+
+  /* 九宮格互補 */
+  const AtoB=gb.missing.filter(n=>ga.cnt[n]);   /* 我補對方的空缺 */
+  const BtoA=ga.missing.filter(n=>gb.cnt[n]);   /* 對方補我的空缺 */
+  const bothMissing=ga.missing.filter(n=>gb.missing.includes(n));
+  const commonLines=ga.hitLines.filter(l=>gb.hitLines.some(x=>x.k===l.k));
+
+  /* 契合度指數（透明計分） */
+  let score=60; const br=[];
+  if(verdict==="最速配"){score+=20;br.push("靈數最速配 +20")}
+  else if(verdict==="容易摩擦"){score-=10;br.push("挑戰型組合 −10")}
+  else {score+=5;br.push("中性組合 +5")}
+  if(BtoA.length){score+=5;br.push("對方補你空缺 +5")}
+  if(AtoB.length){score+=5;br.push("你補對方空缺 +5")}
+  const clBonus=Math.min(commonLines.length*3,9);
+  if(clBonus){score+=clBonus;br.push(`共同連線 +${clBonus}`)}
+  if(fyA===fyB){score+=3;br.push("今年流年同步 +3")}
+  if(a.sub===b.sub){score+=2;br.push("同主命數共鳴 +2")}
+  score=Math.max(30,Math.min(99,score));
+
+  const spread=(p,pre,who)=>`
+  <div class="spread">
+    ${cardHTML(CARDS[p.sub],pre+"sub",p.sub,who)}
+    ${cardHTML(CARDS[p.act],pre+"act",p.act,who)}
+    ${cardHTML(CARDS[p.z.card],pre+"tr",p.z.sym+" "+p.z.card,who)}
+  </div>`;
+  const swp=n=>`<span class="sw" style="background:${COLOR[n].hex}"></span>`;
+
+  const html=`
+  <div class="box">
+    <div class="score-wrap">
+      <div class="score-num">${score}<small> /100</small></div>
+      <div><span class="pill ${vCls}" style="font-size:1.02em">${verdict}</span></div>
+      <div class="score-br">${br.map(x=>`<span>${x}</span>`).join("")}</div>
+    </div>
+    <p style="color:var(--muted);text-align:center;font-size:.9em">${vNote}</p>
+  </div>
+
+  ${spread(a,"pa-","我")}
+  ${meaningHTML(CARDS[a.sub],"m-pa-sub")}${meaningHTML(CARDS[a.act],"m-pa-act")}${meaningHTML(CARDS[a.z.card],"m-pa-tr",`<p class="note" style="margin:0 0 4px">特質：${a.z.nm}星座靈數</p>`)}
+  ${spread(b,"pb-","對方")}
+  ${meaningHTML(CARDS[b.sub],"m-pb-sub")}${meaningHTML(CARDS[b.act],"m-pb-act")}${meaningHTML(CARDS[b.z.card],"m-pb-tr",`<p class="note" style="margin:0 0 4px">特質：${b.z.nm}星座靈數</p>`)}
+  <p class="note" style="margin:-6px 0 12px;text-align:center">點牌卡展開優缺點</p>
+
+  <div class="box">
+    <h2>配對化學反應 ${a.sub} × ${b.sub}</h2>
+    <p style="margin-bottom:10px">${COMBO[key]}</p>
+    <div class="fy-aspect"><b>我（${a.sub}・${LIFE[a.sub].t}）</b>｜${LIFE[a.sub].a.性格}</div>
+    <div class="fy-aspect"><b>對方（${b.sub}・${LIFE[b.sub].t}）</b>｜${LIFE[b.sub].a.性格}</div>
+    <div class="fy-aspect"><b>我的感情觀</b>｜${LIFE[a.sub].a.感情}</div>
+    <div class="fy-aspect"><b>對方的感情觀</b>｜${LIFE[b.sub].a.感情}</div>
+  </div>
+
+  <div class="box">
+    <h2>關係數 ${rel}・${R.t}</h2>
+    <div class="calc-steps">${a.sub}＋${b.sub} ＝ ${a.sub+b.sub}${a.sub+b.sub>9?` → ${rel}`:""}</div>
+    <div class="fy-aspect"><b>關係樣貌</b>｜${R.d}</div>
+    <div class="fy-aspect"><b>相處建議</b>｜${R.tip}</div>
+    <div class="fy-aspect"><b>適合一起做</b>｜${R.act}</div>
+    <div class="fy-aspect"><b>關係地雷</b>｜${R.warn}</div>
+  </div>
+
+  <div class="box">
+    <h2>吵架模式與安撫法</h2>
+    <div class="fy-aspect"><b>我（${a.sub}）吵架時</b>｜${QUARREL[a.sub].q}</div>
+    <div class="fy-aspect"><b>安撫我的方法</b>｜${QUARREL[a.sub].fix}</div>
+    <div class="fy-aspect" style="margin-top:10px"><b>對方（${b.sub}）吵架時</b>｜${QUARREL[b.sub].q}</div>
+    <div class="fy-aspect"><b>安撫對方的方法</b>｜${QUARREL[b.sub].fix}</div>
+  </div>
+
+  <div class="box">
+    <h2>對方相處攻略（${b.sub}・${LIFE[b.sub].t}）</h2>
+    ${approachHTML(b.sub,"對方")}
+  </div>
+
+  <div class="box">
+    <h2>九宮格互補分析</h2>
+    ${BtoA.length?`<div class="fy-aspect"><b>對方補足你</b>｜你空缺的 ${BtoA.join("、")}，對方身上有——${BtoA.map(n=>`${n}（${GAP[n].split("，")[0]}）`).join("；")}</div>`:""}
+    ${AtoB.length?`<div class="fy-aspect"><b>你補足對方</b>｜對方空缺的 ${AtoB.join("、")}，你身上有——${AtoB.map(n=>`${n}（${GAP[n].split("，")[0]}）`).join("；")}</div>`:""}
+    ${!BtoA.length&&!AtoB.length?`<div class="fy-aspect"><b>互補狀況</b>｜兩人沒有明顯的空缺互補，屬於同型能量。</div>`:""}
+    ${commonLines.length?`<div class="fy-aspect"><b>共同連線</b>｜${commonLines.map(l=>`${l.nm}（${l.d}）`).join("；")}</div>`:""}
+    ${bothMissing.length?`<div class="fy-aspect"><b>共同空缺</b>｜兩人都缺 ${bothMissing.join("、")}，這是關係要一起補的課題：${bothMissing.map(n=>GAP[n]).join("；")}</div>`:""}
+  </div>
+
+  <div class="box">
+    <h2>${nowY} 兩人流年</h2>
+    <div class="fy-aspect"><b>我</b>｜流年 ${fyA}・${FLOW[fyA].t}（${FLOW[fyA].kw}）→ ${FLOW_ACT[fyA]}</div>
+    <div class="fy-aspect"><b>對方</b>｜流年 ${fyB}・${FLOW[fyB].t}（${FLOW[fyB].kw}）→ ${FLOW_ACT[fyB]}</div>
+    <div class="fy-aspect"><b>同步狀況</b>｜${fyA===fyB?"兩人今年流年同步，課題一致，適合一起規劃、一起行動。":"兩人今年課題不同，互相體諒對方正在經歷的階段，別用自己的節奏要求對方。"}</div>
+  </div>
+
+  <div class="box">
+    <h2>色彩靈數</h2>
+    <div class="fy-aspect"><b>我的代表色</b>｜${swp(a.sub)}${COLOR[a.sub].c}（${COLOR[a.sub].e}）</div>
+    <div class="fy-aspect"><b>對方代表色</b>｜${swp(b.sub)}${COLOR[b.sub].c}（${COLOR[b.sub].e}）</div>
+    <div class="fy-aspect"><b>共同開運色</b>｜${swp(rel)}${COLOR[rel].c}——約會、合作、談重要事情時，其中一人帶上這個顏色。</div>
+  </div>
+  <button class="copybtn" onclick="copyResult(this)">📋 複製結果文字</button>`;
+
+  lastCopy=`🔮 塔羅靈數合盤\n我：${A.y}/${A.m}/${A.d}（潛意識 ${a.sub} ${CARDS[a.sub].nm}・${LIFE[a.sub].t}）\n對方：${B.y}/${B.m}/${B.d}（潛意識 ${b.sub} ${CARDS[b.sub].nm}・${LIFE[b.sub].t}）\n──\n契合度：${score}/100（${verdict}）\n化學反應：${COMBO[key]}\n──\n關係數：${rel}・${R.t}\n關係樣貌：${R.d}\n相處建議：${R.tip}\n適合一起做：${R.act}\n關係地雷：${R.warn}\n──\n對方其實是：${APPROACH[b.sub].inner.replace(/他/g,"對方")}\n贏得好感：${APPROACH[b.sub].win.replace(/他/g,"對方")}\n這樣說對方聽得進：${APPROACH[b.sub].talk.replace(/他/g,"對方")}\n千萬別做：${APPROACH[b.sub].no.replace(/他/g,"對方")}\n──\n吵架時：我 → ${QUARREL[a.sub].q}／對方 → ${QUARREL[b.sub].q}\n安撫法：對我 → ${QUARREL[a.sub].fix}／對他 → ${QUARREL[b.sub].fix}\n──\n${nowY} 流年：我 ${fyA}・${FLOW[fyA].t}／對方 ${fyB}・${FLOW[fyB].t}\n共同開運色：${COLOR[rel].c}`;
+
+  document.getElementById("result").innerHTML=html;
+  document.getElementById("result").scrollIntoView({behavior:"smooth"});
+}
+
+/* ================= 生命靈數區塊 ================= */
+function gridData(digits,total,sub){
+  const stages=[]; let t=total; while(t>9){stages.push(t); t=digitSum(t);}
+  const circled=[...digits.filter(x=>x>0)];
+  stages.forEach(s=>String(s).split("").forEach(c=>{if(+c>0)circled.push(+c)}));
+  circled.push(sub);
+  const cnt={}; circled.forEach(n=>cnt[n]=(cnt[n]||0)+1);
+  const missing=[1,2,3,4,5,6,7,8,9].filter(n=>!cnt[n]);
+  const hitLines=LINES.filter(l=>l.k.split("").every(n=>cnt[+n]));
+  return {stages,cnt,missing,hitLines};
+}
+function lifeBlock(digits,total,sub,day){
+  const {stages,cnt,missing,hitLines}=gridData(digits,total,sub);
+  const talent=stages.length?stages.map(s=>String(s).split("").join("、")).join(" → "):"無（總和已是個位）";
+  const bday=reduce1(day);
+  const cell=n=>`<div class="${cnt[n]?"hit":""}">${n}${cnt[n]?`<span class="ct">×${cnt[n]}</span>`:""}</div>`;
+  const L=LIFE[sub], LA=LIFE_ACT[sub];
+  const html=`
+  <div class="box">
+    <h2>生命靈數 ─ 主命數 ${sub}・${L.t}</h2>
+    <div class="calc-steps">主命數 <b>${sub}</b>（＝潛意識數，同一算法）｜天賦數 <b>${talent}</b>｜生日數 <b>${bday}</b></div>
+    <p style="color:var(--muted);margin-bottom:8px">${L.kw}</p>
+    ${Object.entries(L.a).map(([k,v])=>`<div class="fy-aspect"><b>${k}</b>｜${v}</div>`).join("")}
+    <div class="meaning">
+      <h3 class="g">行動建議</h3>
+      <ul>${LA.act.map(x=>`<li>${x}</li>`).join("")}</ul>
+      <h3 style="color:var(--gold)">如何改善</h3>
+      <p style="font-size:.95em;margin-bottom:8px">${LA.fix}</p>
+    </div>
+    <div class="meaning">
+      <h3 style="color:var(--gold)">九宮格連線</h3>
+      <div class="ng">${cell(3)}${cell(6)}${cell(9)}${cell(2)}${cell(5)}${cell(8)}${cell(1)}${cell(4)}${cell(7)}</div>
+      <div class="line-list">
+        ${hitLines.length?hitLines.map(l=>`<span class="pill g">${l.k} ${l.nm}</span>`).join(""):`<span class="pill">無完整連線</span>`}
+      </div>
+      ${hitLines.map(l=>`<div class="fy-aspect" style="margin-top:6px"><b>${l.nm}</b>｜${l.d}</div>`).join("")}
+      ${missing.length?`
+      <h3 class="b" style="margin-top:10px">空缺數補強</h3>
+      <ul>${missing.map(n=>`<li><b style="color:var(--gold)">${n}</b>｜${GAP[n]}</li>`).join("")}</ul>`:`<p class="note">無空缺數，九數俱全。</p>`}
+    </div>
+  </div>`;
+  return {
+    html, talent, bday,
+    lines: hitLines.length?hitLines.map(l=>l.nm).join("、"):"無",
+    missing: missing.length?missing.join("、"):"無"
+  };
+}
+
+/* ================= 色彩靈數 ================= */
+const swch=n=>`<span class="sw" style="background:${COLOR[n].hex}"></span>`;
+function colorBlock(sub,fy){
+  const C=COLOR[sub];
+  return `
+  <div class="box">
+    <h2>色彩靈數</h2>
+    <div class="fy-aspect"><b>代表色</b>｜${swch(sub)}${C.c}（${C.e}）</div>
+    <div class="fy-aspect"><b>怎麼用</b>｜${C.use}</div>
+    <div class="fy-aspect"><b>平衡色</b>｜${C.bal}</div>
+    <div class="fy-aspect"><b>流年輔助色</b>｜${swch(fy)}${COLOR[fy].c}——今年可多運用的顏色，呼應流年能量。</div>
+  </div>`;
+}
+document.getElementById("colorList").innerHTML=Object.entries(COLOR).map(([n,C])=>`
+  <div class="school">
+    <b>${swch(+n)}${n}・${C.c}</b><span class="tag">${C.e}</span>
+    <p>用法：${C.use}</p>
+    <p>平衡：${C.bal}</p>
+  </div>`).join("");
+
+/* ================= 相處攻略 ================= */
+function approachHTML(n,who){
+  const A=APPROACH[n];
+  return Object.entries(APPROACH_LABEL).map(([k,lab])=>
+    `<div class="fy-aspect"><b>${lab}</b>｜${A[k].replace(/他/g,who||"他")}</div>`).join("");
+}
+const apNav=document.getElementById("apNav");
+apNav.innerHTML=Object.keys(APPROACH).map(n=>`<button onclick="showAP(${n},this)">${n}</button>`).join("");
+function showAP(n,btn){
+  apNav.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b===btn));
+  document.getElementById("apDetail").innerHTML=`
+    <h2 style="color:var(--gold);font-size:1.1em;margin:8px 0 2px" class="serif">${n}・${LIFE[n].t}</h2>
+    <p style="color:var(--muted);margin-bottom:10px">${LIFE[n].kw}｜代表色 ${swch(n)}${COLOR[n].c}</p>
+    ${approachHTML(n)}
+    <div class="fy-aspect" style="margin-top:10px"><b>吵架時</b>｜${QUARREL[n].q}</div>
+    <div class="fy-aspect"><b>安撫法</b>｜${QUARREL[n].fix}</div>`;
+}
+showAP(1,apNav.querySelector("button"));
+
+/* ================= 生命靈數分頁 ================= */
+const lpNav=document.getElementById("lpNav");
+lpNav.innerHTML=Object.keys(LIFE).map(n=>`<button onclick="showLP(${n},this)">${n}</button>`).join("");
+function showLP(n,btn){
+  lpNav.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b===btn));
+  const L=LIFE[n], LA=LIFE_ACT[n];
+  document.getElementById("lpDetail").innerHTML=`
+    <h2 style="color:var(--gold);font-size:1.1em;margin-bottom:2px" class="serif">${n}・${L.t}</h2>
+    <p style="color:var(--muted);margin-bottom:10px">${L.kw}｜代表色 ${swch(n)}${COLOR[n].c}</p>
+    ${Object.entries(L.a).map(([k,v])=>`<div class="fy-aspect"><b>${k}</b>｜${v}</div>`).join("")}
+    <div class="meaning">
+      <h3 class="g">行動建議</h3>
+      <ul>${LA.act.map(x=>`<li>${x}</li>`).join("")}</ul>
+      <h3 style="color:var(--gold)">如何改善</h3>
+      <p style="font-size:.95em">${LA.fix}</p>
+    </div>`;
+}
+showLP(1,lpNav.querySelector("button"));
+document.getElementById("lineBody").innerHTML=LINES.map(l=>`
+  <tr><td style="white-space:nowrap"><b style="color:var(--gold)">${l.k}</b> ${l.nm}</td><td>${l.d}</td></tr>`).join("");
+
+/* ================= 流派分頁 ================= */
+document.getElementById("schoolsSame").innerHTML=SCHOOLS_SAME.map(s=>`
+  <div class="school"><b>${s.nm}</b><span class="tag">加總化簡</span><p>${s.d}</p></div>`).join("");
+document.getElementById("schoolsDiff").innerHTML=SCHOOLS_DIFF.map(s=>`
+  <div class="school"><b>${s.nm}</b><p>${s.d}</p></div>`).join("");
+
+/* ================= 22 牌速查 ================= */
+const grid=document.getElementById("cardGrid");
+grid.innerHTML=CARDS.map(c=>`
+  <div class="gcard" onclick="showCard(${c.n})">
+    <div class="num">${ROMAN[c.n]}</div>
+    <div class="nm">${c.nm}</div>
+    <div class="zo">${c.zo||"&nbsp;"}</div>
+  </div>`).join("");
+function showCard(n){
+  const c=CARDS[n];
+  grid.style.display="none";
+  const dt=document.getElementById("cardDetail");
+  dt.innerHTML=`<span class="backlink" onclick="backGrid()">← 回 22 牌</span>`+
+    meaningHTML(c,"cd").replace('class="box detail"','class="box detail on"');
+  dt.classList.add("on");
+}
+function backGrid(){
+  document.getElementById("cardDetail").classList.remove("on");
+  grid.style.display="grid";
+}
+
+/* ================= 速配表 ================= */
+document.getElementById("matchBody").innerHTML=Object.entries(MATCH).map(([n,m])=>`
+  <tr><td><b style="color:var(--gold)">${n}</b> ${CARDS[n].nm}</td>
+  <td class="g">${m.g.map(x=>`<span class="g">${x} ${CARDS[x].nm}</span>`).join("、")}</td>
+  <td>${m.b.map(x=>`<span class="b">${x} ${CARDS[x].nm}</span>`).join("、")}</td></tr>`).join("");
+
+/* ================= 流年速查 ================= */
+const fyNav=document.getElementById("fyNav");
+fyNav.innerHTML=Object.keys(FLOW).map(n=>`<button onclick="showFY(${n},this)">${n}</button>`).join("");
+function showFY(n,btn){
+  fyNav.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b===btn));
+  const f=FLOW[n];
+  document.getElementById("fyDetail").innerHTML=`
+    <h2 style="color:var(--gold);font-size:1.1em;margin-bottom:2px" class="serif">${n}・${f.t}</h2>
+    <p style="color:var(--muted);margin-bottom:10px">${f.kw}</p>
+    ${Object.entries(f.a).map(([k,v])=>`<div class="fy-aspect"><b>${k}</b>｜${v}</div>`).join("")}
+    <div class="fy-aspect"><b>行動建議</b>｜${FLOW_ACT[n]}</div>`;
+}
+showFY(1,fyNav.querySelector("button"));
+
+/* ================= 星座表 ================= */
+document.getElementById("zodiacBody").innerHTML=ZODIAC.map(z=>`
+  <tr><td>${z.sym} ${z.nm}</td><td><b style="color:var(--gold)">${z.card}</b></td><td>${CARDS[z.card].nm}</td></tr>`).join("");
+</script>
+</body>
+</html>
