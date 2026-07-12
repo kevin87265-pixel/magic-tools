@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark light">
+<title>紫微斗數速查 | 神奇身心靈學苑</title>
+<style>
+:root{
+  color-scheme: dark;
+  --bg:#1b1b2b; --bg2:#232338; --card:#26263e; --card2:#2d2d48;
+  --gold:#d4af37; --gold-soft:#e8cd6f; --ink:#f0ead8; --ink2:#cfc7ae;
+  --line:#3d3d5c; --accent:#8a7ff0; --danger:#e0707a; --ok:#7fc98f;
+  --fs-body:15px; --fs-num:17px; --fs-h:30px;
+}
+html.light{
+  color-scheme: light;
+  --bg:#f5f1e6; --bg2:#ece6d4; --card:#ffffff; --card2:#f7f3e8;
+  --gold:#9a7a10; --gold-soft:#7a610d; --ink:#2a2418; --ink2:#5a5240;
+  --line:#d8d0ba; --accent:#5a4fc0; --danger:#b23a46; --ok:#2e7d4f;
+}
+html.big{ --fs-body:18px; --fs-num:20px; --fs-h:34px; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:"Source Han Sans TC","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  font-size:var(--fs-body); line-height:1.75; min-height:100vh;
+}
+header{
+  padding:26px 16px 14px; text-align:center;
+  background:linear-gradient(180deg,var(--bg2),var(--bg));
+  border-bottom:1px solid var(--line);
+}
+header h1{font-size:var(--fs-h); letter-spacing:.14em; color:var(--gold); font-weight:700}
+header p{color:var(--ink2); font-size:calc(var(--fs-body) - 1px); margin-top:4px; letter-spacing:.08em}
+.toggles{position:fixed; top:10px; right:10px; display:flex; gap:6px; z-index:50}
+.toggles button{
+  background:var(--card); color:var(--ink); border:1px solid var(--line);
+  border-radius:8px; padding:5px 10px; cursor:pointer; font-size:13px;
+}
+.toggles button:hover{border-color:var(--gold)}
+.searchbar{max-width:920px; margin:14px auto 0; padding:0 14px}
+.searchbar input{
+  width:100%; padding:11px 16px; border-radius:12px; border:1px solid var(--line);
+  background:var(--card); color:var(--ink); font-size:var(--fs-body); outline:none;
+}
+.searchbar input:focus{border-color:var(--gold)}
+nav{
+  display:grid; grid-template-columns:repeat(5,1fr); gap:7px; padding:12px 14px; max-width:920px; margin:0 auto;
+}
+@media (min-width:640px){ nav{grid-template-columns:repeat(10,1fr)} }
+nav button{
+  padding:7px 4px; text-align:center; border-radius:20px; border:1px solid var(--line);
+  background:var(--card); color:var(--ink2); cursor:pointer; font-size:var(--fs-body);
+  letter-spacing:.05em; white-space:nowrap;
+}
+nav button.on{background:var(--gold); color:#1b1b2b; border-color:var(--gold); font-weight:700}
+main{max-width:920px; margin:0 auto; padding:6px 14px 70px}
+section{display:none}
+section.on{display:block}
+.grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px; margin-top:10px}
+.card{
+  background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px 16px 14px;
+}
+.card h3{color:var(--gold); font-size:calc(var(--fs-body) + 4px); letter-spacing:.1em; display:flex; align-items:baseline; gap:8px; flex-wrap:wrap}
+.card h3 small{color:var(--ink2); font-size:calc(var(--fs-body) - 2px); letter-spacing:.04em; font-weight:400}
+.tags{display:flex; flex-wrap:wrap; gap:6px; margin:8px 0 6px}
+.tag{
+  font-size:calc(var(--fs-body) - 2px); padding:2px 10px; border-radius:12px;
+  background:var(--card2); border:1px solid var(--line); color:var(--gold-soft);
+}
+.tag.k{color:var(--accent)}
+.card p{color:var(--ink); margin-top:6px}
+.card p b{color:var(--gold-soft)}
+.card .sub{color:var(--ink2); font-size:calc(var(--fs-body) - 1px); margin-top:8px}
+.note{
+  margin:12px 0 4px; padding:10px 14px; border-left:3px solid var(--gold);
+  background:var(--card2); border-radius:0 10px 10px 0; color:var(--ink2);
+  font-size:calc(var(--fs-body) - 1px);
+}
+table{width:100%; border-collapse:collapse; margin-top:12px; background:var(--card); border-radius:12px; overflow:hidden}
+th,td{border:1px solid var(--line); padding:7px 6px; text-align:center; font-size:var(--fs-body)}
+th{background:var(--card2); color:var(--gold); letter-spacing:.06em}
+td:first-child,th:first-child{color:var(--gold-soft); font-weight:700; position:sticky; left:0; background:var(--card2)}
+.tablewrap{overflow-x:auto; border-radius:12px; border:1px solid var(--line)}
+.b-廟{color:var(--ok); font-weight:700}
+.b-旺{color:var(--gold-soft); font-weight:700}
+.b-得,.b-利{color:var(--ink)}
+.b-平{color:var(--ink2)}
+.b-陷{color:var(--danger); font-weight:700}
+.hua{display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:10px; margin-top:10px}
+.hua .card h3{justify-content:center}
+.hua .row{display:flex; justify-content:space-between; margin-top:6px; padding:4px 8px; border-radius:8px; background:var(--card2)}
+.hua .row span:first-child{color:var(--ink2)}
+.hua .lu{color:var(--ok)} .hua .quan{color:var(--gold-soft)} .hua .ke{color:var(--accent)} .hua .ji{color:var(--danger)}
+.frow{display:flex; gap:10px; margin-top:6px; align-items:baseline}
+.flab{flex:0 0 auto; font-size:calc(var(--fs-body) - 2px); color:var(--gold-soft); border:1px solid var(--line); background:var(--card2); border-radius:8px; padding:1px 8px}
+.frow span:last-child{color:var(--ink2)}
+.frow.good span:last-child{color:var(--ok)}
+.frow.bad span:last-child{color:var(--danger)}
+.sechead{color:var(--gold); font-size:calc(var(--fs-body) + 5px); letter-spacing:.12em; margin:22px 4px 4px; padding-left:10px; border-left:4px solid var(--gold)}
+.card.xg h3{color:var(--danger)}
+.card.xg .tag{color:var(--danger)}
+ol.steps{margin:10px 0 0 24px}
+ol.steps li{margin:8px 0; color:var(--ink)}
+footer{text-align:center; color:var(--ink2); padding:20px; font-size:13px; border-top:1px solid var(--line)}
+.hide{display:none !important}
+tr.hide{display:none !important}
+@media (max-width:520px){ header h1{font-size:calc(var(--fs-h) - 6px)} }
+
+/* ══ 開場特效 ══ */
+#splash{position:fixed; inset:0; z-index:999; background:#16162a; overflow:hidden; touch-action:none;
+  font-family:"Source Han Sans TC","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif}
+#splash .sp-aurora{position:absolute; inset:-25%; filter:blur(80px); opacity:.5; pointer-events:none}
+#splash .sp-aurora i{position:absolute; border-radius:50%}
+#splash .sp-aurora i:nth-child(1){width:60vmax;height:60vmax; left:-14%; top:-18%;
+  background:radial-gradient(circle,#3d3387 0%,transparent 62%); animation:spd1 18s ease-in-out infinite alternate}
+#splash .sp-aurora i:nth-child(2){width:50vmax;height:50vmax; right:-15%; bottom:-20%;
+  background:radial-gradient(circle,#6b4fc4 0%,transparent 62%); animation:spd2 22s ease-in-out infinite alternate}
+#splash .sp-aurora i:nth-child(3){width:36vmax;height:36vmax; right:5%; top:-12%;
+  background:radial-gradient(circle,#8a6b16 0%,transparent 66%); animation:spd3 15s ease-in-out infinite alternate}
+@keyframes spd1{to{transform:translate(10vmax,8vmax) scale(1.18)}}
+@keyframes spd2{to{transform:translate(-9vmax,-7vmax) scale(1.12)}}
+@keyframes spd3{to{transform:translate(-7vmax,9vmax) scale(1.25)}}
+#sp-c{position:absolute; inset:0; display:block}
+#splash .sp-ui{position:absolute; left:0; right:0; bottom:8vh; text-align:center; pointer-events:none}
+#splash .sp-sub{font-size:clamp(15px,4vmin,20px); letter-spacing:.55em; padding-left:.55em; color:#e8cd6f;
+  opacity:0; transform:translateY(18px); transition:1s ease}
+#splash .sp-org{margin-top:9px; font-size:clamp(12px,3vmin,14px); letter-spacing:.3em; padding-left:.3em; color:#9a927c;
+  opacity:0; transform:translateY(18px); transition:1s ease .15s}
+#sp-btn{pointer-events:auto; margin-top:26px; opacity:0; transform:translateY(18px); transition:1s ease .3s;
+  background:rgba(212,175,55,.1); color:#e8cd6f; border:1px solid rgba(212,175,55,.6); border-radius:999px;
+  padding:12px 50px; font-size:16px; letter-spacing:.32em; padding-left:calc(50px + .32em);
+  cursor:pointer; backdrop-filter:blur(4px); animation:sppulse 2.6s ease infinite}
+@keyframes sppulse{0%,100%{box-shadow:0 0 22px rgba(212,175,55,.15), inset 0 0 16px rgba(212,175,55,.07)}
+ 50%{box-shadow:0 0 44px rgba(212,175,55,.4), inset 0 0 24px rgba(212,175,55,.14)}}
+#sp-btn:active{background:rgba(212,175,55,.24)}
+#splash.ready .sp-sub,#splash.ready .sp-org,#splash.ready #sp-btn{opacity:1; transform:none}
+#splash .sp-hint{position:absolute; top:5.5vh; left:0; right:0; text-align:center;
+  font-size:12px; letter-spacing:.42em; padding-left:.42em; color:#7d77a0;
+  opacity:0; transition:1.2s ease .6s; pointer-events:none}
+#splash.ready .sp-hint{opacity:.95}
+#splash.leave{transition:opacity .6s ease; opacity:0}
+</style>
+</head>
+<body>
+<div id="splash">
+  <div class="sp-aurora"><i></i><i></i><i></i></div>
+  <canvas id="sp-c"></canvas>
+  <div class="sp-hint">點 擊 或 滑 過 文 字</div>
+  <div class="sp-ui">
+    <div class="sp-sub">速查 · 課堂隨查手冊</div>
+    <div class="sp-org">神奇身心靈學苑</div>
+    <button id="sp-btn">進 入</button>
+  </div>
+</div>
+
+<div class="toggles">
+  <button id="tgTheme" aria-label="深淺色切換">🌗</button>
+  <button id="tgFont" aria-label="大字模式">A+</button>
+</div>
+<header>
+  <h1>紫微斗數速查</h1>
+  <p>神奇身心靈學苑 · 課堂隨查手冊</p>
+</header>
+<div class="searchbar"><input id="q" type="search" placeholder="搜尋星曜、宮位、格局關鍵字…"></div>
+<nav id="nav"></nav>
+<main id="main"></main>
+<footer>神奇身心靈學苑 © 2026 · 通行版速查，派系差異以課堂講授為準</footer>
+<script>
+/* ========== 資料 ========== */
+const FAQ = [
+["財運好不好？","財帛宮為主，福德宮互照（財與享用一體兩面），田宅是財庫——賺得到還要守得住。武曲、太陰化祿主財旺；財宮逢空劫最忌，得而復失。"],
+["工作該不該換？","官祿宮為主，遷移宮看外出機會。星性對照四大類型給方向（順性而為）；流年官祿或命宮逢四化引動＝異動之年，忌入官祿防職場是非。"],
+["感情桃花怎麼看？","夫妻宮主對待模式。大桃花是貪狼、廉貞；天姚是性桃花、玩玩的；咸池是一定會被發現的桃花，也是桃花煞。遷移有桃花＝外出遇到。破軍在夫妻宮不利婚姻，破軍＋咸池更容易離婚。"],
+["什麼時候結婚？","流年太歲走到本命紅鸞天喜的宮位，或流年鸞喜入命宮／夫妻宮，且夫妻三方無重煞沖破＝婚喜訊號年。中晚年逢鸞喜引動，轉論刑傷孝服或再婚桃花，不可一律斷喜。"],
+["身體健康？","疾厄宮本宮坐星五行對臟腑（木肝火心土脾胃金肺水腎），父母宮沖照看遺傳與家族病史，兄弟田宅有煞忌會照才加重——查「疾厄」頁徵驗表，提醒保健、不做醫學診斷。"],
+["考試考得上嗎？","出社會前讀書考試參考官祿宮；看文昌、化科、天魁有沒有落入命宮或官祿的三方四正。文昌化忌學科不利、文曲化忌術科不利；陽梁昌祿為典型考試格。"],
+["投資合夥看哪裡？","事業投資夥伴→僕役（交友）宮；有參與經營→官祿宮；有參與且每天工作→財帛宮；沒有參與經營→福德宮。先問清楚參與程度再定宮。"],
+["能不能買房？","田宅宮為主；太陰主不動產，田宅逢祿主置產順利，逢忌煞防產權糾紛、漏水嫌隙。田宅也是財之庫，看一生成果收藏。"],
+["會不會有官司？","官非看官符、天刑會照；天相被刑忌夾印主契約出問題、用印惹禍、作保出事（查「夾宮」頁引動年干）。簽約年份逢引動，提醒條款看清楚。"],
+["適合外出發展嗎？","遷移宮強於命宮＝出外得志。天馬、歲驛主變動搬遷；祿馬交馳動中得財、利遠地；馬遇空亡終身奔走、勞而少獲。"],
+["貴人運？","看天魁天鉞——魁為明現貴人、鉞為暗中助力；命宮帶天魁，貴人運旺。中年後魁鉞力減，靠自己累積的左輔右弼（真實的文臣武將）。"],
+["小孩緣分？","子女宮看子女緣分、個性與教養方式；子女宮也是桃花與合夥下游位，問不孕、意外時同參田宅氣數。"]
+];
+const GUIDE = [
+{t:"① 先看本命命宮——一輩子的底",tag:"定性",
+ d:"本命盤管一輩子，命宮主星解釋這個人的<b>內心狀況</b>——他是誰、怎麼想事情。依序看四件事：<br><b>1.</b> 主星是誰 → 查「十四主星」頁，先講人物形象與個性直述；<br><b>2.</b> 屬四大類型何者（開創／領導／支援／合作）→ 抓行事風格底色；<br><b>3.</b> 廟旺狀態（App 已標示）→ 廟旺＝星性<b>顯性</b>，特質明顯外放；落陷＝星性<b>隱性</b>，特質潛藏不易展現——不是沒有，是收在裡面；<br><b>4.</b> 命宮有無生年四化、吉星煞星同宮 → 祿忌坐命定一生得失基調。"},
+{t:"② 三方四正四格合看——有比重",tag:"定強弱",
+ d:"命宮＋對宮（遷移）＋三合二宮（財帛、官祿）共四格合參，<b>比重不是平均分</b>：<br><b>本宮 50%</b>｜<b>對宮 30%</b>｜<b>三合二宮各 10%</b><br>本宮是「你自己」，對宮是「迎面而來的環境」，三合是「你的手腳舞台」。會照的吉星煞星依這個比重加減分——同樣一顆擎羊，坐本宮的力道遠大於三合會照。四格看完順手檢查有無成局：機月同梁、殺破狼、府相朝垣（詳「格局」頁）。"},
+{t:"③ 順著主星優勢走——解盤的目的",tag:"定方向",
+ d:"越朝自己主星狀態的優勢去發展，運勢越好；逆著星性硬拚，事倍功半。對照四大類型給方向：<br><b>開創型</b>（殺破廉貪）→ 業務開拓、創業、變動性強的戰場；<br><b>領導型</b>（紫府武相）→ 管理、財經、制度內往上爬；<br><b>支援型</b>（陽巨機）→ 企劃、教學、傳播，靠腦袋與口才；<br><b>合作型</b>（陰同梁）→ 服務、協調、醫療宗教，靠人和與付出。<br>解盤不是報吉凶，是幫他找到「順性而為」的方向。"},
+{t:"④ 空宮借對宮——力量減半",tag:"特殊處理",
+ d:"命宮（或任何宮）無十四主星＝空宮，<b>借對宮主星</b>來論。兩個鐵則：<br><b>1.</b> 借來的星<b>狀態只有一半</b>——優點缺點都打對折，不能當坐守論；<br><b>2.</b> 空宮的人受環境影響大、可塑性也大——好壞看借到什麼、三方會到什麼。<br>借星之後，比重照②的 50／30／10／10 走，只是本宮那 50% 是「半力的借星」。"},
+{t:"⑤ 逐宮解釋——同一顆星換舞台",tag:"十二宮",
+ d:"用同一套星情走完十二宮：星入何宮管何事——入夫妻看對待模式、入財帛看財路手段、入疾厄看病灶體質（查「疾厄宮表」）。每一宮都重複同一組動作：<br><b>主星星情 → 廟旺 → 同宮吉煞 → 有無四化 → 鄰宮有無成夾</b>（查「夾宮」頁）。<br>建議講解順序：命→福德（內外呼應）→ 財帛官祿（事業財）→ 夫妻 → 疾厄 → 其餘各宮，客人問哪宮就跳哪宮。"},
+{t:"⑥ 再看大限流年——先定盤再走運",tag:"時間軸",
+ d:"順序不能倒：<b>本命是體、大限是十年氣候、流年是當年引信</b>。<br><b>大限</b>：把大限宮當「十年的命宮」，用①～⑤同一套流程重走一次，看這十年重心與課題；<br><b>流年</b>：流年干帶流年四化入盤——流忌落哪宮、有無疊生年忌（忌上加忌）、有無補位成夾（雙忌夾、羊陀夾忌引動，詳「夾宮」頁流年三步驟）；<br><b>神煞</b>最後才看，只定象不定吉凶——主星無事，神煞單見不斷。"}
+];
+const STARS = [
+{n:"紫微",def:"北斗群星之首・帝星｜陰土（腸胃）｜化氣為貴",
+ person:"皇帝、喜惡隨心、自我、任性、領導、穩重",
+ event:"高貴、貴金屬、奢侈、體面、統治、突出、不服輸",
+ desc:"莊重矜持，自制性很強，有領導管理的能力。凡事克己復禮，很重視形象，絕不輕易表露真實情感；待人接物稍嫌表面化，缺乏整體投入的熱情，經常知交沒幾個，顧慮太多時處理重大問題顯得推托逃避。不是每個紫微都當老闆，應稱「領導型」：有很強的地位驅力，想出人頭地、想成功，但成功要經過很多奮鬥。",
+ pros:"慈愛威嚴・君臨天下・求知慾勝・好勝心強・堅持原則・渴望實現自我",
+ cons:"剛愎自用・眼高手低・專斷固執・不聽人勸"},
+{n:"天機",def:"南斗第三星・智多星｜陰木（肝膽）｜化氣為善",
+ person:"軍師、謀士、宗教家、企劃人員、機靈好動之人",
+ event:"機械、變動、宗教哲學、思考、口舌",
+ desc:"頭腦轉得快，善於分析推理，點子多、反應靈敏，是天生的幕僚軍師。個性溫和帶點神經質，坐不住、閒不下來，對新鮮事物永遠好奇。罩門是想得多做得少——計畫一百分、執行五十分，選項太多反而搖擺不定；一生多變動，宜以智慧為業。",
+ pros:"聰明機智・善於企劃・學習力強・隨機應變・心地善良",
+ cons:"多思多慮・見異思遷・投機取巧・神經緊張・博而不精"},
+{n:"太陽",def:"中天主星・官祿主｜陽火（心臟、眼目）｜化氣為貴",
+ person:"父親、長官、外向熱情、光明磊落之人",
+ event:"名聲、政治、公益、能源光電、外交",
+ desc:"熱情外放、光明磊落，有話直說藏不住事，天生喜歡照顧別人、主持公道。愛面子、重名聲勝過重錢財——主貴不主富。像太陽普照大地：付出多、回收少，施而不受。廟旺者精力充沛越做越旺；落陷者做得要死還被嫌，勞而無功，防眼目心血之疾。",
+ pros:"熱情博愛・積極主動・不計付出・有領導魅力",
+ cons:"好大喜功・虎頭蛇尾・太直得罪人・勞碌操煩"},
+{n:"武曲",def:"北斗第六星・財帛主｜陰金（肺、呼吸）｜化氣為財",
+ person:"軍人、財務人員、行動派、寡言剛毅之人",
+ event:"金融、金屬、武職、技術、現金",
+ desc:"個性剛直果決，講話短促有力、不愛囉嗦，想到就做——十四主星裡最強的行動派財星。重視實際利益，數字觀念好，靠一技之長與拼勁賺短兵相接的錢。剛過頭就是孤：不善表達感情，人情世故上吃虧，寡宿之性，女命尤須軟化。",
+ pros:"刻苦耐勞・意志堅定・執行力強・理財務實",
+ cons:"剛毅孤僻・不解風情・欠缺變通・易與人衝突"},
+{n:"天同",def:"南斗第四星・福德主｜陽水（膀胱、泌尿）｜化氣為福",
+ person:"小孩、老好人、樂天知足者",
+ event:"享受、飲食、休閒、服務業、福利",
+ desc:"個性溫和謙遜、與世無爭，人緣極好，像個永遠長不大的孩子——情緒導向、感受優先。知足常樂是優點也是缺點：安逸慣了缺乏鬥志，遇壓力習慣退讓逃避。天同是先勞後逸的白手起家格，須逢煞激發（如馬頭帶箭）反能成大器。",
+ pros:"溫和善良・人緣佳・知足惜福・協調力好",
+ cons:"懶散被動・意志不堅・怕壓力・遇事退縮"},
+{n:"廉貞",def:"北斗第五星・次桃花｜陰火（心、血液）｜化氣為囚",
+ person:"公關、政客、愛恨分明個性鮮明之人",
+ event:"電子、血光、官非、酒色、公家機關",
+ desc:"十四主星中性質最複雜難捉摸的一顆——理智與感情、原則與慾望在體內拉鋸。廟旺時幹練威嚴、公關手腕一流，是官場戰將；落陷時感情用事、行事偏激，易惹是非官訟血光。愛恨分明、敢愛敢恨，自尊心強，吃軟不吃硬。",
+ pros:"精明幹練・敢衝敢拼・公關手腕好・重原則",
+ cons:"心高氣傲・愛恨極端・易走偏鋒・招惹是非"},
+{n:"天府",def:"南斗主星・財庫星｜陽土（脾胃）｜化氣為令",
+ person:"老闆娘、大管家、穩重長者",
+ event:"銀行、倉庫、不動產、管理、保守",
+ desc:"穩重敦厚、處事圓融，天生的管理者——不衝鋒陷陣，但把後方管得井井有條。才藝多、器量大，重視生活品質與安全感，是「守成」的財庫星。缺點是保守怕變、習慣留一手；無祿為空庫露庫，外表風光內在空虛，易流於自滿慵懶。",
+ pros:"穩健可靠・包容力強・善於管理・多才多藝",
+ cons:"保守怕變・安於現狀・愛面子・略嫌自滿"},
+{n:"太陰",def:"中天星・田宅主｜陰水（腎、婦科）｜化氣為富",
+ person:"母親、妻子、女兒、溫柔細膩之人",
+ event:"不動產、儲蓄、夜間行業、美容、旅遊",
+ desc:"溫柔內斂、心思細膩，重感情、愛乾淨，審美品味好。主富——賺的是細水長流的錢，擅長儲蓄置產。情緒像月亮有陰晴圓缺：多愁善感、容易內耗，心事不對外說悶在心裡。夜生人廟旺更吉；男命得之細心體貼，得女性之助。",
+ pros:"溫柔體貼・心思縝密・重感情・善理財置產",
+ cons:"多愁善感・內向壓抑・優柔寡斷・易鑽牛角尖"},
+{n:"貪狼",def:"北斗第一星・第一桃花｜陽木帶水（肝、腎）｜化氣為桃花",
+ person:"交際高手、業務王牌、多才多藝之人",
+ event:"應酬、娛樂、才藝、五術、投機",
+ desc:"十四主星中慾望最強、才藝最多的一顆——琴棋書畫、吃喝玩樂樣樣通，交際手腕一流、八面玲瓏。企圖心旺盛，什麼都想要，人生豐富多彩，與五術神仙之學亦有緣。慾望管理是一生課題：管得好是動力，管不好是劫數；貪多務得、博而不精是通病。",
+ pros:"多才多藝・交際手腕強・企圖心旺・適應力好",
+ cons:"貪多務得・喜新厭舊・愛慕虛榮・易沉迷酒色財氣"},
+{n:"巨門",def:"北斗第二星・暗星｜陰水帶金（口、食道）｜化氣為暗",
+ person:"老師、律師、名嘴、心思深沉之人",
+ event:"口舌、是非、法律、傳播、暗處",
+ desc:"口才是天賦也是武器——分析犀利、辯才無礙，天生適合靠嘴吃飯：教學、法律、業務、傳播。心思深、疑心重，凡事先看陰暗面，防衛心強不易交心。話多必失，是非常隨口舌來：用對地方口燦蓮花，用錯地方禍從口出；化祿權則石中隱玉，大放異彩。",
+ pros:"口才犀利・觀察入微・研究精神強・記憶力好",
+ cons:"多疑善辯・出言不遜・是非口舌・不易信任人"},
+{n:"天相",def:"南斗第五星・印星｜陽水（膀胱、皮膚）｜化氣為印",
+ person:"宰相、秘書、幕僚長、正義感強之人",
+ event:"印鑑、契約、服務、調解、衣食",
+ desc:"謹慎穩重、公正無私，天生的宰相之才——自己不當家，但當家的少不了他。有正義感、愛打抱不平，重視穿著飲食、生活有品味。性質中性如一枚印章：蓋在好文件是授權、蓋在壞文件是背書——最受夾宮環境影響，近朱者赤近墨者黑（財蔭夾吉、刑忌夾凶）。",
+ pros:"忠誠謹慎・公正協調・服務熱忱・形象端正",
+ cons:"缺乏主見・耳根子軟・過度謹慎・易受環境左右"},
+{n:"天梁",def:"南斗第二星・蔭星｜陽土（脾胃）｜化氣為蔭",
+ person:"老人、長輩、醫生、宗教家、監察官",
+ event:"醫藥、保險、宗教、公職、化解災厄",
+ desc:"少年老成、原則性強，天生帶「老大哥」氣質——愛照顧人、愛管閒事、愛講道理。有逢凶化吉的庇蔭力，但有蔭必先有災：先經歷風浪，才顯化解之功。清高孤傲，看不慣的事一定要說；與醫藥、宗教、五術特別有緣，逢煞主漂泊。",
+ pros:"穩重可靠・長者風範・逢凶化吉・原則分明",
+ cons:"固執說教・孤芳自賞・愛管閒事・老氣橫秋"},
+{n:"七殺",def:"南斗第六星・上將｜陽金帶火（肺、大腸）｜化氣為權",
+ person:"將軍、開拓者、獨行俠",
+ event:"軍警、開創、變動、風險、獨當一面",
+ desc:"眼神銳利、氣場強大，天生的戰將——獨立、果決、不服輸，討厭被管，寧為雞首不為牛後。做事全力以赴、破釜沉舟，但不耐煩瑣、不耐等待。人生必有一次大轉折，成敗起伏大；喜怒藏於心，外冷內熱，肩上扛的永遠比說出口的多。",
+ pros:"獨立果敢・不畏艱難・執行力強・敢承擔",
+ cons:"孤僻急躁・不聽指揮・大起大落・情感壓抑"},
+{n:"破軍",def:"北斗第七星・耗星｜陰水（腎、生殖）｜化氣為耗",
+ person:"先鋒部隊、革命家、打掉重練之人",
+ event:"破壞重建、海洋、變動、消耗、開創",
+ desc:"天生的破壞者與開創者——看不慣舊的，就想打掉重練，信奉「不破不立」。衝勁十足、敢冒險，變動是宿命：換工作、換環境比別人頻繁，六親緣分也多變化，早年離家白手起家者多。得祿則耗中有成、先破後得；與昌曲同度反主辛勞。",
+ pros:"開創力強・敢衝敢變・不戀舊・抗壓耐操",
+ cons:"破耗勞碌・喜怒無常・不計後果・六親緣變"}
+];
+
+const PALACES = [
+{n:"命宮",d:"一生格局總樞紐：個性、才能、先天架構。三方四正（財官遷）合看方定強弱。"},
+{n:"兄弟宮",d:"兄弟姊妹、平輩情誼、合夥關係；亦看母親（一說）、現金週轉位。"},
+{n:"夫妻宮",d:"婚姻感情、配偶形性、對待模式；照官祿，亦影響事業型態。"},
+{n:"子女宮",d:"子女緣分、性生活、桃花、合夥下游；亦看意外、田宅之氣數位。"},
+{n:"財帛宮",d:"財源型態、理財方式、賺錢手段；與福德互照，看財與享用。"},
+{n:"疾厄宮",d:"體質、疾病傾向、情緒潛在面；亦為工作場所之災厄位。"},
+{n:"遷移宮",d:"外出際遇、社交形象、驛馬；與命宮互照，在外之我。"},
+{n:"交友宮",d:"（僕役）朋友、部屬、群眾關係；看得助或受累、下屬忠奸。"},
+{n:"官祿宮",d:"（事業）事業型態、職場表現、讀書運；與夫妻互照。"},
+{n:"田宅宮",d:"不動產、家運、居住環境；財之庫位，收藏一生成果。"},
+{n:"福德宮",d:"精神享受、興趣嗜好、壽元、潛意識；女命尤重，與財帛互照。"},
+{n:"父母宮",d:"（相貌）父母緣、上司長輩、文書契約；亦看遺傳、公家關係。"}
+];
+
+const ASSIST = [
+{n:"文昌 · 文曲",t:"六吉",d:"科甲文墨之星。昌主正途功名、文書；曲主口才、異途才藝。夾命拱命主聰明，陽梁昌祿成格利考試。忌：昌曲化忌主文書失誤、感情困擾。"},
+{n:"左輔 · 右弼",t:"六吉",d:"助力之星。主貴人平輩之助、領導加分，夾紫微天府最喜。單見入夫妻宮，傳統論多一說（宜整體參斷）。"},
+{n:"天魁 · 天鉞",t:"六吉",d:"天乙貴人。魁為陽貴（明現貴人），鉞為陰貴（暗中助力）。主機會、提拔，中年後力減。"},
+{n:"祿存",t:"祿馬",d:"小財星、解厄制化。主俸祿、儲蓄，永為羊陀所夾——保守謹慎由此而來。與化祿交會為祿重，逢沖則祿逢沖破。"},
+{n:"天馬",t:"祿馬",d:"驛馬星，只入寅申巳亥。主變動、遠行、行動財；祿馬交馳主發財於遠郡，逢空亡則馬落空亡。"},
+{n:"擎羊 · 陀羅",t:"六煞",d:"羊主明槍（刑傷、衝勁、外顯衝突），陀主暗箭（拖延、糾纏、內耗）。廟旺（辰戌丑未）反主權威橫發，馬頭帶箭為其例。"},
+{n:"火星 · 鈴星",t:"六煞",d:"火主明快暴烈，鈴主陰沉持久。逢貪狼成火貪／鈴貪格主橫發；夾忌則為敗局之一。"},
+{n:"地空 · 地劫",t:"六煞",d:"空主精神面損耗、思想超脫；劫主物質面破耗、波折。入命宜哲學宗教創意，財宮最忌；半空折翅指其夾命沖命。"},
+{n:"化祿",t:"四化",d:"緣起、財祿、順遂。所入之宮主得、主緣；忌沖則祿受損。"},
+{n:"化權",t:"四化",d:"權柄、成就、主觀。主掌控與擴張，過重則霸道爭執。"},
+{n:"化科",t:"四化",d:"名聲、貴人、化解。主考試文書順利、危難有救，亦主風評。"},
+{n:"化忌",t:"四化",d:"虧欠、執著、阻滯。為全盤動線之鑰：忌入為債、忌沖為破（層次詳課堂）。"},
+{n:"紅鸞 · 天喜",t:"桃花雜曜",d:"婚喜之星，永在對宮。主婚嫁、喜慶、人緣；老限逢鸞喜另有他論。"},
+{n:"天姚 · 咸池",t:"桃花雜曜",d:"風流桃花。姚主風情手腕，咸池主酒色慾念；逢正曜吉化可轉為人緣才藝。"},
+{n:"天刑",t:"刑忌雜曜",d:"刑法、自律、孤剋，亦主醫藥、五術緣。與廉貞天相之組合另成專題。"},
+{n:"天空 · 旬空 · 截空",t:"空亡",d:"主落空、虛耗、精神化。吉處藏凶、凶處藏解，看所空何宮何星。"},
+{n:"三台八座 · 恩光天貴 · 台輔封誥",t:"百官",d:"百官朝拱之貴曜，助紫微、太陽等主星成局，主地位排場。"},
+{n:"孤辰 · 寡宿",t:"孤剋",d:"主孤獨感、六親緣淡；入命福夫妻須留意心境調適。"}
+];
+
+const JIEFA = {
+order:"主星格局定性 → 四化定因 → 六吉六煞定強度 → 神煞定象",
+steps:[
+ {t:"① 定類型",d:"先認主星屬四大類型何者，抓性格底色與行事風格（見下方四類型卡）。"},
+ {t:"② 看宮位",d:"星入何宮管何事——同一顆星入命是性格、入財是財路、入疾是病灶。命無正曜則借對宮安星論之。"},
+ {t:"③ 看組合",d:"同宮星曜先合參，再看三方四正會照——星不孤論，組合改變性質。"},
+ {t:"④ 四化定因",d:"生年祿權科忌落點決定一生得失方向；祿為緣起、忌為虧欠執著。流年四化為當年引信，忌疊生年忌之宮為忌上加忌（詳夾宮篇）。"},
+ {t:"⑤ 吉煞定強度",d:"六吉加分、六煞減分或激發——只調整強度，不推翻主星定性。"},
+ {t:"⑥ 神煞定象",d:"神煞是丁級證據，只為事件定象（孝服／官非／搬遷／桃花），絕不單獨定吉凶；主星無事，神煞單見不斷。"}
+],
+types:[
+ {t:"開創型",m:"七殺 · 破軍 · 廉貞 · 貪狼",a:"行動創新、主動積極、有能力、不落人後",x:"行動力夠、執行力強、求新求變"},
+ {t:"領導型",m:"紫微 · 天府 · 武曲 · 天相",a:"理性務實、客觀公道、有公信力、有影響力",x:"謀定而後動、運籌帷幄、有條不紊"},
+ {t:"支援型（熱情圓融）",m:"太陽 · 巨門 · 天機",a:"聰慧、受歡迎、回應快、有感染力",x:"反應快、心思細膩、同理心強、善於人際"},
+ {t:"合作型（溫良利他）",m:"太陰 · 天梁 · 天同",a:"有價值、富足、精神生活層次高",x:"肯付出、不喜競爭、不強求回報、好相處、謙讓"}
+],
+sihua:[
+ {t:"化祿",g:"古典：化祿掌福德，主財祿；行限逢之，旺地十年吉慶，陷而衝破則虛華不實。",m:"現代：朝氣蓬勃，建設性強——穩健踏實、順利、財利。"},
+ {t:"化權",g:"古典：化權掌生機，主權威；二限逢之無有不利，但易有家庭糾紛。",m:"現代：英氣煥發，擴張性強——勇猛精進、權威、權力。"},
+ {t:"化科",g:"古典：化科掌文墨，主聲名；為人聰明豁達、面目俊秀、文學可誇。",m:"現代：喜氣洋洋，榮譽感重——學習研究、文教、聲名。"},
+ {t:"化忌",g:"古典：化忌為多咎之神，主是非；小限逢之一年不足，大限相遇十年悔吝。",m:"現代：暮氣沉沉，挫折感重——忙亂疏忽、憂患困擾。"}
+],
+hualu:[
+ ["廉貞化祿（甲）","公關手腕帶財，人際應酬、異性緣加分；次桃花轉為人緣財。"],
+ ["天機化祿（乙）","靠腦袋賺錢——企劃、顧問、動腦得利；變動中得財，宜多元收入。"],
+ ["天同化祿（丙）","白手起家後享福；人緣帶財，福中生財，但防安逸不進取。"],
+ ["太陰化祿（丁）","不動產、儲蓄之財，細水長流；利夜間財、女性客群。"],
+ ["貪狼化祿（戊）","交際應酬得財、才藝變現；人緣桃花皆旺，偏財機遇多。"],
+ ["武曲化祿（己）","正財大旺，行動力直接變現；利金融、實業、現金生意。"],
+ ["太陽化祿（庚）","名聲帶財——先有名後有利；利公眾事業，付出開始有回報。"],
+ ["巨門化祿（辛）","靠口才賺錢——教學、業務、法律、傳播；是非轉為口碑。"],
+ ["天梁化祿（壬）","蔭中得財、長輩貴人送財；惟天梁不喜祿厚，防因財招議、受惠招怨。"],
+ ["破軍化祿（癸）","開創得財、破舊立新有成；變動投資得利，先破後得。"]
+],
+huaji:[
+ ["太陽化忌（甲）","太開朗、講話太直接會有問題。"],
+ ["太陰化忌（乙）","過度的計畫反而容易失敗。"],
+ ["廉貞化忌（丙）","太過有競爭力的行為容易失敗。"],
+ ["巨門化忌（丁）","唱反調、多嘴容易出問題。"],
+ ["天機化忌（戊）","想太多、變來變去不容易成功。"],
+ ["文曲化忌（己）","術科類（唱歌跳舞）的考試不容易考上。"],
+ ["天同化忌（庚）","跟別人做一樣的事不容易成功。"],
+ ["文昌化忌（辛）","學科類的考試不容易考上。"],
+ ["武曲化忌（壬）","快速做決定、跟多數人不同的決定都容易失敗。"],
+ ["貪狼化忌（癸）","過於享樂、桃花煞、炫耀導致失敗（忙到沒時間花錢、公司好到發很多錢給員工）。"]
+],
+noji:"紫微、天府、天相、七殺永不化忌亦不化祿；紫微只化權（壬）化科（乙），天府、天相、七殺不參與四化——盤中見其化曜必是排盤錯誤。",
+close:"四大類型性格南轅北轍——誤以為要用同一套方法跟所有人相處，就是「自我的盲點」。算命的目的，是為了不被命所算；真正的造命，是調整心態、揚長避短、找對的人與對的時機。"
+};
+
+const JIE_PRINCIPLE = [
+ {t:"本宮（權重最高）",d:"坐星五行對應臟腑——木肝、火心、土脾胃、金肺、水腎；坐星五行與是否化忌，決定體質傾向與病灶方向。"},
+ {t:"對宮（父母宮沖照）",d:"父母宮主遺傳——先天體質、家族病史從這裡看，權重次之。"},
+ {t:"三合（兄弟・田宅）",d:"同源手足與居住環境為輔，有煞忌會照才納入加重判斷。"}
+];
+const JIE_TABLE = [
+["紫微","消化系統"],
+["紫微＋天相","皮膚過敏、結石"],
+["紫微＋桃花","婦女病、性病"],
+["紫微＋天府＋武曲化忌","癌症"],
+["天機","肝火旺、神經衰弱、小時多病"],
+["天機＋太陰＋桃花","女命經期不準、有暗疾"],
+["天機＋擎羊＋天刑","因病動手術"],
+["太陽","血壓高、眼疾、頭痛"],
+["太陽＋天梁","有中風徵兆"],
+["太陽＋太陰","心臟病、腦部疾病"],
+["武曲","呼吸系統"],
+["武曲＋破軍＋煞星","癌症"],
+["武曲＋七殺＋火星＋煞星","傷殘"],
+["天同","膀胱、腎臟、性病、痔瘡"],
+["天同＋巨門","隱疾、精神病"],
+["廉貞＋貪狼","性病＋婦女病"],
+["廉貞＋天相","糖尿、結石"],
+["廉貞＋七殺","肺、鼻過敏"],
+["廉貞＋破軍","結石、意外"],
+["巨門","口方面之疾病"],
+["巨門＋太陽","高血壓"],
+["巨門＋天機","肝胃不和"],
+["巨門＋擎羊（陀羅）＋化忌＋天刑","胃癌、食道癌"],
+["巨門＋火星（鈴星）＋化忌＋天刑＋天虛","肺癌"],
+["天府","胃病"],
+["太陰","腎臟、皮膚"],
+["貪狼","性病、女性可能不孕"],
+["天相","腎臟、皮膚"],
+["天梁","腸胃（容易治癒、長壽）"],
+["七殺","多病、見煞終身傷殘"],
+["破軍","手術、外傷"]
+];
+const JIAGONG = {
+motto:"本宮看強弱，三方看成就，夾宮看包圍。",
+logic:[
+ {t:"空間概念",d:"任何宮位必被左右兩鄰宮夾住。本宮是「你」，鄰宮是「環境」。"},
+ {t:"力量方向",d:"三方四正是你主動可拼搏的手腳與舞台；夾宮是被動承受——從兩側包圍，無處可躲。"},
+ {t:"觸發條件",d:"鄰宮星曜須有對稱性／同質性才成夾；平時不顯，凶吉交會時才引爆。"}
+],
+concepts:[
+ {t:"生年忌 vs 流年忌",d:"生年忌是慢性病——一輩子都在；流年忌是急性發作——當年才有。流年忌疊到生年忌之宮＝「忌上加忌」，該宮最易出事之年。此為雙忌夾與羊陀夾忌引動的理論基礎。"},
+ {t:"生年羊陀 vs 流年羊陀",d:"生年羊陀祿存是固定骨架；流年天干每年帶一組新的流祿、流羊、流陀進盤。所有「流年夾宮引動」皆依賴此概念。"},
+ {t:"與飛星派的分界",d:"本課程屬三合派（星情派）：用生年四化與流年四化，不用宮干飛化——不做十二宮各以宮干飛四化與自化的操作。"}
+],
+xiong:[
+ {n:"羊陀夾忌（第一凶夾）",d:"祿存前一宮必為擎羊、後一宮必為陀羅，故<b>化忌與祿存同宮</b>即天然被羊陀所夾。主孤立無援、官非——想前進有擎羊擋路，想後退有陀羅纏身。賦云「羊陀夾忌為敗局」（骨髓賦）。"},
+ {n:"火鈴夾",d:"左右鄰宮一顆火星、一顆鈴星。主煎熬、暴敗、意外折傷；夾財帛、官祿主環境劇變導致暴敗。"},
+ {n:"空劫夾",d:"地空、地劫分居兩鄰宮（只發生在巳宮或亥宮）。主得而復失、精神損耗——努力像漏了底的水桶。"},
+ {n:"雙忌夾",d:"生年忌與流年忌分居兩鄰宮夾住本宮。凶性不亞於羊陀夾忌，看流年災厄極準——舊傷加新傷，兩面夾攻。"}
+],
+ji:[
+ {n:"雙祿夾",d:"祿存與化祿分居兩鄰宮（本命、大限、流年皆可構成）。夾命身：一生衣食無憂；夾財官：左右逢源。"},
+ {n:"日月夾",d:"命宮在丑或未，被廟旺日月所夾。主接近權貴、得長輩庇蔭——太陽父兄之助，太陰母姐之蔭。"},
+ {n:"紫府夾命",d:"命宮在寅或申被紫府夾。被夾宮只有兩種情況：<b>太陰坐守</b>，或<b>空宮借對宮同梁</b>。主後台強硬、因人成事。"},
+ {n:"化星三夾",d:"權祿夾／科權夾／科祿夾——生年或流年兩顆化星分居鄰宮。實務出現率比日月夾高：權祿主事業財富雙推、科權主名位雙進、科祿主名利相生。"},
+ {n:"左右夾 · 昌曲夾 · 魁鉞夾",d:"左右夾主助力多，昌曲夾主文才考運，魁鉞夾主貴人提拔。成立條件受出生月、時、年干嚴格限制——<b>魁鉞夾只有丙丁年（夾戌）、壬癸年（夾辰）可能成立</b>，其他年干若「找到魁鉞夾」必是排盤錯誤。"},
+ {n:"祿權夾馬（財祿夾馬）",d:"天馬被祿存與化祿（或武曲財星）所夾。天馬主奔動，被財祿包夾＝動中得財，越動越發，最利業務、貿易、外派。"}
+],
+xing:{n:"刑忌夾印——印章被凍結",
+ d:"天相化氣為印，主契約、用印、決策背書。天相鄰宮<b>永遠是巨門（前）與天梁（後）</b>：巨門宮化忌時，忌與天梁之「刑」一左一右夾住天相——印章被非法凍結。主契約出問題、用印惹禍、作保出事、官司訴訟。",
+ y:"引動年干（只有這些）：① 丁年巨門化忌（最經典）② 甲年太陽化忌且陽巨同宮寅申 ③ 辛年文昌忌／己年文曲忌恰落巨門或天梁宮。刑囚 vs 刑忌完整辨析見進階課。"},
+steps:[
+ "先定骨架：排出本命固定夾局（生年羊陀祿存、六吉、空劫位置）。",
+ "再入引信:流年天干帶流祿／流羊／流陀與流年忌入盤。",
+ "查引動：流忌流曜是否補位成夾、或疊入被夾之宮（忌上加忌）——凶夾被引動之年即應期。"
+],
+wrong:[
+ "孤辰寡宿結構上永遠相隔四宮以上，<b>不可能成夾</b>——常見誤傳。",
+ "「府相夾命格」不存在：府相安星永遠三合相會、不可能相鄰，正名為<b>府相朝垣</b>。"
+]};
+
+const GEJU_JI = [
+{n:"君臣慶會",c:"紫微守命，左右昌曲魁鉞會照",d:"帝得百官，主大貴，領導格局第一等。"},
+{n:"紫府同宮",c:"紫微天府同守寅申",d:"「紫府同宮，終身福厚」（骨髓賦）。帝庫相逢，富貴雙全，須逢祿方實。"},
+{n:"府相朝垣",c:"天府天相於財官二位朝命",d:"「府相同來會命宮，全家食祿」（骨髓賦）。衣祿豐足，宜公職管理。"},
+{n:"機月同梁",c:"三方四正會齊機月同梁",d:"宜機構幕僚、公教、企劃文書，安定中求發展。"},
+{n:"日月並明",c:"如丑宮立命，日巳月酉拱照",d:"日月皆旺拱命，主清貴顯達。"},
+{n:"日照雷門",c:"太陽卯宮守命（日生人）",d:"「日照雷門，富貴榮華」（骨髓賦）。旭日東昇，名聲事業蒸蒸日上。"},
+{n:"月朗天門",c:"太陰亥宮守命（夜生人）",d:"「月朗天門，進爵封侯」（骨髓賦）。主富、田宅豐厚。"},
+{n:"明珠出海",c:"未宮立命，日卯月亥來朝",d:"少年得志、科名早發之貴格。"},
+{n:"陽梁昌祿",c:"太陽天梁文昌化祿／祿存交會",d:"典型考試格，利國考、學術、專業證照。"},
+{n:"科權祿拱",c:"三奇會於命宮三方四正",d:"「科權祿拱，名譽昭彰」（太微賦）。名利權三全之上格。"},
+{n:"雙祿朝垣",c:"祿存與化祿於三方拱命",d:"雙祿交流，主財源豐盈；「明祿暗祿，錦上添花」為其延伸。"},
+{n:"祿馬交馳",c:"祿存／化祿與天馬同會（寅申巳亥）",d:"主發財於遠郡，動中得財，利外地經商。"},
+{n:"火貪 · 鈴貪",c:"貪狼逢火星或鈴星同守（辰戌丑未尤佳）",d:"橫發之格，主暴起之財；防橫發橫破，發後宜守。"},
+{n:"武貪同行",c:"武曲貪狼同守丑未",d:"「武貪墓中居，三十才發福」（骨髓賦）。先貧後富，中年後發。"},
+{n:"石中隱玉",c:"巨門子午守命，逢化祿化權",d:"璞玉深藏，先晦後發，大器晚成之貴。"},
+{n:"七殺朝斗",c:"七殺寅申子午入命",d:"「七殺朝斗，爵祿榮昌」（骨髓賦）。開創而有成。"},
+{n:"英星入廟",c:"破軍子午守命",d:"破軍得地，主武職顯貴、開創建功。"},
+{n:"雄宿朝垣",c:"廉貞寅申守命",d:"廉貞入廟，幹練威嚴，利公職武職。"},
+{n:"馬頭帶箭",c:"午宮天同太陰逢擎羊（丙戊年）",d:"威震邊疆，煞星激發福星，宜武職外鄉建功。（雙面格深論見進階課）"},
+{n:"巨日同宮",c:"巨門太陽同守寅（申次之）",d:"「巨日同宮，官封三代」（骨髓賦）。以口才名望立業。"}
+];
+const GEJU_XIONG = [
+{n:"羊陀夾忌",c:"化忌與祿存同宮，天然被羊陀所夾",d:"「羊陀夾忌為敗局」（骨髓賦）。一生多困，宜制化。"},
+{n:"火鈴夾忌",c:"化忌坐命逢火鈴相夾",d:"主突發之災困，行運逢之尤驗。"},
+{n:"刑忌夾印",c:"天相受化忌（巨門宮）與天梁之刑相夾",d:"「刑囚夾印，刑杖惟司」（太微賦）。契約官非之局，詳夾宮篇。"},
+{n:"馬遇空亡",c:"天馬落旬空／截空之地",d:"「馬遇空亡，終身奔走」（骨髓賦）。勞而少獲。空劫夾沖另稱半天折翅，教學宜分開。"},
+{n:"祿逢沖破",c:"祿存／化祿被忌煞沖破",d:"「祿逢沖破，吉處藏凶」（太微賦）。得而復失，喜中藏憂。"},
+{n:"鈴昌陀武",c:"鈴星文昌陀羅武曲四星交會限運",d:"「鈴昌陀武，限至投河」（太微賦）。大限逢之防重大挫敗。"},
+{n:"廉貞七殺",c:"廉殺同會逢煞忌（丑未尤驗）",d:"「廉貞七殺，路上埋屍」（太微賦）。防外出意外血光，行運引動論。"},
+{n:"極居卯酉",c:"紫微貪狼同守卯酉逢空曜",d:"「極居卯酉，多為脫俗僧人」（骨髓賦）。主思想超脫，緣向五術宗教。"},
+{n:"日月反背",c:"太陽戌亥子、太陰卯辰巳失輝",d:"勞碌少成之象；逢吉化反主辛勤有成，不可一概論凶。"},
+{n:"命無正曜",c:"命宮無十四主星",d:"借對宮安星論之，主漂蕩或特殊際遇，吉凶看借星組合。"},
+{n:"雙忌夾命",c:"生年忌＋流年忌夾命",d:"流年災厄之驗，凶性不亞於羊陀夾忌，詳夾宮篇。"},
+{n:"巨逢四煞",c:"巨門與羊陀火鈴交會陷地",d:"口舌是非加重，防官非橫禍；吉化可解。"}
+];
+</script>
+<script>
+/* ========== 渲染 ========== */
+const TABS = [
+ {id:"guide", label:"指引"},
+ {id:"jiefa", label:"解法"},
+ {id:"faq", label:"常問"},
+ {id:"stars", label:"主星"},
+ {id:"palaces", label:"十二宮"},
+ {id:"silu", label:"祿忌"},
+ {id:"assist", label:"輔煞"},
+ {id:"jia", label:"夾宮"},
+ {id:"geju", label:"格局"},
+ {id:"jie", label:"疾厄"}
+];
+const nav = document.getElementById("nav");
+const main = document.getElementById("main");
+
+TABS.forEach((t,i)=>{
+  const b = document.createElement("button");
+  b.textContent = t.label; b.dataset.tab = t.id;
+  if(i===0) b.classList.add("on");
+  b.onclick = ()=>{
+    document.querySelectorAll("nav button").forEach(x=>x.classList.remove("on"));
+    b.classList.add("on");
+    document.querySelectorAll("main section").forEach(s=>s.classList.toggle("on", s.id===t.id));
+    localStorage.setItem("zw_tab", t.id);
+    document.getElementById("q").dispatchEvent(new Event("input"));
+  };
+  nav.appendChild(b);
+});
+
+function card(title, small, tags, body, sub){
+  return `<div class="card" data-q="${(title+small+tags.join("")+body+(sub||"")).replace(/<[^>]+>/g,"").replace(/"/g,"")}">
+    <h3>${title}<small>${small}</small></h3>
+    ${tags.length?`<div class="tags">${tags.map(t=>`<span class="tag">${t}</span>`).join("")}</div>`:""}
+    <p>${body}</p>${sub?`<p class="sub">⚠ ${sub}</p>`:""}
+  </div>`;
+}
+
+/* 主星 */
+let html = `<section id="guide" class="on"><div class="note" style="text-align:center;color:var(--gold)">看盤順序：本命定性 → 三方四正定強弱 → 順星性定方向 → 空宮借星 → 逐宮解釋 → 大限流年</div><div class="grid" style="grid-template-columns:1fr">`;
+GUIDE.forEach(g=>{ html += card(g.t,"",[g.tag],g.d); });
+html += `</div></section>`;
+
+html += `<section id="stars"><div class="grid" style="grid-template-columns:1fr">`;
+STARS.forEach(s=>{
+  html += `<div class="card" data-q="${s.n}${s.def}${s.person}${s.event}${s.desc}${s.pros}${s.cons}">
+    <h3>${s.n}<small>${s.def}</small></h3>
+    <div class="frow"><span class="flab">人物形象</span><span>${s.person}</span></div>
+    <div class="frow"><span class="flab">事件形象</span><span>${s.event}</span></div>
+    <p style="margin-top:10px">${s.desc}</p>
+    <div class="frow good"><span class="flab">優　點</span><span>${s.pros}</span></div>
+    <div class="frow bad"><span class="flab">缺　點</span><span>${s.cons}</span></div>
+  </div>`;
+});
+html += `</div></section>`;
+
+/* 十二宮 */
+html += `<section id="palaces"><div class="note">三方四正合看：本宮＋對宮＋三合二宮；本對為體、三合為用。</div><div class="grid">`;
+PALACES.forEach(p=>{ html += card(p.n, "", [], p.d); });
+html += `</div></section>`;
+
+/* 解法 */
+html += `<section id="jiefa">
+<div class="note" style="text-align:center;font-size:calc(var(--fs-body)+1px);color:var(--gold)">判斷順序：${JIEFA.order}</div>
+<h2 class="sechead">解星六步</h2><div class="grid">`;
+JIEFA.steps.forEach(x=>{ html += card(x.t,"",[],x.d); });
+html += `</div><h2 class="sechead">命格四大類型（動態）</h2><div class="grid">`;
+JIEFA.types.forEach(x=>{ html += card(x.t, x.m, ["類型"], `<b>放大優勢</b>　${x.a}`, null).replace("</p>", `</p><p class="sub"><b>特質</b>　${x.x}</p>`); });
+html += `</div><div class="note">${JIEFA.close}</div></section>`;
+
+/* 化祿化忌 */
+html += `<section id="silu">
+<h2 class="sechead">四化性質總論</h2><div class="grid">`;
+JIEFA.sihua.forEach(x=>{ html += card(x.t,"",["四化"],x.g,null).replace("</p>", `</p><p class="sub">${x.m}</p>`).replace("⚠ ",""); });
+html += `</div><h2 class="sechead">化祿狀況</h2>
+<div class="tablewrap"><table><thead><tr><th style="min-width:150px">星曜化祿</th><th>狀況</th></tr></thead><tbody>`;
+JIEFA.hualu.forEach(r=>{ html += `<tr class="jrow" data-q="${r[0]}${r[1]}"><td style="color:var(--ok)">${r[0]}</td><td style="text-align:left;padding-left:12px">${r[1]}</td></tr>`; });
+html += `</tbody></table></div>
+<h2 class="sechead">化忌應用</h2>
+<div class="tablewrap"><table><thead><tr><th style="min-width:150px">星曜化忌</th><th>提醒</th></tr></thead><tbody>`;
+JIEFA.huaji.forEach(r=>{ html += `<tr class="jrow" data-q="${r[0]}${r[1]}"><td style="color:var(--danger)">${r[0]}</td><td style="text-align:left;padding-left:12px">${r[1]}</td></tr>`; });
+html += `</tbody></table></div>
+<div class="note">${JIEFA.noji}</div></section>`;
+
+/* 疾厄宮表 */
+html += `<section id="jie">
+<div class="note" style="text-align:center;color:var(--gold)">疾厄宮怎麼看：先本宮、再對宮、後三合</div>
+<div class="grid">`;
+JIE_PRINCIPLE.forEach(x=>{ html += card(x.t,"",[],x.d); });
+html += `</div><h2 class="sechead">徵驗訊號表</h2>
+<div class="tablewrap"><table><thead><tr><th style="min-width:150px">星曜／組合</th><th>徵驗訊號</th></tr></thead><tbody>`;
+JIE_TABLE.forEach(r=>{ html += `<tr class="jrow" data-q="${r[0]}${r[1]}"><td>${r[0]}</td><td style="text-align:left;padding-left:12px">${r[1]}</td></tr>`; });
+html += `</tbody></table></div>
+<div class="note" style="border-left-color:var(--danger)">徵驗訊號是傳統經驗的「傾向與保健提醒」，不是醫學診斷；重症條目為古訣所載，僅供參考，身體狀況一律以醫療檢查為準。</div>
+</section>`;
+
+/* 輔煞 */
+html += `<section id="assist"><div class="grid">`;
+ASSIST.forEach(a=>{ html += card(a.n, "", [a.t], a.d); });
+html += `</div></section>`;
+
+/* 夾宮 */
+html += `<section id="jia">
+<div class="note" style="text-align:center;font-size:calc(var(--fs-body)+1px);color:var(--gold)">「${JIAGONG.motto}」</div>
+<h2 class="sechead">核心邏輯</h2><div class="grid">`;
+JIAGONG.logic.forEach(x=>{ html += card(x.t,"",[],x.d); });
+html += `</div><h2 class="sechead">三個必懂觀念</h2><div class="grid">`;
+JIAGONG.concepts.forEach(x=>{ html += card(x.t,"",["觀念"],x.d); });
+html += `</div><h2 class="sechead">凶夾：四大包圍網</h2><div class="grid">`;
+JIAGONG.xiong.forEach(x=>{ html += card(x.n,"",["凶夾"],x.d); });
+html += `</div><h2 class="sechead">吉夾：六種靠山</h2><div class="grid">`;
+JIAGONG.ji.forEach(x=>{ html += card(x.n,"",["吉夾"],x.d); });
+html += `</div><h2 class="sechead">進階：刑忌夾印</h2><div class="grid">`;
+html += card(JIAGONG.xing.n,"",["進階"],JIAGONG.xing.d,JIAGONG.xing.y);
+html += `</div><h2 class="sechead">流年引動三步驟</h2><ol class="steps">`;
+JIAGONG.steps.forEach(s=>{ html += `<li>${s}</li>`; });
+html += `</ol><h2 class="sechead">常見誤傳提醒</h2>`;
+JIAGONG.wrong.forEach(w=>{ html += `<div class="note" style="border-left-color:var(--danger)">${w}</div>`; });
+html += `</section>`;
+
+/* 格局 */
+html += `<section id="geju"><div class="note">成格與否須驗三方四正吉煞比重，不可單憑名目斷吉凶。賦文以《紫微斗數全書》通行本為準。</div>
+<h2 class="sechead">吉格</h2><div class="grid">`;
+GEJU_JI.forEach(g=>{ html += card(g.n,"",["吉格"],`<b>${g.c}</b><br>${g.d}`); });
+html += `</div><h2 class="sechead" style="color:var(--danger)">凶格</h2><div class="grid">`;
+GEJU_XIONG.forEach(g=>{ html += card(g.n,"",["凶格"],`<b>${g.c}</b><br>${g.d}`).replace('class="card"','class="card xg"'); });
+html += `</div></section>`;
+
+/* 常問 */
+html += `<section id="faq"><div class="note">客人開口的第一句話，決定你先翻哪一宮——先定宮，再走解法六步。</div><div class="grid" style="grid-template-columns:1fr">`;
+FAQ.forEach(f=>{ html += card(f[0],"",["常問"],f[1]); });
+html += `</div></section>`;
+
+main.innerHTML = html;
+
+/* 搜尋 */
+document.getElementById("q").addEventListener("input", e=>{
+  const q = e.target.value.trim();
+  const active = document.querySelector("main section.on");
+  if(!q){ document.querySelectorAll(".card, .jrow").forEach(c=>c.classList.remove("hide")); return; }
+  active.querySelectorAll(".card, .jrow").forEach(c=>{
+    c.classList.toggle("hide", !(c.dataset.q||"").includes(q));
+  });
+});
+
+/* 主題切換 */
+const root = document.documentElement;
+function syncMeta(){
+  document.querySelector('meta[name="color-scheme"]').content = root.classList.contains("light") ? "light dark" : "dark light";
+}
+document.getElementById("tgTheme").onclick = ()=>{
+  root.classList.toggle("light");
+  localStorage.setItem("zw_theme", root.classList.contains("light") ? "light" : "dark");
+  syncMeta();
+};
+document.getElementById("tgFont").onclick = ()=>{
+  root.classList.toggle("big");
+  localStorage.setItem("zw_font", root.classList.contains("big") ? "big" : "normal");
+};
+if(localStorage.getItem("zw_theme")==="light") root.classList.add("light");
+if(localStorage.getItem("zw_font")==="big") root.classList.add("big");
+syncMeta();
+const savedTab = localStorage.getItem("zw_tab");
+if(savedTab){
+  const b = document.querySelector(`nav button[data-tab="${savedTab}"]`);
+  if(b) b.click();
+}
+</script>
+<script>
+(function(){
+  const spToday = new Date().toDateString();
+  if(localStorage.getItem("zw_splash") === spToday){
+    document.getElementById("splash").remove();
+    return;                                   /* 今天播過，直接進主頁 */
+  }
+  localStorage.setItem("zw_splash", spToday);
+  document.body.style.overflow="hidden";
+let spStop=false;
+
+const cv = document.getElementById("sp-c"), ctx = cv.getContext("2d");
+const DPR = Math.min(devicePixelRatio || 1, 2);
+let W, H;
+
+/* ── 字形取樣 ── */
+function samplePoints(){
+  const off = document.createElement("canvas");
+  const octx = off.getContext("2d");
+  off.width = W; off.height = H;
+  const vertical = innerWidth < 560;
+  const fs = vertical ? Math.min(W*0.42, H*0.155) : Math.min(W*0.19, H*0.34);
+  octx.fillStyle = "#fff";
+  octx.font = `900 ${fs}px "Source Han Sans TC","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif`;
+  octx.textAlign = "center"; octx.textBaseline = "middle";
+  const chars = "紫微斗數";
+  if(vertical){
+    const cy = H*0.40, gap = fs*1.06;
+    [...chars].forEach((ch,i)=> octx.fillText(ch, W/2, cy + (i-1.5)*gap));
+  }else{
+    const gap = fs*1.08, cx = W/2, cy = H*0.44;
+    [...chars].forEach((ch,i)=> octx.fillText(ch, cx + (i-1.5)*gap, cy));
+  }
+  const img = octx.getImageData(0,0,W,H).data;
+  const step = Math.max(3, Math.round(3.6*DPR));
+  const pts = [];
+  for(let y=0; y<H; y+=step)
+    for(let x=0; x<W; x+=step)
+      if(img[(y*W+x)*4+3] > 128) pts.push({x,y});
+  return pts;
+}
+
+/* ── 粒子 ── */
+const GOLD = ["#ffe9a8","#e8cd6f","#d4af37"], VIO = ["#c2b0ff","#9d8ef2"];
+let parts = [], waves = [], meteors = [];
+const T_VORTEX = 1650, T_BLAST = 1950;  /* 星盤→爆發→聚字 */
+
+function build(){
+  W = cv.width = innerWidth*DPR; H = cv.height = innerHeight*DPR;
+  const targets = samplePoints();
+  const vertical = innerWidth < 560;
+  parts = targets.map(t=>{
+    const prog = vertical ? t.y/H : t.x/W;      /* 波浪式聚字 */
+    return {
+      ca: Math.random()*Math.PI*2,
+      cr: Math.random()*Math.min(W,H)*0.055,
+      sp: 0.003 + Math.random()*0.004,
+      x: W/2, y: H/2,
+      vx:0, vy:0, tx:t.x, ty:t.y,
+      c: Math.random()<0.78 ? GOLD[(Math.random()*3)|0] : VIO[(Math.random()*2)|0],
+      r: (Math.random()*1.1+0.7)*DPR,
+      d: T_BLAST + 150 + prog*750 + Math.random()*120
+    };
+  });
+}
+build();
+let rebuildTimer;
+addEventListener("resize", ()=>{ clearTimeout(rebuildTimer); rebuildTimer=setTimeout(build,200); });
+
+/* ── 衝擊波 ── */
+function shockwave(x,y,max,alpha){ waves.push({x,y,r:0,max,alpha}); }
+
+/* ── 流星 ── */
+function spawnMeteor(){
+  const fromTop = Math.random()<0.5;
+  meteors.push({
+    x: Math.random()*W*0.8, y: fromTop? -20 : Math.random()*H*0.3,
+    vx:(5+Math.random()*4)*DPR, vy:(3+Math.random()*3)*DPR, life:1
+  });
+  if(!spStop) setTimeout(spawnMeteor, 2200+Math.random()*3500);
+}
+setTimeout(spawnMeteor, 2600);
+
+/* ── 指標互動 ── */
+const ptr = {x:-9999, y:-9999};
+function setPtr(e){
+  const t = e.touches ? e.touches[0] : e;
+  ptr.x = t.clientX*DPR; ptr.y = t.clientY*DPR;
+}
+const spOv=document.getElementById("splash");
+spOv.addEventListener("mousemove", setPtr, {passive:true});
+spOv.addEventListener("touchmove", setPtr, {passive:true});
+spOv.addEventListener("touchend", ()=>{ ptr.x=-9999; ptr.y=-9999; });
+
+/* 點擊爆散 */
+function boom(e){
+  if(e.target.id==="sp-btn") return;
+  const t = e.touches ? e.touches[0] : e;
+  const bx = t.clientX*DPR, by = t.clientY*DPR;
+  const R = 260*DPR;
+  for(const p of parts){
+    const dx=p.x-bx, dy=p.y-by, d=Math.hypot(dx,dy);
+    if(d<R){
+      const f=(1-d/R)*(9+Math.random()*7)*DPR;
+      p.vx += dx/(d||1)*f; p.vy += dy/(d||1)*f;
+    }
+  }
+  shockwave(bx,by, R*1.25, .5);
+}
+spOv.addEventListener("pointerdown", boom);
+
+const T0 = performance.now();
+let readyFlag=false, blasted=false;
+
+(function loop(now){
+  const t = now - T0;
+
+  /* 階段一（星盤）全清屏保持銳利；之後改彗尾疊光 */
+  const chartPhase = t < T_VORTEX;
+  ctx.globalCompositeOperation = "source-over";
+  if(chartPhase){
+    ctx.clearRect(0,0,W,H);
+  }else{
+    ctx.fillStyle = "rgba(22,22,42,0.30)";
+    ctx.fillRect(0,0,W,H);
+    ctx.globalCompositeOperation = "lighter";
+  }
+
+  /* 超新星爆發：一次性把粒子往外轟 */
+  if(!blasted && t > T_VORTEX){
+    blasted = true;
+    for(const p of parts){
+      const dx=p.x-W/2, dy=p.y-H/2, d=Math.hypot(dx,dy)||1;
+      const f=(7+Math.random()*9)*DPR;
+      p.vx += dx/d*f; p.vy += dy/d*f;
+    }
+    shockwave(W/2,H/2, Math.min(W,H)*0.55, .65);
+    shockwave(W/2,H/2, Math.min(W,H)*0.34, .4);
+  }
+
+  const REPEL = 95*DPR;
+  for(const p of parts){
+    if(t < T_VORTEX){
+      /* 中心光核旋動 */
+      const a = p.ca + t*p.sp;
+      const pulse = 1 + 0.18*Math.sin(t*0.004 + p.ca);
+      p.x = W/2 + Math.cos(a)*p.cr*pulse;
+      p.y = H/2 + Math.sin(a)*p.cr*pulse;
+    }else if(t < p.d){
+      /* 爆發漂移中 */
+      p.vx*=0.965; p.vy*=0.965;
+      p.x+=p.vx; p.y+=p.vy;
+    }else{
+      let ax=(p.tx-p.x)*0.02, ay=(p.ty-p.y)*0.02;
+      const dx=p.x-ptr.x, dy=p.y-ptr.y, d2=dx*dx+dy*dy;
+      if(d2<REPEL*REPEL){
+        const d=Math.sqrt(d2)||1, f=(REPEL-d)/REPEL*2.8;
+        ax+=dx/d*f; ay+=dy/d*f;
+      }
+      p.vx=(p.vx+ax)*0.84; p.vy=(p.vy+ay)*0.84;
+      p.x+=p.vx; p.y+=p.vy;
+    }
+    if(chartPhase){
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,7);
+      ctx.fillStyle=p.c; ctx.globalAlpha=0.95; ctx.fill();
+    }else{
+      /* 疊光雙層：外暈＋內核 */
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r*2.6,0,7);
+      ctx.fillStyle=p.c; ctx.globalAlpha=0.10; ctx.fill();
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,7);
+      ctx.globalAlpha=0.9; ctx.fill();
+    }
+  }
+  ctx.globalAlpha=1;
+
+  /* 固定線紫微星盤：外環/內環/十二宮輻線 + 十四主星（紫微在寅局） */
+  if(t < T_VORTEX + 220){
+    const R1 = Math.min(W,H)*0.36, R2 = R1*0.5, R3 = R1*0.18;
+    const grow = Math.min(1, t/560), ease = 1 - Math.pow(1-grow,3);
+    const rot = t*0.00035;
+    let alpha = ease;
+    let scale = ease;
+    if(t > T_VORTEX){                            /* 爆發：放大碎散淡出 */
+      const k = (t-T_VORTEX)/220;
+      alpha *= Math.max(0, 1-k);
+      scale = 1 + k*0.25;
+    }
+    if(alpha > 0.01){
+      ctx.save();
+      ctx.translate(W/2, H/2); ctx.rotate(rot); ctx.scale(scale, scale);
+      /* 環 */
+      const ring = (r, a, w)=>{
+        ctx.beginPath(); ctx.arc(0,0,r,0,7);
+        ctx.strokeStyle = `rgba(212,175,55,${a*alpha})`;
+        ctx.lineWidth = w*DPR; ctx.stroke();
+      };
+      ring(R1, .6, 1.3); ring(R1*1.035, .22, .7);
+      ring(R2, .42, .9); ring(R3, .3, .8);
+      /* 十二宮輻線 */
+      ctx.strokeStyle = `rgba(212,175,55,${.3*alpha})`;
+      ctx.lineWidth = .8*DPR;
+      for(let s=0;s<12;s++){
+        const a = s/12*Math.PI*2;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(a)*R2, Math.sin(a)*R2);
+        ctx.lineTo(Math.cos(a)*R1, Math.sin(a)*R1);
+        ctx.stroke();
+      }
+      ctx.restore();
+      /* 十四主星入十二宮（紫微在寅局），字保持正立 */
+      const SECT = [["破軍"],["天機"],["紫微","天府"],["太陰"],["貪狼"],["巨門"],
+                    ["廉貞","天相"],["天梁"],["七殺"],["天同"],["武曲"],["太陽"]];
+      const fs = Math.max(11.5*DPR, R1*0.093);
+      ctx.font = `700 ${fs}px "Source Han Sans TC","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif`;
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      const Rn = (R1+R2)/2 * scale;
+      SECT.forEach((names,i)=>{
+        const a = (i+0.5)/12*Math.PI*2 - Math.PI/2 + rot;
+        const x = W/2 + Math.cos(a)*Rn;
+        const y = H/2 + Math.sin(a)*Rn;
+        ctx.fillStyle = `rgba(240,225,170,${.9*alpha})`;
+        if(names.length===1){
+          ctx.fillText(names[0], x, y);
+        }else{
+          ctx.fillText(names[0], x, y - fs*0.56);
+          ctx.fillText(names[1], x, y + fs*0.56);
+        }
+      });
+    }
+  }
+
+  /* 衝擊波環 */
+  for(let i=waves.length-1;i>=0;i--){
+    const w=waves[i];
+    w.r += (w.max-w.r)*0.11 + 1.5*DPR;
+    const a = w.alpha*(1-w.r/w.max);
+    if(a<=0.01){ waves.splice(i,1); continue; }
+    ctx.beginPath(); ctx.arc(w.x,w.y,w.r,0,7);
+    ctx.strokeStyle=`rgba(255,235,170,${a})`;
+    ctx.lineWidth=2*DPR*(1-w.r/w.max)+0.5;
+    ctx.stroke();
+  }
+
+  /* 流星 */
+  for(let i=meteors.length-1;i>=0;i--){
+    const m=meteors[i];
+    m.x+=m.vx; m.y+=m.vy; m.life-=0.012;
+    if(m.life<=0||m.x>W+50||m.y>H+50){ meteors.splice(i,1); continue; }
+    const g=ctx.createLinearGradient(m.x,m.y,m.x-m.vx*10,m.y-m.vy*10);
+    g.addColorStop(0,`rgba(255,244,200,${0.8*m.life})`);
+    g.addColorStop(1,"rgba(255,244,200,0)");
+    ctx.strokeStyle=g; ctx.lineWidth=1.4*DPR;
+    ctx.beginPath(); ctx.moveTo(m.x,m.y); ctx.lineTo(m.x-m.vx*10,m.y-m.vy*10); ctx.stroke();
+  }
+
+  if(!readyFlag && t>2400){ readyFlag=true; document.getElementById("splash").classList.add("ready"); }
+  if(!spStop) requestAnimationFrame(loop);
+})(T0);
+
+/* 進入：爆散離場 */
+document.getElementById("sp-btn").onclick=(e)=>{
+  e.stopPropagation();
+  for(const p of parts){
+    const a=Math.random()*Math.PI*2, f=(4+Math.random()*8)*DPR;
+    p.vx+=Math.cos(a)*f; p.vy+=Math.sin(a)*f;
+    p.d = 9e9; /* 不再回聚 */
+  }
+  shockwave(W/2,H*0.44, Math.max(W,H)*0.8, .5);
+  const ov = document.getElementById("splash");
+  ov.classList.add("leave");
+  setTimeout(()=>{ ov.remove(); document.body.style.overflow=""; spStop=true; }, 660);
+};
+})();
+</script>
+</body>
+</html>
