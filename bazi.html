@@ -1,0 +1,1892 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" style="color-scheme: dark;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark light">
+<title>八字速查 | 神奇學苑</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#191b1e; --card:#22252a; --card2:#2a2d33; --line:#3b3f46;
+  --tx:#eeeff0; --tx2:#b6b9be; --gold:#c9a15a; --red:#b3382e;
+  --wood:#5d9b62; --fire:#c4453c; --earth:#c9962f; --metal:#9aa0ab; --water:#5583c9;
+  --ink:#e8e9ea;
+  --fs:15px;
+}
+html[data-theme="light"]{
+  --bg:#f5f1e6; --card:#fdfbf4; --card2:#efe9da; --line:#d9d2bf;
+  --tx:#2a2723; --tx2:#6b6558; --gold:#96702a; --red:#a63a32;
+  --wood:#3d7a42; --fire:#a63a32; --earth:#96700f; --metal:#6b7280; --water:#3a63a8;
+  --ink:#2a2723;
+}
+html[data-theme="large"]{ --fs:18px; }
+*{box-sizing:border-box; margin:0; padding:0;}
+body{
+  background:var(--bg); color:var(--tx);
+  background-image:
+    radial-gradient(ellipse 60% 40% at 15% 10%, rgba(128,132,138,.06), transparent 70%),
+    radial-gradient(ellipse 50% 35% at 85% 85%, rgba(128,132,138,.05), transparent 70%);
+  background-attachment:fixed;
+  font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  font-size:var(--fs); line-height:1.75;
+}
+/* ===== 水墨開場 ===== */
+#splash{
+  position:fixed; inset:0; z-index:999; background:var(--bg);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; overflow:hidden;
+  transition:opacity .9s ease, visibility .9s;
+}
+#splash.gone{opacity:0; visibility:hidden; pointer-events:none;}
+#fluid{position:absolute; inset:0; width:100%; height:100%; z-index:0;}
+.splashcore{position:relative; text-align:center; z-index:2; pointer-events:none;}
+/* 點擊墨暈轉場 */
+#burst{
+  position:fixed; width:26px; height:26px; margin:-13px 0 0 -13px;
+  border-radius:50%;
+  background:radial-gradient(circle, var(--ink) 0%, rgba(128,130,134,.4) 30%, rgba(128,130,134,.18) 52%, transparent 74%);
+  z-index:1000; pointer-events:none;
+  transform:scale(0) translateZ(0); opacity:0;
+  will-change:transform, opacity;
+}
+#burst.go{animation:burstout 1.1s cubic-bezier(.22,.5,.3,1) forwards;}
+@keyframes burstout{
+  0%{transform:scale(0) rotate(0deg) translateZ(0); opacity:.5;}
+  40%{opacity:.42;}
+  100%{transform:scale(150) rotate(8deg) translateZ(0); opacity:0;}
+}
+#splash svg.mtn{
+  position:absolute; bottom:0; left:0; width:100%; height:38vh;
+  opacity:0; animation:mtnfade .8s ease .15s forwards;
+}
+@keyframes mtnfade{to{opacity:1;}}
+.splashcore{position:relative; text-align:center; z-index:2;}
+.splashtitle{
+  font-family:"Noto Serif TC",serif; font-weight:900;
+  font-size:clamp(100px, 32vw, 210px); letter-spacing:.04em; color:var(--tx);
+  line-height:1.05;
+}
+.splashtitle .ch{
+  display:inline-block; filter:blur(16px); opacity:0; transform:scale(1.3) rotate(-4deg);
+}
+.splashtitle .ch1{animation:brushsettle .6s cubic-bezier(.2,.7,.3,1) .9s forwards;}
+.splashtitle .ch2{animation:brushsettle .6s cubic-bezier(.2,.7,.3,1) 1.05s forwards;}
+@keyframes brushsettle{
+  0%{filter:blur(16px); opacity:0; transform:scale(1.3) rotate(-4deg);}
+  60%{opacity:.9; filter:blur(2px);}
+  100%{filter:blur(0); opacity:1; transform:scale(1) rotate(0);}
+}
+/* ===== 水墨介面 ===== */
+header{padding:34px 18px 10px; text-align:center; position:relative;}
+header::after{
+  content:""; display:block; margin:16px auto 0; width:120px; height:3px;
+  background:linear-gradient(90deg, transparent, var(--tx2), transparent);
+  filter:blur(1px); opacity:.5;
+}
+.seal{
+  display:inline-block; border:2px solid var(--red); color:var(--red);
+  font-family:"Noto Serif TC",serif; font-weight:900; font-size:1.5em;
+  padding:6px 12px; border-radius:6px; letter-spacing:.35em; text-indent:.35em;
+  margin-bottom:10px;
+}
+h1{font-family:"Noto Serif TC",serif; font-size:1.7em; letter-spacing:.12em;}
+header p{color:var(--tx2); font-size:.88em; margin-top:6px;}
+.themes{margin-top:14px; display:flex; gap:8px; justify-content:center;}
+.themes button{
+  background:var(--card); color:var(--tx2); border:1px solid var(--line);
+  border-radius:20px; padding:6px 14px; font-size:.85em; cursor:pointer;
+}
+.themes button.on{color:var(--gold); border-color:var(--gold);}
+nav{
+  position:sticky; top:0; z-index:9; background:var(--bg);
+  border-bottom:1px solid var(--line);
+  display:flex; gap:8px; overflow-x:auto; padding:10px 14px;
+  -webkit-overflow-scrolling:touch;
+}
+nav::-webkit-scrollbar{display:none;}
+nav button{
+  flex:0 0 auto; color:var(--tx2); font-family:inherit;
+  background:var(--card); border:1px solid var(--line);
+  border-radius:18px; padding:5px 13px; font-size:.85em; white-space:nowrap;
+  cursor:pointer;
+}
+nav button:active{color:var(--gold);}
+main{max-width:820px; margin:0 auto; padding:10px 14px 70px;}
+section{margin-top:34px; scroll-margin-top:100px;}
+h2{
+  font-family:"Noto Serif TC",serif; font-size:1.3em; letter-spacing:.08em;
+  display:flex; align-items:center; gap:10px; margin-bottom:14px;
+}
+h2 .stamp{
+  flex:0 0 auto; width:1.7em; height:1.7em; display:flex; align-items:center; justify-content:center;
+  background:var(--red); color:#fff; border-radius:5px; font-size:.8em;
+}
+h3{font-size:1.05em; color:var(--gold); margin:18px 0 8px; letter-spacing:.05em;}
+.card{
+  background:var(--card); border:1px solid var(--line); border-radius:10px;
+  padding:16px 16px; margin-bottom:12px;
+  box-shadow:0 2px 14px rgba(0,0,0,.12);
+  position:relative; overflow:hidden;
+}
+.card::before{
+  content:""; position:absolute; top:-40px; right:-40px; width:140px; height:110px;
+  background:radial-gradient(circle, var(--ink) 0%, transparent 70%);
+  opacity:.04; filter:blur(10px); pointer-events:none;
+}
+.note{color:var(--tx2); font-size:.86em;}
+table{width:100%; border-collapse:collapse; font-size:.92em; margin:8px 0;}
+th,td{border:1px solid var(--line); padding:7px 6px; text-align:center; vertical-align:middle;}
+th{background:var(--card2); font-weight:700;}
+.tblwrap{overflow-x:auto;}
+.e-wood{color:var(--wood); font-weight:700;}
+.e-fire{color:var(--fire); font-weight:700;}
+.e-earth{color:var(--earth); font-weight:700;}
+.e-metal{color:var(--metal); font-weight:700;}
+.e-water{color:var(--water); font-weight:700;}
+details{
+  background:var(--card); border:1px solid var(--line); border-radius:12px;
+  margin-bottom:10px; overflow:hidden;
+}
+details summary{
+  cursor:pointer; padding:13px 16px; font-weight:700; letter-spacing:.03em;
+  list-style:none; display:flex; align-items:center; gap:10px;
+}
+details summary::-webkit-details-marker{display:none;}
+details summary::after{content:"＋"; margin-left:auto; color:var(--tx2); font-weight:400;}
+details[open] summary::after{content:"－";}
+details .body{padding:0 16px 15px; border-top:1px solid var(--line); padding-top:12px;}
+.tag{
+  display:inline-block; font-size:.72em; padding:1px 8px; border-radius:10px;
+  border:1px solid var(--gold); color:var(--gold); font-weight:400;
+}
+.tag.new{border-color:var(--red); color:var(--red);}
+ul{padding-left:1.3em;}
+li{margin:3px 0;}
+.pillar b{color:var(--gold);}
+.rule{display:flex; gap:12px; padding:9px 0; border-bottom:1px dashed var(--line); align-items:baseline;}
+.rule:last-child{border-bottom:none;}
+.rule .kw{
+  flex:0 0 auto; font-family:"Noto Serif TC",serif; font-weight:900;
+  color:var(--red); font-size:1.05em; letter-spacing:.15em;
+}
+.poem{
+  font-family:"Noto Serif TC",serif; text-align:center; letter-spacing:.1em;
+  line-height:2.1; font-size:.95em;
+}
+footer{text-align:center; color:var(--tx2); font-size:.8em; padding:30px 0 40px;}
+/* 分類主選單 */
+#home{max-width:820px; margin:0 auto; padding:6px 14px 60px; display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+.catcard{
+  background:var(--card); border:1px solid var(--line); border-radius:12px;
+  padding:18px 16px; cursor:pointer; position:relative; overflow:hidden;
+  box-shadow:0 2px 14px rgba(0,0,0,.12);
+}
+.catcard::before{
+  content:""; position:absolute; bottom:-30px; left:-30px; width:120px; height:90px;
+  background:radial-gradient(circle, var(--ink) 0%, transparent 70%);
+  opacity:.05; filter:blur(9px); pointer-events:none;
+}
+.catcard:active{border-color:var(--gold);}
+.catcard .cstamp{
+  display:inline-flex; width:2em; height:2em; align-items:center; justify-content:center;
+  background:var(--red); color:#fff; border-radius:6px; font-family:"Noto Serif TC",serif;
+  font-weight:900; margin-bottom:8px;
+}
+.catcard h3{margin:0 0 4px; color:var(--tx); font-size:1.05em;}
+.catcard p{color:var(--tx2); font-size:.78em; line-height:1.5;}
+#backbar{
+  position:sticky; top:0; z-index:9; background:var(--bg); border-bottom:1px solid var(--line);
+  display:none; align-items:center; gap:10px; padding:10px 14px;
+}
+#backbar button.backbtn{
+  background:var(--card); color:var(--tx); border:1px solid var(--line);
+  border-radius:18px; padding:5px 14px; font-size:.9em; cursor:pointer; flex:0 0 auto;
+}
+#backbar .cattitle{font-family:"Noto Serif TC",serif; font-weight:700; letter-spacing:.08em;}
+#subnav{
+  position:sticky; top:49px; z-index:8; background:var(--bg); border-bottom:1px solid var(--line);
+  display:none; gap:8px; overflow-x:auto; padding:8px 14px; -webkit-overflow-scrolling:touch;
+}
+#subnav::-webkit-scrollbar{display:none;}
+#subnav button{
+  flex:0 0 auto; color:var(--tx2); font-family:inherit;
+  background:var(--card); border:1px solid var(--line);
+  border-radius:18px; padding:4px 12px; font-size:.82em; white-space:nowrap; cursor:pointer;
+}
+section.hidden{display:none;}
+@media (max-width:480px){ table{font-size:.82em;} th,td{padding:6px 3px;} }
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <canvas id="fluid"></canvas>
+  <svg class="mtn" viewBox="0 0 1200 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <path d="M0,300 L0,210 Q120,120 240,185 Q330,230 420,180 Q560,105 700,190 Q820,255 940,175 Q1060,125 1200,205 L1200,300 Z" fill="currentColor" opacity=".10"/>
+    <path d="M0,300 L0,250 Q180,180 340,235 Q480,280 620,230 Q780,175 920,245 Q1060,300 1200,250 L1200,300 Z" fill="currentColor" opacity=".16"/>
+    <path d="M0,300 L0,278 Q220,235 430,272 Q640,305 850,268 Q1030,240 1200,280 L1200,300 Z" fill="currentColor" opacity=".24"/>
+  </svg>
+  <div class="splashcore">
+    <div class="splashtitle"><span class="ch ch1">八</span><span class="ch ch2">字</span></div>
+  </div>
+</div>
+
+<header>
+  <div class="seal">八字</div>
+  <h1>八字命理速查</h1>
+  <p>神奇身心靈學苑 · 教學參考</p>
+  <div class="themes">
+    <button id="btnDark" class="on" onclick="setTheme('dark')">深色</button>
+    <button id="btnLight" onclick="setTheme('light')">淺色</button>
+    <button id="btnLarge" onclick="setTheme('large')">大字</button>
+  </div>
+</header>
+
+<div id="home">
+  <div class="catcard" onclick="openCat('base')">
+    <span class="cstamp">基</span>
+    <h3>基礎入門</h3>
+    <p>論命守則・人生棋盤・陰陽五行・生剋缺補・十二時辰</p>
+  </div>
+  <div class="catcard" onclick="openCat('stem')">
+    <span class="cstamp">干</span>
+    <h3>十天干</h3>
+    <p>總表・十干個性詳解・先天病因與身體系統</p>
+  </div>
+  <div class="catcard" onclick="openCat('branch')">
+    <span class="cstamp">支</span>
+    <h3>十二地支</h3>
+    <p>總表・月支個性・馬花庫・刑沖合害・合婚判斷</p>
+  </div>
+  <div class="catcard" onclick="openCat('adv')">
+    <span class="cstamp">查</span>
+    <h3>干支進階速查</h3>
+    <p>地支藏干・六十甲子納音・十二長生・空亡・特殊格局</p>
+  </div>
+  <div class="catcard" onclick="openCat('god')">
+    <span class="cstamp">神</span>
+    <h3>十神</h3>
+    <p>排法白話・十神個論・五行十神速查表</p>
+  </div>
+  <div class="catcard" onclick="openCat('appx')">
+    <span class="cstamp">孝</span>
+    <h3>附錄</h3>
+    <p>八字賦文名句選・百孝經</p>
+  </div>
+</div>
+
+<div id="backbar">
+  <button class="backbtn" onclick="goHome()">‹ 回主選單</button>
+  <span class="cattitle" id="cattitle"></span>
+</div>
+<div id="subnav"></div>
+
+<main>
+
+<!-- ===== 論命守則 ===== -->
+<section id="rules">
+  <h2><span class="stamp">守</span>學苑論命守則</h2>
+  <div class="card">
+    <div class="rule"><span class="kw">守正</span><span>依學理推論，不以聳動之言製造恐慌。</span></div>
+    <div class="rule"><span class="kw">導善</span><span>談改運以引導為主，不用威嚇話術逼人消費。</span></div>
+    <div class="rule"><span class="kw">隨緣</span><span>服務隨緣而至，不強行推銷、不糾纏遊說。</span></div>
+    <div class="rule"><span class="kw">同理</span><span>體恤問命者的處境，不趁人之危斂財。</span></div>
+    <div class="rule"><span class="kw">誠信</span><span>心正意誠，不假借命理之名騙財騙色。</span></div>
+    <div class="rule"><span class="kw">求真</span><span>虛心探究學問本質，不故弄玄虛唬人。</span></div>
+    <div class="rule"><span class="kw">有據</span><span>每句論斷都有學理依據，不裝神弄鬼。</span></div>
+    <div class="rule"><span class="kw">慈悲</span><span>對處於低谷的人多一分扶持，不落井下石。</span></div>
+    <div class="rule"><span class="kw">共感</span><span>人溺己溺，不對他人的災厄幸災樂禍。</span></div>
+    <div class="rule"><span class="kw">守密</span><span>尊重隱私，諮詢內容絕不外洩、不揭人短。</span></div>
+    <div class="rule"><span class="kw">敬業</span><span>尊重同業，不批評攻擊其他老師與門派。</span></div>
+    <div class="rule"><span class="kw">惜福</span><span>珍惜福分與緣分，不造業、不損德。</span></div>
+    <p class="note" style="text-align:center; margin-top:10px;">若有違背，因果自負。</p>
+  </div>
+</section>
+
+<!-- ===== 人生棋盤 ===== -->
+<section id="board">
+  <h2><span class="stamp">盤</span>人生棋盤（四柱宮位）</h2>
+  <div class="card">
+    <p class="note">課前準備：① 下載排盤 App — 五行人（iOS）／論八字（Android）　② 收集 10–20 張命盤（家人、親戚、朋友、同事）</p>
+    <div class="tblwrap">
+    <table>
+      <tr><th></th><th>時柱 49–64</th><th>日柱 33–48</th><th>月柱 17–32</th><th>年柱 0–16</th></tr>
+      <tr><th>天干</th><td>事業、家庭子女<br>部屬、人際關係</td><td><b>日主本人</b><br>（外在個性）</td><td>兄弟、姊妹<br>朋友、同輩</td><td>祖父、父親<br>上司、長輩</td></tr>
+      <tr><th>地支</th><td>事業、家庭子女<br>部屬、人際關係</td><td>配偶<br>（創業原點）</td><td><b>本人</b><br>（內在個性）</td><td>祖母、母親<br>上司、長輩</td></tr>
+      <tr><th>象</th><td>果</td><td>花</td><td>苗</td><td>根</td></tr>
+      <tr><th>時期</th><td>老人時期</td><td>創業時期</td><td>求學時期</td><td>兒童時期</td></tr>
+    </table>
+    </div>
+    <p class="note">命盤閱讀順序由右至左：年柱 → 月柱 → 日柱 → 時柱。</p>
+  </div>
+</section>
+
+<!-- ===== 陰陽五行 ===== -->
+<section id="basic">
+  <h2><span class="stamp">基</span>陰陽五行基礎</h2>
+  <div class="card">
+    <h3 style="margin-top:0;">陰陽</h3>
+    <p>陽 → 表現在外，外放。陰 → 表現在內，內斂。</p>
+    <div class="tblwrap">
+    <table>
+      <tr><th>陽</th><td>日</td><td>男</td><td>奇</td><td>進</td><td>上</td><td>左</td><td>腑</td><td>背</td><td>凸</td><td>天</td><td>乾</td></tr>
+      <tr><th>陰</th><td>月</td><td>女</td><td>偶</td><td>退</td><td>下</td><td>右</td><td>臟</td><td>腹</td><td>凹</td><td>地</td><td>坤</td></tr>
+    </table>
+    </div>
+    <p class="note">陽天干：甲丙戊庚壬（大 +）｜陰天干：乙丁己辛癸（小 −）</p>
+    <h3>五行特質</h3>
+    <div class="tblwrap">
+    <table>
+      <tr><th>五行</th><th>性質</th><th>象</th><th>心性關鍵字</th></tr>
+      <tr><td class="e-wood">木</td><td>生發舒展</td><td>植物</td><td>目標、規劃、企圖心</td></tr>
+      <tr><td class="e-fire">火</td><td>溫熱炎上</td><td>溫度</td><td>熱忱心、執行力、渲染力</td></tr>
+      <tr><td class="e-earth">土</td><td>長養變化</td><td>土壤</td><td>往來、穩定、自信心（串聯）</td></tr>
+      <tr><td class="e-metal">金</td><td>清蕭收斂</td><td>礦物</td><td>果斷、檢視、收斂心</td></tr>
+      <tr><td class="e-water">水</td><td>寒潤下濕</td><td>液體</td><td>智慧、策略、多元心（多變）</td></tr>
+    </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 生剋缺補 ===== -->
+<section id="cycle">
+  <h2><span class="stamp">生</span>五行生剋・缺與過多</h2>
+  <div class="card">
+    <h3 style="margin-top:0;">相生相剋</h3>
+    <p><b>相生</b>（母子之道，無怨無悔的付出）：<span class="e-wood">木</span>→<span class="e-fire">火</span>→<span class="e-earth">土</span>→<span class="e-metal">金</span>→<span class="e-water">水</span>→<span class="e-wood">木</span></p>
+    <p><b>相剋</b>(夫妻之道，互相包容方可成財）：<span class="e-wood">木</span>剋<span class="e-earth">土</span>、<span class="e-earth">土</span>剋<span class="e-water">水</span>、<span class="e-water">水</span>剋<span class="e-fire">火</span>、<span class="e-fire">火</span>剋<span class="e-metal">金</span>、<span class="e-metal">金</span>剋<span class="e-wood">木</span></p>
+    <h3>命盤五行屬性判斷</h3>
+    <p>打開排盤 App（五行人／論八字），命盤最下方會有一列五行統計，例如：<span class="e-wood">木：3</span>　<span class="e-fire">火：0</span>　<span class="e-earth">土：3</span>　<span class="e-metal">金：0</span>　<span class="e-water">水：2</span></p>
+    <p>這是把四柱八個字（四天干＋四地支）各自的五行加總起來的數量。以這列數字判斷：</p>
+    <div class="tblwrap">
+    <table>
+      <tr><th>數量</th><th>判斷</th><th>意義</th></tr>
+      <tr><td><b>0</b></td><td>缺</td><td>沒有這個五行 → 對照下方「缺五行解讀」</td></tr>
+      <tr><td><b>1～2</b></td><td>正常</td><td>具備該五行的特質</td></tr>
+      <tr><td><b>3 以上（含 3）</b></td><td>太多</td><td>該五行特質過旺，優點會放大、缺點也會放大</td></tr>
+    </table>
+    </div>
+    <p class="note">範例（上方數字）：缺火、缺金 → 熱情持續力不足、做事不夠果斷；木 3、土 3 偏多 → 企圖心與固執面都強。</p>
+    <h3>缺五行解讀</h3>
+    <div class="tblwrap">
+    <table>
+      <tr><th>缺</th><th>現象</th></tr>
+      <tr><td class="e-wood">缺木</td><td>容易沒有目標、不知道怎麼規劃、不知道方向、比較沒有企圖心</td></tr>
+      <tr><td class="e-fire">缺火</td><td>缺熱情、做事容易頭燒尾冷、感情不夠熱情、持續力不夠</td></tr>
+      <tr><td class="e-earth">缺土</td><td>自信心不足、容易沒有安全感、容易沒收成、做事沒有結果；男生沒有土也容易影響到感情</td></tr>
+      <tr><td class="e-metal">缺金</td><td>猶豫不決、做事情不果斷；做業務缺金很難收單</td></tr>
+      <tr><td class="e-water">缺水</td><td>轉念困難、不懂得變通、感情容易被騙</td></tr>
+    </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 十天干 ===== -->
+<section id="stems">
+  <h2><span class="stamp">干</span>十天干</h2>
+  <div class="card">
+    <h3 style="margin-top:0;">十天干總表</h3>
+    <div class="tblwrap">
+    <table>
+      <tr><th>陽</th><th>陰</th><th>五行</th><th>五方</th><th>五常</th><th>五毒</th><th>五臟</th><th>五味</th><th>四季</th><th>五色</th><th>五性</th></tr>
+      <tr><td>甲</td><td>乙</td><td class="e-wood">木</td><td>東</td><td>仁</td><td>怒</td><td>肝</td><td>酸</td><td>春</td><td>青</td><td>直</td></tr>
+      <tr><td>丙</td><td>丁</td><td class="e-fire">火</td><td>南</td><td>禮</td><td>恨</td><td>心</td><td>苦</td><td>夏</td><td>赤</td><td>急</td></tr>
+      <tr><td>戊</td><td>己</td><td class="e-earth">土</td><td>中</td><td>信</td><td>怨</td><td>脾</td><td>甘</td><td>四季</td><td>黃</td><td>緩</td></tr>
+      <tr><td>庚</td><td>辛</td><td class="e-metal">金</td><td>西</td><td>義</td><td>惱</td><td>肺</td><td>辛</td><td>秋</td><td>白</td><td>躁</td></tr>
+      <tr><td>壬</td><td>癸</td><td class="e-water">水</td><td>北</td><td>智</td><td>煩</td><td>腎</td><td>鹹</td><td>冬</td><td>黑</td><td>隨</td></tr>
+    </table>
+    </div>
+  </div>
+
+  <h3>十天干個性詳解</h3>
+
+  <details><summary><span class="e-wood">甲木</span>・大樹</summary><div class="body">
+    <p>仁慈、老闆格、做事有條理、喜明爭不喜暗鬥、講話直接不喜囉嗦、心軟性硬。忌支配、大方向規劃能力強、被動式照顧、不服輸、靈機應變能力差。</p>
+    <ul>
+      <li>不會主動低頭認錯、不主動攀談、不喜歡被管被支配</li>
+      <li>被動式照顧：在身邊的都會照顧，離開就不會理你</li>
+      <li>同一個工作要堅持 3–5 年以上才會被看見、才會成功（一棵樹成長需要多年）</li>
+      <li>喜歡當老闆、當領導；有甲木的員工可以讓他當主管，不然容易離開</li>
+      <li>容易被騙（被騙三次還跟人家說謝謝）、要紮根往上長、要學專業，專業就有錢</li>
+      <li>專情；不爽直接明講</li>
+    </ul>
+  </div></details>
+
+  <details><summary><span class="e-wood">乙木</span>・小草／藤蔓</summary><div class="body">
+    <p>仁慈、幕後老闆、喜暗鬥不喜明爭、適應環境力強、機警、善於策劃、野心大多心。細節規劃能力強、要依附別人、外柔內剛、喜歡交友、靈機應變能力較好、比較多疑、斷疑方能生信心。</p>
+    <ul>
+      <li>依附別人生長，要找好的方向去攀，不然有什麼攀什麼——跟對人會成功，跟錯人會走偏</li>
+      <li>適合當幕後老闆（小草強出頭容易被除掉）、要老二哲學</li>
+      <li>常常一次做很多事情（不是大好就是大壞，通常是大壞）→ 一次做一件事，慢慢做</li>
+      <li>會主動跟別人攀談、跟陌生人可以交際應酬</li>
+      <li>想法細膩、先做再說、乙木出頭就會被扯後腿、比較不會把事情明講</li>
+    </ul>
+  </div></details>
+
+  <details><summary><span class="e-fire">丙火</span>・太陽</summary><div class="body">
+    <p>好客、熱情活潑、為人豪爽、個性急易衝動、喜照顧關懷人、不拘小節、處事欠缺持久力、好聽眾。陰晴不定、不會分好壞人、交友廣知心少、健忘、重感覺。</p>
+    <ul>
+      <li>正面的人、心直口快、想到什麼做什麼、勇於追求敢於放棄</li>
+      <li>像陽光普照大地——眼裡沒有好壞人之分、喜歡人多的地方</li>
+      <li>很適合做公關、也適合當「垃圾桶」好聽眾；但很健忘（答應太多人，忘記答應誰）</li>
+      <li>做事情缺乏持續力、頭燒尾冷；憑感覺太快，也很容易後悔</li>
+      <li>買東西看感覺；「請、謝謝、對不起」掛嘴邊（須以禮相待）；空虛（注意道德觀）</li>
+      <li>要給舞台發揮；丙火大愛</li>
+    </ul>
+  </div></details>
+
+  <details><summary><span class="e-fire">丁火</span>・蠟燭</summary><div class="body">
+    <p>熱心、思考細膩、第六感、內心感情豐富、空虛、第一印象、能洞察人心。付出不易被看見、只對自己人付出、也容易被自己人傷害、外冷內熱、疑心病重（善妒忌）。</p>
+    <ul>
+      <li>敏感體質、第六感很準、憑直覺做事、很重第一印象與感覺</li>
+      <li>拿蠟燭照別人——看別人很仔細，但看不清自己</li>
+      <li>會挑人照顧（顧自己人、只對自己人付出），相對也容易被自己人傷害</li>
+      <li>需要存在感、忌妒心強、翻臉比翻書快、不善於表達</li>
+      <li>犧牲奉獻自己（但容易被當理所當然）；對熟人話多、不熟的沒話說、很悶燒</li>
+    </ul>
+  </div></details>
+
+  <details><summary><span class="e-earth">戊土</span>・高山</summary><div class="body">
+    <p>固執、穩健踏實、給人安全感、有耐心、寬大為懷、能體諒他人、懷才不遇。大男人主義、富有同化力、外表沉穩內心急、細心。</p>
+    <ul>
+      <li>很執著、他決定的事情沒人可改變、堅持己見（自己的想法意見）</li>
+      <li>安全感、可靠感、很有耐心、腳踏實地、包容力很強</li>
+      <li>外柔內剛、吃軟不吃硬、按部就班；缺乏自信 → 多誇獎他、不要批評他</li>
+      <li>同化力強（希望別人跟他一樣）、細心會照顧別人；高山承載萬物（做事容易不被看見，偷懶就被抓包）</li>
+      <li>最不會表達內心情感；屬土不會說謊，一說謊就被抓包</li>
+      <li>不要惹惱戊土，會發生土石流；容易懷才不遇（阿里山看神木姑娘，忘記阿里山本人）</li>
+    </ul>
+  </div></details>
+
+  <details><summary><span class="e-earth">己土</span>・泥巴</summary><div class="body">
+    <p>固執、主觀意識強、外表溫文儒雅、心思過於細膩、重誠信、懷才不遇、不喜歡被否決、需要被磨練。複製能力強、可塑性高、價值取決於自己。</p>
+    <ul>
+      <li>爛泥塗不上牆——所以己土需要被磨練（陶土需要被雕塑）</li>
+      <li>複製能力很強、學習力強、適應能力強</li>
+      <li>耳根子較軟、較沒主見、容易沒自信、需要被鼓勵、喜歡被認可讚同</li>
+      <li>看得很細、答應他要做到（討厭被騙）、黏著性很強很黏人、愛管閒事</li>
+      <li>做事拖拖拉拉、付出不被看見、做錯就被看見；善良、孤僻、神秘、疑心病重</li>
+      <li>茫然無目標時容易消極妥協；價值取決於自己</li>
+    </ul>
+  </div></details>
+
+  <details><summary><span class="e-metal">庚金</span>・大刀</summary><div class="body">
+    <p>講義氣、（自覺得）是非分明、眼光犀利、外表樂觀開朗、善於與人交心、喜歡直來直往、性急、不欠人人情、吃軟不吃硬。重點式聽跟講、好勝、對於喜歡的事情會努力學習、愛面子。</p>
+    <ul>
+      <li>講話很直接、一刀見血、禍從口出——容易間接犯小人（講話太直，要收斂一點）</li>
+      <li>跟庚金講重點、不要拖泥帶水；錯就錯，不用囉嗦解釋一堆</li>
+      <li>重朋友重義氣、對朋友好、不喜歡欠人人情——但要注意怕被朋友利用</li>
+      <li>重家庭、做事粗心、看不慣偷雞摸狗的事情、意志力堅強、個性不服輸、乾脆利落</li>
+      <li>檢視問題、發現問題，但不做改變；有破壞性的感覺（誰要改變他，就要先受傷）</li>
+      <li>有貴氣感、財氣感；要學專業才能賺到錢；當朋友義氣相挺、眼光非常犀利、義不容辭</li>
+      <li>庚金執著起來不用去安慰，讓他自己轉念</li>
+    </ul>
+  </div></details>
+
+  <details><summary><span class="e-metal">辛金</span>・小刀</summary><div class="body">
+    <p>重義氣、有氣質、豐富的感情拘小、容易壓抑自身情緒、說話收斂也銳利、常為錢煩惱、易惱。眉角很多、交際能力好、過度敏感、注重外表、重視物質享受、會觀察人、處理事情會兩極化、愛面子。</p>
+    <ul>
+      <li>講話很間接、拐彎抹角、冷嘲熱諷（容易傷到人）、罵人不帶髒字（酸人）、很有儀式感</li>
+      <li>看起來偏白、有氣質的感覺、高貴高雅秀氣（庚金五官比較立體深邃）</li>
+      <li>想很多、多慮、自己腦補、容易神經質、較敏感、神經質</li>
+      <li>對感情很重視、重視物質慾望、缺乏魄力、自尊心強</li>
+      <li>記帳錢——有錢煩惱、沒錢也煩惱；沒錢沒安全感；在對方身上看不到希望會離開</li>
+      <li>口才好、容易有少年白髮；屬金的都講義氣、重朋友</li>
+    </ul>
+  </div></details>
+
+  <details><summary><span class="e-water">壬水</span>・大海</summary><div class="body">
+    <p>聰明、神秘、較不接受別人意見、野心大、外表冷靜內心急、交際廣、膽大細心、反應快、能見風轉舵。情緒來得快去得也快、匯聚力強、包容力強、企圖心強（走運時才會發）、想賺大錢但是要有定性、交際好、勇於挑戰。</p>
+    <ul>
+      <li>深不可測、有股神秘感、給人神秘的感覺</li>
+      <li>很聰明、聽不進別人意見——要有一定專業或道理才聽得進；聰明反被聰明誤</li>
+      <li>看小錢看不上、要賺大錢；做事情缺乏思考、有頭無尾（無定性）只賺大錢</li>
+      <li>對你有意見不講，你讓他不高興，他十天就給你反擊（大海嘯）</li>
+      <li>匯聚力好（朋友多）、沒耐心、好自由、自我意識過於強大、閒不住、很冷靜</li>
+      <li>圓融、能力好、可以當老闆（面對不同人就會有不同講法）、野心大、好高騖遠</li>
+    </ul>
+  </div></details>
+
+  <details><summary><span class="e-water">癸水</span>・小水滴</summary><div class="body">
+    <p>聰明（經驗累積而來）、為人較多情冷靜、善忍耐、善算計、善於商業經營、滴水穿石、適應環境。外冷內熱、心思細膩、耐性好、想太多、欠缺通容性。</p>
+    <ul>
+      <li>癸水最聰明、非常聰明、多情冷靜、沒有癸水做不到的</li>
+      <li>忍耐度極高、擅忍耐、耐心比較好——你讓他不開心，五年十年累積下來給你一反擊</li>
+      <li>很會算計（有利益才會幫忙）、韌性高、多心機、重視自己的利益（注意道德觀）</li>
+      <li>只相信自己、不輕易相信別人、疑心病重、主觀意識強、保守、喜新厭舊、喜歡自己嘗試</li>
+      <li>給人冷冷的感覺（酷酷的高冷）、愛好自由、不喜歡被管、掌控慾很強、洗腦高手</li>
+      <li>生意頭腦、經營事業、做生意、做商人——他們的聰明來自於經驗豐富</li>
+      <li>女生懂抓住男人的心；男生多半花心（癸水男比較渣，太用自己想法想）</li>
+    </ul>
+  </div></details>
+</section>
+
+<!-- ===== 十二地支 ===== -->
+<section id="branches">
+  <h2><span class="stamp">支</span>十二地支</h2>
+  <div class="card">
+    <h3 style="margin-top:0;">十二地支總表</h3>
+    <div class="tblwrap">
+    <table>
+      <tr><th>地支</th><td>子</td><td>丑</td><td>寅</td><td>卯</td><td>辰</td><td>巳</td><td>午</td><td>未</td><td>申</td><td>酉</td><td>戌</td><td>亥</td></tr>
+      <tr><th>陰陽</th><td>陽</td><td>陰</td><td>陽</td><td>陰</td><td>陽</td><td>陰</td><td>陽</td><td>陰</td><td>陽</td><td>陰</td><td>陽</td><td>陰</td></tr>
+      <tr><th>五行</th><td class="e-water">水</td><td class="e-earth">土</td><td class="e-wood">木</td><td class="e-wood">木</td><td class="e-earth">土</td><td class="e-fire">火</td><td class="e-fire">火</td><td class="e-earth">土</td><td class="e-metal">金</td><td class="e-metal">金</td><td class="e-earth">土</td><td class="e-water">水</td></tr>
+      <tr><th>生肖</th><td>鼠</td><td>牛</td><td>虎</td><td>兔</td><td>龍</td><td>蛇</td><td>馬</td><td>羊</td><td>猴</td><td>雞</td><td>狗</td><td>豬</td></tr>
+      <tr><th>臟腑<br>(先天病因)</th><td>膽</td><td>肝</td><td>肺</td><td>大腸</td><td>胃</td><td>脾</td><td>心</td><td>小腸</td><td>膀胱</td><td>腎</td><td>心包</td><td>三焦</td></tr>
+      <tr><th>月令</th><td>11</td><td>12</td><td>01</td><td>02</td><td>03</td><td>04</td><td>05</td><td>06</td><td>07</td><td>08</td><td>09</td><td>10</td></tr>
+      <tr><th>四季</th><td>冬</td><td>冬</td><td>春</td><td>春</td><td>春</td><td>夏</td><td>夏</td><td>夏</td><td>秋</td><td>秋</td><td>秋</td><td>冬</td></tr>
+    </table>
+    </div>
+    <h3>四季月令對照</h3>
+    <div class="tblwrap">
+    <table>
+      <tr><th>季節</th><th colspan="3">月份（農曆）</th></tr>
+      <tr><td class="e-wood">春天（木）</td><td>1月 寅・陽木虎</td><td>2月 卯・陰木兔</td><td>3月 辰・陽土龍</td></tr>
+      <tr><td class="e-fire">夏天（火）</td><td>4月 巳・陰火蛇</td><td>5月 午・陽火馬</td><td>6月 未・陰土羊</td></tr>
+      <tr><td class="e-metal">秋天（金）</td><td>7月 申・陽金猴</td><td>8月 酉・陰金雞</td><td>9月 戌・陽土狗</td></tr>
+      <tr><td class="e-water">冬天（水）</td><td>10月 亥・陰水豬</td><td>11月 子・陽水鼠</td><td>12月 丑・陰土牛</td></tr>
+    </table>
+    </div>
+    <p class="note">辰戌丑未為四季（土），分居四季之末。</p>
+  </div>
+
+  <h3>月份所生個性分析（月支）</h3>
+
+  <details><summary><span class="e-wood">寅</span>・虎・1月春天（木）｜能幹耐勞</summary><div class="body">
+    <p>仁慈、領導人、愛漂亮、權威、贏在爆發力輸在持續力、喜獨來獨往。注意車關、注意肺。</p>
+    <ul>
+      <li>女生容易是女強人：不服輸、好勝、愛當老大、完美主義者、榮譽感與責任心強</li>
+      <li>野心大、責任心強、企圖心強、自我要求高、勞碌命；一山不容二虎，要有危機意識、做事要堅持</li>
+      <li>重視榮譽感、愛漂亮、樂觀進取、積極向上；脾氣不好（暴躁的動物）</li>
+      <li>虎頭蛇尾（三分鐘熱度）、較獨立、喜歡單打獨鬥、喜掌權</li>
+      <li>男生大多比較懶（在外一條龍、在家一條蟲）；女生大多閒不住</li>
+    </ul>
+  </div></details>
+
+  <details><summary><span class="e-wood">卯</span>・兔・2月春天（木)｜保護色強</summary><div class="body">
+    <p>仁慈、人緣佳、沒膽、喜乾淨、家裡東西常移動、第六感。注意大腸。</p>
+    <ul>
+      <li>喜歡浪漫、浪漫主義、完美主義者；只接受成功、不能接受失敗</li>
+      <li>敏感體質、守不住秘密（容易聽到秘密、也容易被身邊卯月的朋友探聽）、耳朵長常聽八卦、話多</li>
+      <li>會有怪癖（潔癖）：外在乾乾淨淨、家裡面很雜亂；東西常移動（狡兔三窟、藏私房錢）</li>
+      <li>憑感覺、打罵教育行不通、風吹草動會受到驚嚇、需要安全感</li>
+      <li>本性善良、防衛心強、做事情有始無終；感情容易是辦公室戀情（身邊的人、同學、朋友的朋友）</li>
+      <li>做事情有始有終才有休息（工作做完才會休息）</li>
+    </ul>
+  </div></details>
+
+  <details><summary><span class="e-earth">辰</span>・龍・3月春天（土）｜捉摸不定</summary><div class="body">
+    <p>固執、老大、主觀重、不喜被管、點子多不切實際、聰明自負、較不信天命、自圓其說、神秘、鐵齒、五術高手。注意胃。</p>
+    <ul>
+      <li>辰在哪一柱，哪一柱就是老大（看地支）；天上的老大、男生大男人、女生大女人</li>
+      <li>福報不錯（常化險為夷）、好相處但不易交心</li>
+      <li>沒錢不會出門（愛面子）、喜歡奉承拍馬屁之感、愛聽好聽話、不容易聽別人的意見（要多聽他人意見）</li>
+      <li>想太多、看遠不看近、不信天命，但學了五術就會信（高手在民間）</li>
+      <li>神秘感（神龍見首不見尾）、猜不透他的心思；八字認真學</li>
+      <li>五術高手：山（風水）、醫（中醫）、命（八字）、相（面相）、卜（卜卦）</li>
+    </ul>
+  </div></details>
+
+  <details><summary><span class="e-fire">巳</span>・蛇・4月夏天（火）｜心思縝密</summary><div class="body">
+    <p>外冷內熱、好辯、警覺性高、行動快、冷靜、不服輸、分析能力強、適合業務推廣。注意車關、注意脾臟。</p>
+    <ul>
+      <li>好勝、愛爭辯，容易招惹口舌是非；有私心、不做沒把握的事情（蛇吞象——只做有把握的事）</li>
+      <li>冷血動物、能屈能伸、觀察力高、心思縝密、聰明、隱藏自己、喜歡跟自己玩</li>
+      <li>自主能力強、數字概念好、難約束、包容力強；體內濕氣過重、會流手汗</li>
+      <li>高冷（不熱不熱情）、掌握重點、明理分析、講話帶毒性、口才好、會纏鬥</li>
+      <li>陰森感、城府深、靠嘴巴吃飯——要有專業、要學一技之長，不然只會講廢話；很會分析（CP值、機會成本）</li>
+      <li>想要的東西想辦法得到</li>
+    </ul>
+  </div></details>
+
+  <details><summary><span class="e-fire">午</span>・馬・5月夏天（火）｜性直膽大</summary><div class="body">
+    <p>好動奔放、好勝心強（愛競爭）、禁不起刺激（容易下錯決定）、耳根輕易受人煽動、事情定後能日行千里、易被設計上當、喜被拍馬屁。注意心臟。</p>
+    <ul>
+      <li>口服心不服（嘴上答應、心裡沒有想）、自尊心強、自卑感重、勞碌命</li>
+      <li>要提升貴人運（千里馬要遇到伯樂）；喜怒哀樂形於色、易招惹是非（開心不開心都寫在臉上）</li>
+      <li>經不起刺激，就是要刺激他——但容易因此下錯指令；個性很急、可以逆向溝通</li>
+      <li>敢拚敢衝、膽大、主觀意識強、急躁、自由、競爭強；大多數男的帥、女的美</li>
+      <li>一定要設定目標（一定能日行千里）、要有行動力；大剌剌、吸引人緣、愛漂亮</li>
+    </ul>
+  </div></details>
+
+  <details><summary><span class="e-earth">未</span>・羊・6月夏天（土）｜愛出風頭・特立獨行</summary><div class="body">
+    <p>固執、注重外表、膽小、孝心不孝口、打破砂鍋問到底（追根究柢）、感情專注、忠貞、翻舊帳。注意小腸。</p>
+    <ul>
+      <li>鑽牛角尖（往死胡同裡走）、很愛問問題、重複問問題、口頭禪：為什麼（好奇寶寶有千百個為什麼）</li>
+      <li>喜歡當老大但當不起來，所以未月喜歡依附別人；脾氣不好</li>
+      <li>注重外表（尤其是頭髮瀏海）；特立獨行、領頭羊、愛出風頭、文青派、藝術家、有創造力</li>
+      <li>內心想的跟說的不一樣、嘴巴很壞、刀子嘴豆腐心；很孝順但要講出來、要懂得道歉</li>
+      <li>感情很專一、忠貞（不易分手、容易翻舊帳）、很會查行蹤；合群的人、沒安全感、富有人情味、不會表達</li>
+    </ul>
+  </div></details>
+
+  <details><summary><span class="e-metal">申</span>・猴・7月秋天（金）｜機靈精明</summary><div class="body">
+    <p>講義氣、心地善良、做事仔細、外剛內柔、沒耐心、模仿力強、說話銳利、精明。注意車關、注意膀胱。</p>
+    <ul>
+      <li>機靈過人、學習力好、三分鐘熱度、坐不住、閒不住、勞碌命、欠缺考慮、持續力不足</li>
+      <li>反應快、帶著他做一次就會了、模仿力很強；可以當會計、算得很清楚（撿便宜小確幸很開心）</li>
+      <li>講話直接不囉嗦（講都是重點）、講話銳利——易被誤會白目、容易惹別人生氣，講話前要三思</li>
+      <li>沒心機、調皮、欠缺穩重性、脾氣不好、急性子、觀察力強、能力強、人緣好</li>
+    </ul>
+  </div></details>
+
+  <details><summary><span class="e-metal">酉</span>・雞・8月秋天（金）｜熱心過頭</summary><div class="body">
+    <p>講義氣、勤奮、熱心過頭、較守不住秘密、神經質、第六感強、很會喝酒不然就是滴酒不沾、人緣好、有愛心。注意腎臟。</p>
+    <ul>
+      <li>熱心過頭（雞婆、地方里長伯）——付出不容易被看到、容易自卑</li>
+      <li>敏感體質、熱臉貼冷屁股、積極主動、較從利益著眼</li>
+      <li>有秘密一定要第一個講給他知道，不然他會想太多、很悲觀；不能跟他講秘密（肯定不小心說出去）</li>
+      <li>自我要求高、自信心強、審美觀強、不能騙他；有人緣、有衝勁</li>
+      <li>容易自己傷害自己、想不開；自己的孩子不喜歡別人教</li>
+    </ul>
+  </div></details>
+
+  <details><summary><span class="e-earth">戌</span>・狗・9月秋天（土）｜忠心重義</summary><div class="body">
+    <p>固執、自尊心強、很忠心、他認同的人誰也不能批評、不信天命、鬼點子多、可當生死之交、重感情。注意心包。</p>
+    <ul>
+      <li>明知不可為而為之、愚忠（不會去想太多）；點子多、突發奇想、鐵齒、主觀強、重信用</li>
+      <li>地上的老大、警戒心強、具有領導能力、喜歡當老大；不要狗眼看人低</li>
+      <li>自尊心很強——不能欺負或批評他的家人和朋友；很重情義、很適合當生死之交</li>
+      <li>照顧人、容易單戀、相信誰就是相信、對他好就可以當一輩子的好朋友</li>
+      <li>喜歡成群結隊；要請戌月幫忙可以先請他吃飯（飯局成事、跟他吃飯可以提升信任感）</li>
+      <li>戌也是五術高手：山、醫、命、相、卜；累世有修</li>
+    </ul>
+  </div></details>
+
+  <details><summary><span class="e-water">亥</span>・豬・10月冬天（水）｜扮豬吃老虎</summary><div class="body">
+    <p>聰明、有口福、好享受、明理、要知道內心世界才能溝通、常追根究底、扮豬吃老虎、轉念轉不過來、重原則、話都放在心裡。注意車關、注意三焦。</p>
+    <ul>
+      <li>有話不講（過度執著不講理）、癡情想不開、報喜不報憂；外表剛硬、內心脆弱、容易悲觀、比較嘮叨愛唸</li>
+      <li>很愛多管閒事（一旦多講就變他的事）；口才好、借力使力</li>
+      <li>觀念較轉不過來（說一就是一，突然改變方式會鑽牛角尖）、要放鬆舒壓</li>
+      <li>很會處理別人的事情、不會處理自己的事情；較難談心（不會自剖內心）</li>
+      <li>有得吃就開心——愛吃羹類、湯湯水水的東西（燴飯、燴麵、羹類）</li>
+      <li>很重原則；可以多聽好心情的事去化解抑鬱</li>
+    </ul>
+  </div></details>
+
+  <details><summary><span class="e-water">子</span>・鼠・11月冬天（水）｜聰明之最</summary><div class="body">
+    <p>聰明、善於保護自己、有雙重個性、難捉摸、沒有原則、猶豫不決（做也後悔不做也後悔）、善變、個性極端。注意膽。</p>
+    <ul>
+      <li>聰明之最、很精明、太會盤算（因小失大）、聰明過頭反被聰明誤</li>
+      <li>鴕鳥心態、機靈妙算、優柔寡斷、介於陰陽之間、危機意識強</li>
+      <li>猶豫不決——直接幫他做決定，不然他會想很久（做也後悔、不做也後悔）</li>
+      <li>晚上思緒很多、早上起來全忘光；會先懂得愛自己才去愛別人</li>
+      <li>要學習承擔力才會成功（不然都會有鴕鳥心態）</li>
+    </ul>
+  </div></details>
+
+  <details><summary><span class="e-earth">丑</span>・牛・12月冬天（土）｜任勞任怨</summary><div class="body">
+    <p>固執、老實、牛脾氣、腳踏實地、追根究底、翻舊帳、任勞任怨、只要認同後做事就會很認真。注意肝。</p>
+    <ul>
+      <li>很勤勞、善良敦厚、埋頭苦幹；問的問題都會先思考後才問</li>
+      <li>習慣一件事情比較久、難聽勸，但學會後很扎實；學習的路上要多鼓勵他</li>
+      <li>沒安全感、會追查行蹤、記仇、一定有私房錢（但又很愛哭沒錢）、愛做又愛唸、鑽牛角尖、愛回憶往事</li>
+      <li>很會翻舊帳（四個胃反芻）；安逸於現狀、很難嘗試新事物、適應環境後不太會離開、錢賺夠就好</li>
+      <li>是隱藏實力的人；忘記一個人要很久；只要認同了就會認真做、說做就做</li>
+      <li>要懂得變通（容易勞碌命）；事情一次交代清楚（他做完再叫他做會被拒絕）</li>
+    </ul>
+  </div></details>
+</section>
+
+<!-- ===== 馬花庫 ===== -->
+<section id="mhk">
+  <h2><span class="stamp">馬</span>馬・花・庫</h2>
+  <div class="card">
+    <h3 style="margin-top:0;">四庫：辰、戌、丑、未</h3>
+    <div class="tblwrap">
+    <table>
+      <tr><th>數量</th><th>意義</th></tr>
+      <tr><td>一庫</td><td>有理財觀（節儉自己、慷慨別人）</td></tr>
+      <tr><td>二庫</td><td>善理財（有理財觀念且懂得運用）</td></tr>
+      <tr><td>三庫</td><td>借錢給別人不敢要回來</td></tr>
+      <tr><td>四庫</td><td>賺盡天下財也易散天下財，不是皇帝命就是乞丐命</td></tr>
+      <tr><td>無庫</td><td>散財童子／財來財去（庫沖開也算）</td></tr>
+    </table>
+    </div>
+    <p class="note">庫的解決辦法：（課堂補充）</p>
+
+    <h3>四馬：寅、申、巳、亥</h3>
+    <div class="tblwrap">
+    <table>
+      <tr><th>數量</th><th>意義</th></tr>
+      <tr><td>一馬</td><td>好動不寧（有目標方法）</td></tr>
+      <tr><td>二馬</td><td>好動閒不住，不喜束縛</td></tr>
+      <tr><td>三馬</td><td>勞碌奔波，注意車關（目標多但不會規劃）</td></tr>
+      <tr><td>四馬</td><td>勞碌命，多頭馬車（閒不住）</td></tr>
+      <tr><td>無馬</td><td>不愛動／易是路癡／沒有衝勁（回家後就不出門）</td></tr>
+    </table>
+    </div>
+    <p class="note">馬的解決辦法：（課堂補充）</p>
+
+    <h3>四花：子、午、卯、酉（人際關係）</h3>
+    <div class="tblwrap">
+    <table>
+      <tr><th>數量</th><th>意義</th></tr>
+      <tr><td>一花</td><td>人緣佳</td></tr>
+      <tr><td>二花</td><td>人緣容貌佳，耐看</td></tr>
+      <tr><td>三花</td><td>異性緣好，善應對</td></tr>
+      <tr><td>四花</td><td>人緣非常好；女生異性緣很好，男生可能喜聲色場所（注意道德觀，同性緣不好）</td></tr>
+      <tr><td>無花</td><td>不喜歡人與人之間的相處／臉嚴肅 ＊自己要常微笑</td></tr>
+    </table>
+    </div>
+    <p class="note">花的解決辦法：（課堂補充）</p>
+  </div>
+</section>
+
+<!-- ===== 刑沖合害 ===== -->
+<section id="clash">
+  <h2><span class="stamp">合</span>刑沖合害</h2>
+  <div class="card">
+    <h3 style="margin-top:0;">地支盤口訣</h3>
+    <div class="tblwrap">
+    <table style="text-align:center; font-family:'Noto Serif TC',serif; font-weight:700;">
+      <tr><td class="e-fire">巳</td><td class="e-fire">午</td><td class="e-earth">未</td><td class="e-metal">申</td></tr>
+      <tr><td class="e-earth">辰</td><td style="border:none;" colspan="2" rowspan="2"><span class="note" style="font-weight:400;">左右對稱＝合<br>上下相對＝害<br>對角穿心＝沖</span></td><td class="e-metal">酉</td></tr>
+      <tr><td class="e-wood">卯</td><td class="e-earth">戌</td></tr>
+      <tr><td class="e-wood">寅</td><td class="e-earth">丑</td><td class="e-water">子</td><td class="e-water">亥</td></tr>
+    </table>
+    </div>
+    <p class="note" style="line-height:2;">把十二地支排成一圈，看位置記關係：<br>
+    <b>左右對稱＝六合</b>：午未、巳申、辰酉、卯戌、寅亥、子丑<br>
+    <b>上下相對＝六害</b>：丑午、子未、寅巳、卯辰、申亥、酉戌<br>
+    <b>對角穿心＝六沖</b>：子午、丑未、寅申、卯酉、辰戌、巳亥<br>
+    記住盤面位置，合害沖都不用背。</p>
+
+    <h3>天干五合</h3>
+    <div class="tblwrap">
+    <table>
+      <tr><th>組合</th><th>化</th><th>名稱</th><th>含義</th></tr>
+      <tr><td>甲己合</td><td class="e-earth">土</td><td>中正之合</td><td>重信守分、安分守己、寬厚正直</td></tr>
+      <tr><td>乙庚合</td><td class="e-metal">金</td><td>仁義之合</td><td>剛柔並濟、重情重義、果敢有仁</td></tr>
+      <tr><td>丙辛合</td><td class="e-water">水</td><td>威制之合</td><td>儀表威嚴、外顯威儀、易恩威並用</td></tr>
+      <tr><td>丁壬合</td><td class="e-wood">木</td><td>淫暱之合</td><td>多情善感、異性緣重、感情豐富易迷戀</td></tr>
+      <tr><td>戊癸合</td><td class="e-fire">火</td><td>無情之合</td><td>外美內冷、聚散隨緣、易有年齡差之緣</td></tr>
+    </table>
+    </div>
+    <h3>地支六合</h3>
+    <div class="tblwrap">
+    <table>
+      <tr><td>子丑合<span class="e-earth">土</span></td><td>寅亥合<span class="e-wood">木</span></td><td>卯戌合<span class="e-fire">火</span></td><td>辰酉合<span class="e-metal">金</span></td><td>巳申合<span class="e-water">水</span></td><td>午未合<span class="e-earth">土</span></td></tr>
+    </table>
+    </div>
+    <h3>地支三合</h3>
+    <div class="tblwrap">
+    <table>
+      <tr><td>申子辰合<span class="e-water">水</span>局</td><td>亥卯未合<span class="e-wood">木</span>局</td><td>寅午戌合<span class="e-fire">火</span>局</td><td>巳酉丑合<span class="e-metal">金</span>局</td></tr>
+    </table>
+    </div>
+    <h3>地支三會</h3>
+    <div class="tblwrap">
+    <table>
+      <tr><td>寅卯辰會東方<span class="e-wood">木</span></td><td>巳午未會南方<span class="e-fire">火</span></td><td>申酉戌會西方<span class="e-metal">金</span></td><td>亥子丑會北方<span class="e-water">水</span></td></tr>
+    </table>
+    </div>
+    <h3>地支六沖</h3>
+    <div class="tblwrap">
+    <table>
+      <tr><td>子午沖</td><td>丑未沖</td><td>寅申沖</td><td>卯酉沖</td><td>辰戌沖</td><td>巳亥沖</td></tr>
+    </table>
+    </div>
+    <h3>地支三刑</h3>
+    <div class="tblwrap">
+    <table>
+      <tr><th>類型</th><th>組合</th></tr>
+      <tr><td>無恩之刑</td><td>寅刑巳、巳刑申、申刑寅</td></tr>
+      <tr><td>恃勢之刑</td><td>丑刑戌、戌刑未、未刑丑</td></tr>
+      <tr><td>無禮之刑</td><td>子刑卯、卯刑子</td></tr>
+      <tr><td>自刑</td><td>辰辰、午午、酉酉、亥亥</td></tr>
+    </table>
+    </div>
+    <h3>地支六害</h3>
+    <div class="tblwrap">
+    <table>
+      <tr><td>子未害</td><td>丑午害</td><td>寅巳害</td><td>卯辰害</td><td>申亥害</td><td>酉戌害</td></tr>
+    </table>
+    </div>
+    <h3>地支相破</h3>
+    <div class="tblwrap">
+    <table>
+      <tr><td>子酉破</td><td>午卯破</td><td>巳申破</td><td>寅亥破</td><td>辰丑破</td><td>戌未破</td></tr>
+    </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 地支藏干 ===== -->
+<section id="hiddenstem">
+  <h2><span class="stamp">藏</span>地支藏干</h2>
+  <div class="card">
+    <p><b>用途：</b>① 排十神時，地支要用藏干對照日主定十神；② 判斷身強身弱時看日主在地支有無「通根」（藏干中有同五行）；③ 命盤 App 最下排的藏干列就是這張表的結果。</p>
+    <p class="note">力量強弱：<b>本氣</b>最強（該支的主要五行）＞中氣＞餘氣。初學排十神以本氣為主即可。</p>
+    <div class="tblwrap">
+    <table>
+      <tr><th>地支</th><th>藏干（本氣 → 中氣 → 餘氣）</th><th>地支</th><th>藏干（本氣 → 中氣 → 餘氣）</th></tr>
+      <tr><td class="e-water">子</td><td><b>癸</b></td><td class="e-fire">午</td><td><b>丁</b>・己</td></tr>
+      <tr><td class="e-earth">丑</td><td><b>己</b>・癸・辛</td><td class="e-earth">未</td><td><b>己</b>・丁・乙</td></tr>
+      <tr><td class="e-wood">寅</td><td><b>甲</b>・丙・戊</td><td class="e-metal">申</td><td><b>庚</b>・壬・戊</td></tr>
+      <tr><td class="e-wood">卯</td><td><b>乙</b></td><td class="e-metal">酉</td><td><b>辛</b></td></tr>
+      <tr><td class="e-earth">辰</td><td><b>戊</b>・乙・癸</td><td class="e-earth">戌</td><td><b>戊</b>・辛・丁</td></tr>
+      <tr><td class="e-fire">巳</td><td><b>丙</b>・戊・庚</td><td class="e-water">亥</td><td><b>壬</b>・甲</td></tr>
+    </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 六十甲子納音 ===== -->
+<section id="nayin">
+  <h2><span class="stamp">納</span>六十甲子納音</h2>
+  <div class="card">
+    <p><b>用途：</b>① 以<b>年柱干支</b>查納音，就是俗稱的「你是什麼命」（例：1995 乙亥年＝山頭火命）；② 傳統合婚會以兩人年命納音的五行生剋做初步參考；③ 論性格大方向、取名用字五行時的輔助依據。</p>
+    <div class="tblwrap">
+    <table>
+      <tr><th>干支</th><th>納音</th><th>干支</th><th>納音</th><th>干支</th><th>納音</th></tr>
+      <tr><td>甲子・乙丑</td><td>海中金</td><td>甲申・乙酉</td><td>泉中水</td><td>甲辰・乙巳</td><td>覆燈火</td></tr>
+      <tr><td>丙寅・丁卯</td><td>爐中火</td><td>丙戌・丁亥</td><td>屋上土</td><td>丙午・丁未</td><td>天河水</td></tr>
+      <tr><td>戊辰・己巳</td><td>大林木</td><td>戊子・己丑</td><td>霹靂火</td><td>戊申・己酉</td><td>大驛土</td></tr>
+      <tr><td>庚午・辛未</td><td>路旁土</td><td>庚寅・辛卯</td><td>松柏木</td><td>庚戌・辛亥</td><td>釵釧金</td></tr>
+      <tr><td>壬申・癸酉</td><td>劍鋒金</td><td>壬辰・癸巳</td><td>長流水</td><td>壬子・癸丑</td><td>桑柘木</td></tr>
+      <tr><td>甲戌・乙亥</td><td>山頭火</td><td>甲午・乙未</td><td>砂中金</td><td>甲寅・乙卯</td><td>大溪水</td></tr>
+      <tr><td>丙子・丁丑</td><td>澗下水</td><td>丙申・丁酉</td><td>山下火</td><td>丙辰・丁巳</td><td>沙中土</td></tr>
+      <tr><td>戊寅・己卯</td><td>城頭土</td><td>戊戌・己亥</td><td>平地木</td><td>戊午・己未</td><td>天上火</td></tr>
+      <tr><td>庚辰・辛巳</td><td>白蠟金</td><td>庚子・辛丑</td><td>壁上土</td><td>庚申・辛酉</td><td>石榴木</td></tr>
+      <tr><td>壬午・癸未</td><td>楊柳木</td><td>壬寅・癸卯</td><td>金箔金</td><td>壬戌・癸亥</td><td>大海水</td></tr>
+    </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 十二長生 ===== -->
+<section id="changsheng">
+  <h2><span class="stamp">長</span>十二長生</h2>
+  <div class="card">
+    <p><b>用途：</b>以日主天干查地支所處的能量階段（像人的一生：出生→壯年→衰老→入墓→重生），用於判斷日主在各柱、大運、流年的旺衰狀態，是身強身弱與行運吉凶的輔助依據。</p>
+    <p class="note">陽干順行、陰干逆行。列＝日主天干，欄＝十二長生階段，格內為地支。</p>
+    <div class="tblwrap">
+    <table>
+      <tr><th>日主</th><th>長生</th><th>沐浴</th><th>冠帶</th><th>臨官</th><th>帝旺</th><th>衰</th><th>病</th><th>死</th><th>墓</th><th>絕</th><th>胎</th><th>養</th></tr>
+      <tr><td class="e-wood">甲</td><td>亥</td><td>子</td><td>丑</td><td>寅</td><td>卯</td><td>辰</td><td>巳</td><td>午</td><td>未</td><td>申</td><td>酉</td><td>戌</td></tr>
+      <tr><td class="e-wood">乙</td><td>午</td><td>巳</td><td>辰</td><td>卯</td><td>寅</td><td>丑</td><td>子</td><td>亥</td><td>戌</td><td>酉</td><td>申</td><td>未</td></tr>
+      <tr><td class="e-fire">丙</td><td>寅</td><td>卯</td><td>辰</td><td>巳</td><td>午</td><td>未</td><td>申</td><td>酉</td><td>戌</td><td>亥</td><td>子</td><td>丑</td></tr>
+      <tr><td class="e-fire">丁</td><td>酉</td><td>申</td><td>未</td><td>午</td><td>巳</td><td>辰</td><td>卯</td><td>寅</td><td>丑</td><td>子</td><td>亥</td><td>戌</td></tr>
+      <tr><td class="e-earth">戊</td><td>寅</td><td>卯</td><td>辰</td><td>巳</td><td>午</td><td>未</td><td>申</td><td>酉</td><td>戌</td><td>亥</td><td>子</td><td>丑</td></tr>
+      <tr><td class="e-earth">己</td><td>酉</td><td>申</td><td>未</td><td>午</td><td>巳</td><td>辰</td><td>卯</td><td>寅</td><td>丑</td><td>子</td><td>亥</td><td>戌</td></tr>
+      <tr><td class="e-metal">庚</td><td>巳</td><td>午</td><td>未</td><td>申</td><td>酉</td><td>戌</td><td>亥</td><td>子</td><td>丑</td><td>寅</td><td>卯</td><td>辰</td></tr>
+      <tr><td class="e-metal">辛</td><td>子</td><td>亥</td><td>戌</td><td>酉</td><td>申</td><td>未</td><td>午</td><td>巳</td><td>辰</td><td>卯</td><td>寅</td><td>丑</td></tr>
+      <tr><td class="e-water">壬</td><td>申</td><td>酉</td><td>戌</td><td>亥</td><td>子</td><td>丑</td><td>寅</td><td>卯</td><td>辰</td><td>巳</td><td>午</td><td>未</td></tr>
+      <tr><td class="e-water">癸</td><td>卯</td><td>寅</td><td>丑</td><td>子</td><td>亥</td><td>戌</td><td>酉</td><td>申</td><td>未</td><td>午</td><td>巳</td><td>辰</td></tr>
+    </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 空亡 ===== -->
+<section id="kongwang">
+  <h2><span class="stamp">空</span>空亡（六甲旬空）</h2>
+  <div class="card">
+    <p class="note">以日柱干支所在的旬查空亡。</p>
+    <div class="tblwrap">
+    <table>
+      <tr><th>旬</th><th>範圍</th><th>空亡</th></tr>
+      <tr><td>甲子旬</td><td>甲子～癸酉</td><td>戌、亥</td></tr>
+      <tr><td>甲戌旬</td><td>甲戌～癸未</td><td>申、酉</td></tr>
+      <tr><td>甲申旬</td><td>甲申～癸巳</td><td>午、未</td></tr>
+      <tr><td>甲午旬</td><td>甲午～癸卯</td><td>辰、巳</td></tr>
+      <tr><td>甲辰旬</td><td>甲辰～癸丑</td><td>寅、卯</td></tr>
+      <tr><td>甲寅旬</td><td>甲寅～癸亥</td><td>子、丑</td></tr>
+    </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 特殊格局 ===== -->
+<section id="pattern">
+  <h2><span class="stamp">格</span>特殊格局（日柱）</h2>
+
+  <details><summary>魁罡格</summary><div class="body">
+    <p><b>日柱為：</b>庚辰、庚戌、壬辰、戊戌（四魁罡）。</p>
+    <ul>
+      <li>聰明果決、行事明快、有領導威嚴、氣勢過人</li>
+      <li>性格剛烈、極端——大好大壞、不走中間路線</li>
+      <li>嫉惡如仇、講原則；女命個性強勢、事業心重、婚姻宜晚</li>
+      <li>忌魁罡逢沖（辰戌沖），逢沖之年注意動盪起伏</li>
+    </ul>
+  </div></details>
+
+  <details><summary>陰差陽錯日</summary><div class="body">
+    <p><b>日柱為：</b>丙子、丁丑、戊寅、辛卯、壬辰、癸巳、丙午、丁未、戊申、辛酉、壬戌、癸亥（十二日）。</p>
+    <ul>
+      <li>主婚姻感情易有波折、時機常陰錯陽差</li>
+      <li>與配偶的家人溝通易有隔閡（婆媳、翁婿）</li>
+      <li>婚事進行中容易出現插曲；感情經營要多花心力</li>
+    </ul>
+  </div></details>
+
+  <details><summary>孤鸞日</summary><div class="body">
+    <p><b>日柱為：</b>甲寅、乙巳、丙午、丁巳、戊申、戊午、辛亥、壬子。</p>
+    <ul>
+      <li>主婚緣較慢、或婚後聚少離多</li>
+      <li>感情路較多波折、對另一半要求高</li>
+      <li>不代表無姻緣——晚婚或聚少離多的相處模式反而穩定</li>
+    </ul>
+  </div></details>
+
+  <details><summary>十靈日</summary><div class="body">
+    <p><b>日柱為：</b>甲辰、乙亥、丙辰、丁酉、戊午、庚戌、庚寅、辛亥、壬寅、癸未。</p>
+    <ul>
+      <li>天生靈性強、直覺敏銳、第六感準</li>
+      <li>聰明領悟快、學五術玄學特別容易上手</li>
+      <li>與宗教、玄學有緣，適合往身心靈領域發展</li>
+    </ul>
+  </div></details>
+
+  <details><summary>六秀日</summary><div class="body">
+    <p><b>日柱為：</b>丙午、丁未、戊子、戊午、己丑、己未。</p>
+    <ul>
+      <li>人秀氣、聰明、有才華，外貌氣質出眾</li>
+      <li>才藝表現容易被看見、有藝文天分</li>
+      <li>注意才華外露、易招人妒</li>
+    </ul>
+  </div></details>
+
+  <details><summary>日貴格</summary><div class="body">
+    <p><b>日柱為：</b>丁酉、丁亥、癸卯、癸巳（天乙貴人坐日支）。</p>
+    <ul>
+      <li>心地善良、為人厚道、有人緣</li>
+      <li>一生貴人運明顯、逢難有人相助</li>
+      <li>配偶多為貴人、婚姻對運勢有加分</li>
+    </ul>
+  </div></details>
+
+  <details><summary>日德格</summary><div class="body">
+    <p><b>日柱為：</b>甲寅、丙辰、戊辰、庚辰、壬戌。</p>
+    <ul>
+      <li>心性慈善、福澤厚、性情穩重</li>
+      <li>樂於助人、行善積德、晚運佳</li>
+      <li>忌刑沖破害、忌魁罡運</li>
+    </ul>
+  </div></details>
+
+  <details><summary>金神格</summary><div class="body">
+    <p><b>時柱（或日柱）見：</b>乙丑、己巳、癸酉。</p>
+    <ul>
+      <li>個性剛毅果斷、破舊立新、有開創魄力</li>
+      <li>脾氣急、行事帶殺伐氣</li>
+      <li>喜行火運制之（金神入火鄉、富貴天下響）</li>
+    </ul>
+  </div></details>
+
+  <details><summary>三奇貴人</summary><div class="body">
+    <p><b>天干依序出現（年月日或月日時順排）：</b></p>
+    <ul>
+      <li>天上三奇：甲、戊、庚</li>
+      <li>地下三奇：乙、丙、丁</li>
+      <li>人中三奇：壬、癸、辛</li>
+      <li>主才華卓越、胸襟開闊、見識過人、常有奇遇</li>
+      <li>須順排且不逢沖破，格局才成立</li>
+    </ul>
+  </div></details>
+
+  <details><summary>專旺格（一行得氣）</summary><div class="body">
+    <p>全局五行一氣專旺、順其旺勢而行，共五種：</p>
+    <div class="tblwrap">
+    <table>
+      <tr><th>格名</th><th>日主</th><th>條件</th></tr>
+      <tr><td>曲直格</td><td class="e-wood">木</td><td>甲乙日主、地支會木局、全局木旺</td></tr>
+      <tr><td>炎上格</td><td class="e-fire">火</td><td>丙丁日主、地支會火局、全局火旺</td></tr>
+      <tr><td>稼穡格</td><td class="e-earth">土</td><td>戊己日主、地支辰戌丑未全、全局土旺</td></tr>
+      <tr><td>從革格</td><td class="e-metal">金</td><td>庚辛日主、地支會金局、全局金旺</td></tr>
+      <tr><td>潤下格</td><td class="e-water">水</td><td>壬癸日主、地支會水局、全局水旺</td></tr>
+    </table>
+    </div>
+    <p class="note">專旺格喜順其勢（生扶本氣），忌逆其旺勢的五行；屬進階論法，入格條件嚴格。</p>
+  </div></details>
+
+  <details><summary>從格（簡介）</summary><div class="body">
+    <ul>
+      <li><b>從財格</b>：日主極弱、全局財星當旺，棄命從財——行財運發富</li>
+      <li><b>從殺格</b>：日主極弱、全局官殺當旺，棄命從殺——行官殺運得權貴</li>
+      <li><b>從兒格</b>：日主極弱、全局食傷當旺，順洩其秀——才華致富</li>
+    </ul>
+    <p class="note">從格與正格喜忌完全相反、判斷門檻高，屬進階內容，此處僅列名目。</p>
+  </div></details>
+</section>
+
+<!-- ===== 合婚判斷 ===== -->
+<section id="hehun">
+  <h2><span class="stamp">婚</span>合婚判斷（地支合盤）</h2>
+  <div class="card">
+    <p><b>方法：</b>取男女雙方四柱<b>地支</b>，同柱兩兩比對（年比年、月比月、日比日、時比時），再加上<b>日、月交叉</b>比對（男日支→女月支、女日支→男月支）。逐一判斷合、沖、害、同、無。</p>
+    <svg viewBox="0 0 400 170" style="width:100%; max-width:460px; display:block; margin:10px auto;">
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--tx2)"/>
+        </marker>
+      </defs>
+      <!-- 表格框 -->
+      <g stroke="var(--line)" fill="var(--card2)">
+        <rect x="10" y="10" width="380" height="30" rx="3"/>
+        <rect x="10" y="45" width="380" height="30" rx="3"/>
+        <rect x="10" y="120" width="380" height="30" rx="3"/>
+      </g>
+      <!-- 標題列 -->
+      <g font-size="15" fill="var(--tx)" text-anchor="middle" font-weight="700">
+        <text x="55" y="31">時柱</text><text x="145" y="31">日主</text><text x="235" y="31">月柱</text><text x="325" y="31">年柱</text>
+      </g>
+      <g font-size="12" fill="var(--tx2)">
+        <text x="352" y="64">男命地支</text>
+        <text x="352" y="140">女命地支</text>
+      </g>
+      <!-- 同柱雙向比對 -->
+      <g stroke="var(--tx2)" stroke-width="1.8" marker-start="url(#ah)" marker-end="url(#ah)">
+        <line x1="55" y1="80" x2="55" y2="115"/>
+        <line x1="145" y1="80" x2="145" y2="115"/>
+        <line x1="235" y1="80" x2="235" y2="115"/>
+        <line x1="325" y1="80" x2="325" y2="115"/>
+      </g>
+      <!-- 日月單向交叉 -->
+      <g stroke="var(--red)" stroke-width="2" marker-end="url(#ah)" fill="none">
+        <line x1="145" y1="80" x2="230" y2="115"/>
+        <line x1="235" y1="115" x2="150" y2="80"/>
+      </g>
+      <g font-size="10" fill="var(--tx2)">
+        <text x="55" y="165" text-anchor="middle">教養</text>
+        <text x="145" y="165" text-anchor="middle">親密</text>
+        <text x="235" y="165" text-anchor="middle">溝通</text>
+        <text x="325" y="165" text-anchor="middle">家庭</text>
+      </g>
+    </svg>
+    <p class="note">灰色雙箭頭＝同柱比對（時比時、日比日、月比月、年比年）；<span style="color:var(--red);">紅色交叉箭頭</span>＝男日支→女月支（男對女）、女日支→男月支（女對男），各單向比一次。</p>
+    <p class="note">合＝六合或三合（同局）｜同＝同一地支（同氣）｜沖害對照「刑沖合害」章節。</p>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0;">互動合盤</h3>
+    <p class="note">選擇兩人四柱地支（順序由右至左：年→月→日→時）：</p>
+    <div class="tblwrap">
+    <table id="hhsel">
+      <tr><th></th><th>時柱</th><th>日主</th><th>月柱</th><th>年柱</th></tr>
+      <tr><th>男命</th><td><select id="m3"></select></td><td><select id="m2"></select></td><td><select id="m1"></select></td><td><select id="m0"></select></td></tr>
+      <tr><th>女命</th><td><select id="f3"></select></td><td><select id="f2"></select></td><td><select id="f1"></select></td><td><select id="f0"></select></td></tr>
+    </table>
+    </div>
+    <div style="text-align:center; margin:10px 0;">
+      <button onclick="hhCalc()" style="background:var(--red); color:#fff; border:none; border-radius:20px; padding:8px 28px; font-size:1em; cursor:pointer; font-family:inherit;">合盤</button>
+    </div>
+    <svg id="hhsvg" viewBox="0 0 360 190" style="width:100%; max-width:480px; display:block; margin:0 auto;"></svg>
+    <p class="note" style="text-align:center;">
+      <span style="color:#b3382e;">━ 合（情絲）</span>　
+      <span style="color:#c9a15a;">━ 同</span>　
+      <span style="color:#5583c9;">━ 沖</span>　
+      <span style="color:#9aa0ab;">╌ 害</span>
+    </p>
+    <div id="hhresult"></div>
+  </div>
+
+  <h3>柱位解讀</h3>
+  <details><summary>年柱（雙方家庭）</summary><div class="body">
+    <ul>
+      <li><b>合</b>（三合或六合）：雙方家長會互相走動、往來</li>
+      <li><b>沖</b>：雙方家庭背景不同</li>
+      <li><b>害</b>：雙方家長互不往來</li>
+      <li><b>同</b>（同氣）：家庭背景一致</li>
+      <li><b>無</b>：雙方家長互不往來</li>
+    </ul>
+  </div></details>
+  <details><summary>月柱（溝通共識）</summary><div class="body">
+    <ul>
+      <li><b>合</b>：男女雙方心心相印、好溝通、能達到共識</li>
+      <li><b>沖</b>：雙方互動多且刺激，但容易爭吵、意見多</li>
+      <li><b>害</b>：雙方相敬如賓，也容易相敬如冰，彼此會藏秘密</li>
+      <li><b>同</b>：處世態度一致、能協調；但剛認識覺得彼此超了解，熟了卻沒刺激感</li>
+      <li><b>無</b>：沒有好壞之分</li>
+    </ul>
+  </div></details>
+  <details><summary>日主（親密關係）</summary><div class="body">
+    <ul>
+      <li><b>合</b>：情被合住，性生活協調、圓滿</li>
+      <li><b>沖</b>：性生活刺激，但也容易會要求對方</li>
+      <li><b>害</b>：睡覺時間不同、同床機會不多、性生活不美滿——除非小別勝新婚</li>
+      <li><b>同</b>：性生活協調、美滿</li>
+    </ul>
+  </div></details>
+  <details><summary>時柱（子女教養）</summary><div class="body">
+    <ul>
+      <li><b>合</b>：夫妻彼此對孩子的管教、觀念一致</li>
+      <li><b>沖</b>：夫妻對孩子的教養觀念不同，會有意見</li>
+      <li><b>害</b>：教養觀念意見不一，甚至各用各的方法</li>
+    </ul>
+  </div></details>
+  <details><summary>男女互動（日月交叉）</summary><div class="body">
+    <ul>
+      <li><b>男合女</b>：男的比較會為女的著想，會尊重、會禮讓</li>
+      <li><b>男沖女</b>：男對女會越看越討厭，而且意見很多、不相讓</li>
+      <li><b>男害女</b>：男對女會越來越不溝通，無言相對</li>
+      <li><b>女合男</b>：女的比較會為男的著想，會尊重、會禮讓</li>
+      <li><b>女沖男</b>：女對男會越看越討厭，而且意見很多、不相讓</li>
+      <li><b>女害男</b>：女對男會越來越不溝通，無言相對</li>
+    </ul>
+  </div></details>
+</section>
+
+<!-- ===== 先天病因 ===== -->
+<section id="health">
+  <h2><span class="stamp">病</span>先天病因・身體系統</h2>
+  <div class="card">
+    <h3 style="margin-top:0;">五行 × 身體系統</h3>
+    <div class="tblwrap">
+    <table>
+      <tr><th>五行</th><th>臟腑</th><th>系統</th></tr>
+      <tr><td class="e-wood">木</td><td>肝、膽</td><td>免疫系統</td></tr>
+      <tr><td class="e-fire">火</td><td>心臟、小腸</td><td>循環系統</td></tr>
+      <tr><td class="e-earth">土</td><td>脾、胃</td><td>消化系統</td></tr>
+      <tr><td class="e-metal">金</td><td>肺、大腸</td><td>呼吸系統</td></tr>
+      <tr><td class="e-water">水</td><td>腎、膀胱</td><td>泌尿系統</td></tr>
+    </table>
+    </div>
+    <p class="note">女性屬水：婦科。</p>
+    <h3>十天干 × 臟腑／部位</h3>
+    <div class="tblwrap">
+    <table>
+      <tr><th>天干</th><td>甲</td><td>乙</td><td>丙</td><td>丁</td><td>戊</td><td>己</td><td>庚</td><td>辛</td><td>壬</td><td>癸</td></tr>
+      <tr><th>臟腑</th><td>膽</td><td>肝</td><td>小腸三焦</td><td>心、心包</td><td>胃</td><td>脾</td><td>大腸</td><td>肺</td><td>膀胱</td><td>腎</td></tr>
+      <tr><th>部位</th><td>頭</td><td>項</td><td>肩</td><td>心</td><td>脅</td><td>腹</td><td>臍</td><td>股</td><td>脛</td><td>足</td></tr>
+    </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 時辰 ===== -->
+<section id="hour">
+  <h2><span class="stamp">時</span>十二時辰對照</h2>
+  <div class="card">
+    <p style="margin-bottom:8px;"><b>早子時</b>：00:00～00:59　｜　<b>晚子時</b>：23:00～23:59</p>
+    <div class="tblwrap">
+    <table>
+      <tr><th>時辰</th><th>時間</th><th>時辰</th><th>時間</th></tr>
+      <tr><td>子</td><td>23:00～00:59</td><td>午</td><td>11:00～12:59</td></tr>
+      <tr><td>丑</td><td>01:00～02:59</td><td>未</td><td>13:00～14:59</td></tr>
+      <tr><td>寅</td><td>03:00～04:59</td><td>申</td><td>15:00～16:59</td></tr>
+      <tr><td>卯</td><td>05:00～06:59</td><td>酉</td><td>17:00～18:59</td></tr>
+      <tr><td>辰</td><td>07:00～08:59</td><td>戌</td><td>19:00～20:59</td></tr>
+      <tr><td>巳</td><td>09:00～10:59</td><td>亥</td><td>21:00～22:59</td></tr>
+    </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 十神 ===== -->
+<section id="gods">
+  <h2><span class="stamp">神</span>十神</h2>
+  <div class="card">
+    <h3 style="margin-top:0;">十神排法</h3>
+    <div class="tblwrap">
+    <table>
+      <tr><th>關係</th><th>同性</th><th>異性</th><th>白話</th></tr>
+      <tr><td>生我為<b>印</b></td><td>偏印</td><td>正印</td><td>貴人</td></tr>
+      <tr><td>我生為<b>傷食</b></td><td>食神</td><td>傷官</td><td>學習力、才華（女命：子媳）</td></tr>
+      <tr><td>剋我為<b>官殺</b></td><td>七殺</td><td>正官</td><td>工作、名聲、地位、考運、官運（男命：子媳／女命：桃花、老公）</td></tr>
+      <tr><td>我剋為<b>財才</b></td><td>偏才</td><td>正財</td><td>財運（男命：老婆、桃花）</td></tr>
+      <tr><td>同我為<b>劫比</b></td><td>比肩</td><td>劫財</td><td>人脈</td></tr>
+    </table>
+    </div>
+    <p class="note">同性＝陽見陽、陰見陰（＋＋／－－）；異性＝陽見陰、陰見陽（＋－）。</p>
+  </div>
+
+  <h3>十神個論</h3>
+
+  <details><summary>比肩【平分】獨立之星</summary><div class="body">
+    <p><b>象徵：</b>兄弟、同性朋友、獨立自主、自尊、好勝不服輸、競爭。</p>
+    <ul>
+      <li>生活與環境中的人事物常會與人競爭；遇強則出現競爭者</li>
+      <li>感情上易有困擾纏身；個性喜好朋友、不服輸、善公開交際</li>
+      <li>賺的錢會和他人享用；主觀、大筆錢財流失；不論身強身弱都要合掉（奇遁）</li>
+    </ul>
+    <p><b>優點：</b>樂觀進取、守本分、重朋友。<b>缺點：</b>主觀、容易與他人發生爭執。</p>
+    <p><b>流年：</b>大筆錢財流失／出現競爭者／換朋友圈／情感困擾。</p>
+    <p class="pillar"><b>年柱</b>：個性穩健但小時候好玩好動不喜讀書、愛交際好交友、有錢可共用，但小時候家庭經濟常陷危機。<br>
+    <b>月柱</b>：親兄弟不會幫忙、僅靠自己打拼；有錢朋友兄弟多、沒錢時無人過問，常為錢財反目。<br>
+    <b>時柱</b>：事業上和同事間壓力大；累積一生的錢財到晚年易留不住；對小孩的費用捨得花，但子女成家立業後各自離開身邊，需注重子女教養。</p>
+  </div></details>
+
+  <details><summary>劫財【奪取】倔強之星</summary><div class="body">
+    <p><b>象徵：</b>姊妹、異性朋友、競爭、野心大、好勝不服輸。</p>
+    <ul>
+      <li>外表樂觀、內心想不開；異性朋友多、好客、能力好</li>
+      <li>容易丟東西、做事有頭無尾、有表現慾、比較容易被說服、不懂理財</li>
+      <li>口才好；賺的錢會和他人享用</li>
+    </ul>
+    <p><b>優點：</b>樂觀進取、守本分、重朋友。<b>缺點：</b>主觀、容易與他人發生爭執。</p>
+    <p><b>流年：</b>小筆錢財流失／換朋友圈／情感困擾。</p>
+    <p class="pillar"><b>年柱</b>：小時候會分攤家庭經濟、早熟；容易欣賞成熟的異性、容易和人吵架、會不斷花錢。<br>
+    <b>月柱</b>：為朋友、兄弟姊妹、平輩失財、付出較多；懂事、感情豐富、會替人操煩；男命婚後太太易有想法。<br>
+    <b>時柱</b>：被事業夥伴、子女劫財；疼愛兒女、是個有求必應的土地公；晚年較容易失財、不能堅持己見；所賺的錢都花在小孩身上、借人錢財不敢要回來。</p>
+    <p class="note"><b>比劫共論：</b>比劫重之人借錢較不會向人討、常丟東西；外表樂觀內心卻想不開、較憑直覺做事；一生感情困擾、剪不斷理還亂、人情包袱很重；男命需防豪奪、容易失戀、婚前女友易有人爭；劫財在任一柱時，戀愛的另一半會出現追求者，失戀機會大且易有刻骨銘心的戀情。</p>
+  </div></details>
+
+  <details><summary>食神【才華】樂天福壽之星</summary><div class="body">
+    <p><b>象徵：</b>才華、食祿（祿、壽）、傳統、溫文儒雅、樂觀進取。</p>
+    <ul>
+      <li>個性直、到處都有得吃、有口福；較會接受傳統的技術，配合自己的才華發展，所以較固定死板</li>
+      <li>食神身強者才華洋溢，可靠智慧或技術賺錢；身弱則較敏感、覺力不從心；有食神者天生會煮菜、善烹飪</li>
+      <li>具有研發精神——學本身有興趣的東西可以坐六個小時還在畫</li>
+      <li>食神和傷官多者，常因自我而斷送財根</li>
+      <li>遇偏印年 → 梟印奪食：賺很會賺，但賺的不是和別人分、就是全部送給別人；會被小人扯後腿；要注意生命安全</li>
+    </ul>
+    <p class="pillar"><b>年柱</b>：小時候會讀書、較會思考、做事有條理。<br>
+    <b>月柱</b>：較有食祿、容易接固定工作、交的朋友素質都不錯、眼光高。<br>
+    <b>時柱</b>：肚量大、長壽、喜歡兒孫滿堂、容易付出、早出社會、煩惱只有五分鐘。</p>
+  </div></details>
+
+  <details><summary>傷官【才華】憂愁創作之星</summary><div class="body">
+    <p><b>象徵：</b>子女、才華、不滿情緒、多愁善感、完美主義。</p>
+    <ul>
+      <li>易被感動、不喜束縛、喜歡自由、自尊心強</li>
+      <li>喜歡獨創新奇、點子變化彈性大、話中常帶諷刺之語</li>
+      <li>易任性、情感豐富較悲觀</li>
+      <li>傷官身強者才華易於顯現、喜多變化；身弱則博學不專精、易對社會不滿</li>
+    </ul>
+    <p class="pillar"><b>年柱</b>：與父母不好溝通、小時候愛出風頭、家運沒落。<br>
+    <b>月柱</b>：對兄弟姊妹付出、跟兄弟不睦、常想不開、標新立異、反應靈敏。<br>
+    <b>時柱</b>：有名聲地位就會被中傷；對部屬很好但易被以下犯上；易傷到子女，有孩子也很難教養（寵）、與子女緣淡，生子體弱多病，有時會沒有下一代。</p>
+  </div></details>
+
+  <details><summary>正財【穩定】歡喜心・踏實之星</summary><div class="body">
+    <p><b>象徵：</b>錢、妻子、歡喜心、個性保守、正派。</p>
+    <ul>
+      <li>克勤克儉、為人正派、對家庭較有責任、滿足慾低；較喜歡住在熱鬧的地方、有歡喜心、較有固定資產和財源</li>
+      <li>為人節儉、重視信用、保守中庸；憨厚、知足常樂、不標新立異、喜穩定</li>
+      <li>重視金錢得失、容易因小失大；易虎頭蛇尾、比較缺乏責任心與榮譽感</li>
+      <li>正財身強者較有機會收成；身弱者晚年較留不住錢財（弱格易財來財去、常寅吃卯糧）</li>
+      <li>財多好溝通、好講話；財多很有異性緣、有歡喜心</li>
+      <li>男生財出現早、較早婚機率高、早熟；八字無財之男子較不疼惜太太、婚後對女人有排斥感、易感情困擾</li>
+      <li>財為養命之源、財可解一切之毒；正財與大自然氣息感應快、所以較有錢賺</li>
+      <li>財被合那年錢財流失大（太太亦被合、嚴防婚變）；如遇梟印逢食或傷官見官時、需注意金錢流向</li>
+      <li>遇比劫財應注意身體健康；男命財壞印、婆媳關係不好</li>
+    </ul>
+    <p class="pillar"><b>年柱</b>：較會有祖產、小時愛玩不喜讀書、少年得志、賺錢機會點子多且賺錢容易、也喜歡賺錢；男命異性緣特佳。<br>
+    <b>月柱</b>：賺錢容易且快、很喜歡賺錢、也很容易滿足（隨緣）；強格易少年得志、容易賺到錢。<br>
+    <b>日柱</b>：男命妻賢美多助、易獲妻財；女命丈夫有正財特質。<br>
+    <b>時柱</b>：老年喜好遊山玩水、較有錢、子女賺錢容易也快；與子息晚輩較親近、越老越愛玩。</p>
+  </div></details>
+
+  <details><summary>偏財【慷慨】好義之心</summary><div class="body">
+    <p><b>象徵：</b>父親、妾、大筆金錢。</p>
+    <ul>
+      <li>慷慨豪邁、精力充沛、豪爽俠義</li>
+      <li>有條理做事、交際手腕強、風情萬種</li>
+      <li>不易珍惜金錢、喜愛奢侈品；不重財、會理財、視財重義</li>
+      <li>較無固定財源、不易蓄財；賺錢比一般人快、賺錢流失也較快</li>
+      <li>感情較為不專、易沉迷五光十色之中</li>
+      <li>流年逢偏財：錢財進出大、生意人會有大筆資金進出、注意錢財流失與桃花</li>
+    </ul>
+    <p class="pillar"><b>年柱</b>：有祖產、坐不住、玩到影響課業、與父親較為不親；不喜歡念書、懂享受生活。<br>
+    <b>月柱</b>：朋友有難必定全力相挺、敢承擔風險、理解力分析力強、廣結善緣；適合從事生意、賺大筆金錢的行業。<br>
+    <b>日柱</b>：女命賺錢能力較為突出；男命易有寵妾傷妻之情形。<br>
+    <b>時柱</b>：財通根者與父親緣分較為淺薄、老年多情、疏財重義；賺錢能力比一般人強、身強老來富、越老越想賺錢。</p>
+  </div></details>
+
+  <details><summary>正官【名聲】文官・儒雅之星</summary><div class="body">
+    <p><b>象徵：</b>官職、社會地位、權勢、愛面子、大男人主義、不積極。</p>
+    <ul>
+      <li>公關佳、有禮、負責態度</li>
+      <li>考試好、會念書</li>
+      <li>官多身弱：壓力大、身體不好、體弱多毛病</li>
+      <li>女生官出現早、早婚機率高、較早熟</li>
+      <li>流年：出現傷官之年考運官運易受影響；官被合之年職位易有變動；女子需注意老公健康與感情溝通</li>
+    </ul>
+    <p class="pillar"><b>年柱</b>：家教嚴（好）、小時候愛唸書、考運好、家教方式是愛和關懷、異性緣好、家境也好、較會早婚、早出名。<br>
+    <b>月柱</b>：別人心目中的好朋友（長官）、出社會有名聲地位、少年得志、很年輕就有名聲賺到錢。<br>
+    <b>時柱</b>：晚年較有地位、小孩很乖都是好帶的乖小孩；身弱則晚年壓力大。</p>
+  </div></details>
+
+  <details><summary>偏官（七殺）【果斷】權勢之星</summary><div class="body">
+    <p><b>象徵：</b>果斷、權勢、魄力、專制霸道。</p>
+    <ul>
+      <li>見義勇為、抑強扶弱；善於策劃、有優秀之直覺判斷能力</li>
+      <li>領導權威、部屬與晚輩較敬畏</li>
+      <li>爭強好勝、常孤軍奮戰、事倍功半極為疲憊</li>
+      <li>果斷公私分明、競爭時剛烈、易有小人與敵對出現</li>
+      <li>敢愛敢恨、阿莎力、凶悍氣勢；公關能力強、口才好、對事積極能幹、負責任</li>
+      <li>帶偏官者自己壓力都很大、都有強烈的責任感</li>
+      <li>女生殺多身弱者、感情較有困擾；逢殺被合、沖之年注意災難與健康</li>
+    </ul>
+    <p class="pillar"><b>年柱</b>：喜歡爬上爬下、身上容易有疤痕；代長男／長女之職機率高、朋友稀少易受排斥；家教嚴、管教方式是打罵、小時身體不好、是孩子王。<br>
+    <b>月柱</b>：敢愛敢恨型、行事不畏強權、名聲地位彰顯、易受上司重用、有風險意識、不拔之毅力。<br>
+    <b>日柱</b>：配偶多半剛烈性格、善外交、性格急躁。<br>
+    <b>時柱</b>：常為子女煩惱、事業壓力大、自我要求過高、晚年容易有開刀之相。</p>
+  </div></details>
+
+  <details><summary>正印【貴人】慈愛・榮譽之星</summary><div class="body">
+    <p><b>象徵：</b>母親、貴人、觀念、慈心、固執。</p>
+    <ul>
+      <li>氣質優雅、寬容善良、易得名聲與權貴</li>
+      <li>常有貴人相助、享現成之福氣</li>
+      <li>過度重視精神生活、而有自命清高之情況</li>
+      <li>雖有先知先覺之智慧、但容易脫離現實不切實際</li>
+      <li>富同情心、仁厚、主觀性強、適合當教育者；所住之地以安靜居多</li>
+      <li>主觀意識很強、被騙也很多，但只要說得有理、會聽下去</li>
+      <li>流年走印：文書、調動之事多加留意；身弱印被合、貴人不現</li>
+    </ul>
+    <p class="pillar"><b>年柱</b>：祖德很好、重視母親、易接觸宗教；容易得到長輩的提拔與疼惜升遷。<br>
+    <b>月柱</b>：具慈善與照料他人之心、易自己接觸宗教；身弱：貴人星顯著｜身強：較為自我固執、易被朋友小人扯後腿。<br>
+    <b>日柱</b>：配偶較為斯文、為人厚道、較自身年紀大；個性穩重踏實、能夠受呵護。<br>
+    <b>時柱</b>：晚年易接觸宗教、喜歡安靜、越老越固執；事業身強：易遇小人｜身弱：易遇貴人。</p>
+  </div></details>
+
+  <details><summary>偏印【創造】孤獨之星</summary><div class="body">
+    <p><b>象徵：</b>貴人、思想、主觀、標新立異、頑固、同中求異。</p>
+    <ul>
+      <li>善靈機應變、企劃、創造、設計力強</li>
+      <li>思想獨樹一格、具有獨特之見解</li>
+      <li>內向多疑、不喜參加社交活動、三心二意</li>
+      <li>厭惡世俗、喜走捷徑、標新立異、愛好革新、好辯</li>
+      <li>反應靈敏、領悟獨特、多疑（疑神疑鬼）、往往不接受別人的見解；孤獨、神秘</li>
+      <li>※ 梟印奪食：偏印沖食神，才華財源易被斷，注意健康與生命安全（參見食神）</li>
+    </ul>
+    <p class="pillar"><b>年柱</b>：易出生於單親或是父親較不照顧家庭；不好帶、容易給神明當義子。<br>
+    <b>月柱</b>：獨來獨往、學習力強、反傳統思維；易得異性長輩之助、心思敏捷。<br>
+    <b>日柱</b>：婚後較為配偶掌權、對配偶較為依賴。<br>
+    <b>時柱</b>：容易犯小人、晚年容易孤單；對任何工作適應力強。</p>
+  </div></details>
+</section>
+
+<!-- ===== 五行速查 ===== -->
+<section id="lookup">
+  <h2><span class="stamp">查</span>五行十神速查表</h2>
+  <div class="card">
+    <p class="note">以日主五行查對應事項的五行（分男女）。</p>
+    <div class="tblwrap">
+    <table>
+      <tr><th rowspan="2">日主</th><th colspan="2">財運</th><th colspan="2">貴人</th><th colspan="2">人脈</th><th colspan="2">桃花</th><th colspan="2">名聲地位</th><th colspan="2">考運<br>(當天)</th><th colspan="2">學習<br>(考試前)</th><th colspan="2">小孩</th></tr>
+      <tr><th>男</th><th>女</th><th>男</th><th>女</th><th>男</th><th>女</th><th>男</th><th>女</th><th>男</th><th>女</th><th>男</th><th>女</th><th>男</th><th>女</th><th>男</th><th>女</th></tr>
+      <tr><td class="e-wood">木</td><td>土</td><td>土</td><td>水</td><td>水</td><td>木</td><td>木</td><td>土</td><td>金</td><td>金</td><td>金</td><td>金</td><td>金</td><td>火</td><td>火</td><td>金</td><td>火</td></tr>
+      <tr><td class="e-fire">火</td><td>金</td><td>金</td><td>木</td><td>木</td><td>火</td><td>火</td><td>金</td><td>水</td><td>水</td><td>水</td><td>水</td><td>水</td><td>土</td><td>土</td><td>水</td><td>土</td></tr>
+      <tr><td class="e-earth">土</td><td>水</td><td>水</td><td>火</td><td>火</td><td>土</td><td>土</td><td>水</td><td>木</td><td>木</td><td>木</td><td>木</td><td>木</td><td>金</td><td>金</td><td>木</td><td>金</td></tr>
+      <tr><td class="e-metal">金</td><td>木</td><td>木</td><td>土</td><td>土</td><td>金</td><td>金</td><td>木</td><td>火</td><td>火</td><td>火</td><td>火</td><td>火</td><td>水</td><td>水</td><td>火</td><td>水</td></tr>
+      <tr><td class="e-water">水</td><td>火</td><td>火</td><td>金</td><td>金</td><td>水</td><td>水</td><td>火</td><td>土</td><td>土</td><td>土</td><td>土</td><td>土</td><td>木</td><td>木</td><td>土</td><td>木</td></tr>
+    </table>
+    </div>
+    <h3>對應邏輯</h3>
+    <div class="tblwrap">
+    <table>
+      <tr><th>事項</th><th>對應十神</th></tr>
+      <tr><td>財運</td><td>我剋（財才）</td></tr>
+      <tr><td>貴人</td><td>生我（印）</td></tr>
+      <tr><td>人脈</td><td>同我（比劫）</td></tr>
+      <tr><td>桃花</td><td>男＝財（我剋）｜女＝官（剋我）</td></tr>
+      <tr><td>名聲地位・考運</td><td>剋我（官殺）</td></tr>
+      <tr><td>學習</td><td>我生（傷食）</td></tr>
+      <tr><td>小孩</td><td>男＝官殺（剋我）｜女＝傷食（我生）</td></tr>
+    </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 賦文名句 ===== -->
+<section id="fu">
+  <h2><span class="stamp">賦</span>八字賦文名句選</h2>
+  <p class="note" style="margin-bottom:10px;">選錄歷代命學典籍中與本課程直接對應的名句，每段附白話與收錄理由。完整原典請查學苑古籍庫。</p>
+
+  <details><summary>《繼善篇》——論月令與日主</summary><div class="body">
+    <p class="poem" style="text-align:left;">「欲知貴賤，先觀月令乃提綱；<br>次斷吉凶，專用日干為主本。」</p>
+    <p><b>白話：</b>看一張命盤，先看月支（月令）定格局高低，再以日主天干為中心論吉凶。</p>
+    <p class="note"><b>為什麼放這個：</b>這句就是「人生棋盤」的原典依據——為什麼月柱地支是內在個性、日主是本人，古人一句話講完。教棋盤時引用，學生馬上懂宮位不是隨便定的。</p>
+  </div></details>
+
+  <details><summary>《滴天髓》——論陽干陰干</summary><div class="body">
+    <p class="poem" style="text-align:left;">「五陽從氣不從勢，五陰從勢無情義。」</p>
+    <p><b>白話：</b>五個陽干（甲丙戊庚壬）重氣節、不輕易屈服環境；五個陰干（乙丁己辛癸）能屈能伸、順勢而為。</p>
+    <p class="note"><b>為什麼放這個：</b>直接對應十天干個性——甲木不低頭認錯、乙木依附而生、壬水勇於挑戰、癸水善忍耐算計，全部收在這一句裡。教完十干個性用它做總結最有力。</p>
+  </div></details>
+
+  <details><summary>《滴天髓》——論十天干（全）</summary><div class="body">
+    <p><span class="e-wood"><b>甲木</b></span>：「甲木參天，脫胎要火。春不容金，秋不容土。火熾乘龍，水宕騎虎。地潤天和，植立千古。」<br><span class="note">參天大樹要靠火發揮——對應甲木要有舞台、學專業才有錢。</span></p>
+    <p><span class="e-wood"><b>乙木</b></span>：「乙木雖柔，刲羊解牛。懷丁抱丙，跨鳳乘猴。虛濕之地，騎馬亦憂。藤蘿繫甲，可春可秋。」<br><span class="note">「藤蘿繫甲」——乙木攀附甲木而生，就是課堂講的依附別人、跟對人會成功。</span></p>
+    <p><span class="e-fire"><b>丙火</b></span>：「丙火猛烈，欺霜侮雪。能煅庚金，逢辛反怯。土眾成慈，水猖顯節。虎馬犬鄉，甲來成滅。」<br><span class="note">太陽猛烈普照——對應丙火熱情大愛、不分好壞人。</span></p>
+    <p><span class="e-fire"><b>丁火</b></span>：「丁火柔中，內性昭融。抱乙而孝，合壬而忠。旺而不烈，衰而不窮。如有嫡母，可秋可冬。」<br><span class="note">燭火柔和內斂、照亮別人——對應丁火外冷內熱、只對自己人付出。</span></p>
+    <p><span class="e-earth"><b>戊土</b></span>：「戊土固重，既中且正。靜翕動闢，萬物司命。水潤物生，火燥物病。若在艮坤，怕沖宜靜。」<br><span class="note">高山厚重中正、承載萬物——對應戊土穩健給人安全感、堅持己見。</span></p>
+    <p><span class="e-earth"><b>己土</b></span>：「己土卑濕，中正蓄藏。不愁木盛，不畏水狂。火少火晦，金多金光。若要物旺，宜助宜幫。」<br><span class="note">田園之土能蓄養萬物，但「宜助宜幫」——對應己土需要被鼓勵、被磨練。</span></p>
+    <p><span class="e-metal"><b>庚金</b></span>：「庚金帶煞，剛健為最。得水而清，得火而銳。土潤則生，土乾則脆。能贏甲兄，輸於乙妹。」<br><span class="note">大刀剛健、得火而銳——對應庚金直來直往、要磨練專業才成器；「輸於乙妹」＝乙庚合，剛者反被柔者收服。</span></p>
+    <p><span class="e-metal"><b>辛金</b></span>：「辛金軟弱，溫潤而清。畏土之疊，樂水之盈。能扶社稷，能救生靈。熱則喜母，寒則喜丁。」<br><span class="note">珠玉小刀溫潤秀氣——對應辛金有氣質、敏感、重視外表。</span></p>
+    <p><span class="e-water"><b>壬水</b></span>：「壬水通河，能洩金氣。剛中之德，周流不滯。通根透癸，沖天奔地。化則有情，從則相濟。」<br><span class="note">江河大海奔流不息、「沖天奔地」——對應壬水野心大、匯聚力強、十天後的大海嘯。</span></p>
+    <p><span class="e-water"><b>癸水</b></span>：「癸水至弱，達於天津。得龍而運，功化斯神。不愁火土，不論庚辛。合戊見火，化象斯真。」<br><span class="note">雨露之水至柔卻無所不達——對應癸水滴水穿石、善忍耐、適應環境。</span></p>
+    <p class="note"><b>為什麼放這個：</b>十天干個性講義（大樹、小草、太陽⋯）全部源自這十段原文。每教一個天干配一段原典，學生知道比喻不是編的；也是進階班讀《滴天髓》的完整入口。</p>
+  </div></details>
+
+  <details><summary>《滴天髓》——論旺衰</summary><div class="body">
+    <p class="poem" style="text-align:left;">「能知衰旺之真機，其於三命之奧，思過半矣。」</p>
+    <p><b>白話：</b>能真正掌握日主旺衰（身強身弱）的判斷，八字的奧妙就懂了一大半。</p>
+    <p class="note"><b>為什麼放這個：</b>十神個論裡到處在講「身強／身弱」，這句點出為什麼旺衰判斷是核心功。放在這裡當引子，銜接之後要補的「身強身弱判斷法」章節。</p>
+  </div></details>
+
+  <details><summary>《四言獨步》——論用神</summary><div class="body">
+    <p class="poem" style="text-align:left;">「用神不可損傷，日主最宜健旺。」</p>
+    <p><b>白話：</b>命局的用神（關鍵五行）不能被沖剋損傷，日主以健旺有力為佳。</p>
+    <p class="note"><b>為什麼放這個：</b>一句話講完「喜用神」的核心邏輯。學生問「為什麼缺的五行要補、忌的要避」，答案的原理就在這句——也是刑沖合害章節為什麼重要的理由。</p>
+  </div></details>
+
+  <details><summary>《淵海子平》——論四柱根苗花果</summary><div class="body">
+    <p class="poem" style="text-align:left;">「以年為根，月為苗，日為花，時為果。」</p>
+    <p><b>白話：</b>年柱是根（祖上、童年）、月柱是苗（成長、求學）、日柱是花（本人、婚姻）、時柱是果（晚年、子女成就）。</p>
+    <p class="note"><b>為什麼放這個：</b>人生棋盤最下面那列「根、苗、花、果」的直接出處。子平法以日主為中心的四柱架構就是從《淵海子平》定下來的，這句是整套宮位系統的源頭。</p>
+  </div></details>
+
+  <details><summary>《窮通寶鑑》——論調候（十天干）</summary><div class="body">
+    <p class="poem" style="text-align:left;">「正月甲木，初春尚有餘寒，得丙癸透，富貴雙全。<br>癸藏丙透，名寒木向陽。」</p>
+    <p><b>白話：</b>《窮通寶鑑》整部書照「日主×月份」講調候——同一個日主，生在不同季節需要的五行完全不同。以正月甲木為例：初春還帶寒氣，要丙火（太陽）來暖、癸水來潤才能生長，先取暖再談其他。</p>
+    <p><b>十天干調候要點（依季節）：</b></p>
+    <p><span class="e-wood"><b>甲木</b></span>：春需丙火暖（寒木向陽），暖後用癸水滋潤；夏火炎以癸水為先；秋金旺用丁火制金；冬寒木以丙火為先。</p>
+    <p><span class="e-wood"><b>乙木</b></span>：「生於春如桃李、夏如禾稼、秋如桐桂、冬如奇葩」——花草之木四季離不開丙火照暖、癸水滋潤。</p>
+    <p><span class="e-fire"><b>丙火</b></span>：太陽之火以壬水為尊（江暉相映），庚金佐之發水源；冬春火氣未盛，兼取甲木生扶。</p>
+    <p><span class="e-fire"><b>丁火</b></span>：燈燭之火以甲木為母、庚金劈甲引丁——「非庚不能劈甲，何以引丁」；夏月炎烈兼取壬癸。</p>
+    <p><span class="e-earth"><b>戊土</b></span>：「無丙照暖，戊土不生；無甲疏劈，戊土不靈；無癸滋潤，萬物不長」——丙、甲、癸三者按季節調配。</p>
+    <p><span class="e-earth"><b>己土</b></span>：田園之土，四季皆喜丙火照暖、癸水滋潤，佐甲木疏土，田園得暖得水方能生萬物。</p>
+    <p><span class="e-metal"><b>庚金</b></span>：頑鐵以丁火煆煉為貴、甲木引丁；秋月剛銳專用丁火；冬月金寒水冷，喜丙丁並暖。</p>
+    <p><span class="e-metal"><b>辛金</b></span>：珠玉之金專喜壬水淘洗顯其秀氣（金白水清）；冬月金寒兼取丙火暖之。</p>
+    <p><span class="e-water"><b>壬水</b></span>：江河之水以庚金為源、戊土為堤；夏月水弱取庚辛發源；冬月水旺用戊土制、丙火暖。</p>
+    <p><span class="e-water"><b>癸水</b></span>：雨露之水至柔，先用辛金發其源；夏月火土燥烈兼取庚辛；冬月寒凍喜丙火照暖。</p>
+    <p class="note">以上為各干調候大要，逐月細節與原文以古籍收錄版本為準。</p>
+    <p class="note"><b>為什麼放這個：</b>調候是「缺五行解讀」的進階版——缺火不只是缺熱情，冬天生的木缺火是連生存都困難。十天干各自的調候要點，就是教喜用神、開運補氣時的依據。</p>
+  </div></details>
+
+  <details><summary>《心命歌》——論心與命</summary><div class="body">
+    <p class="poem" style="text-align:left;">「心好命又好，發達榮華早。<br>心好命不好，一生也溫飽。<br>命好心不好，前程恐難保。<br>心命俱不好，窮苦直到老。」</p>
+    <p><b>白話：</b>心地與命格互為表裡——命再好，心術不正也難保前程；命普通，心正行善一樣衣食無虞。</p>
+    <p class="note"><b>為什麼放這個：</b>對應學苑論命守則的精神——命理是引導人向善的工具，不是宿命論。學生或客人問「命不好是不是就完了」，用這首回答，也提醒論命者自己守德。</p>
+  </div></details>
+</section>
+
+<!-- ===== 百孝經 ===== -->
+<section id="filial">
+  <h2><span class="stamp">孝</span>百孝經</h2>
+  <details><summary>展開全文</summary><div class="body poem">
+    天地重孝孝當先　一個孝字全家安　孝順能生孝順子　孝順子弟必明賢<br>
+    孝是人道第一步　孝子謝世即為仙　自古忠臣多孝子　君選賢臣舉孝廉<br>
+    盡心竭力孝父母　孝道不獨講吃穿　孝道貴在心中孝　孝親親責莫回言<br>
+    惜乎人間不識孝　回心復孝天理還　諸事不順因不孝　怎知孝能感動天<br>
+    孝道貴順無他妙　孝順不分女共男　福祿皆由孝字得　天將孝子另眼觀<br>
+    人人都可孝父母　孝敬父母如敬天　孝子口裡有孝語　孝婦面上帶孝顏<br>
+    公婆上邊能盡孝　又落孝來又落賢　女得淑名先學孝　三從四德孝在前<br>
+    孝在鄉黨人欽敬　孝在家中大小歡　孝子逢人就勸孝　孝化風俗人品端<br>
+    生前孝子聲價貴　死後孝子萬古傳　處世惟有孝力大　孝能感動地合天<br>
+    孝經孝文把孝勸　孝父孝母孝祖先　父母生子原為孝　能孝就是好兒男<br>
+    為人能把父母孝　下輩孝子照樣還　堂上父母不知孝　不孝受窮莫怨天<br>
+    孝子面帶太和象　入孝出悌自然安　親在應孝不知孝　親死知孝後悔難<br>
+    孝在心孝不在貌　孝貴實行不在言　孝子齊家全家樂　孝子治國萬民安<br>
+    五穀豐登皆因孝　一孝即是太平年　能孝不在貧和富　善體親心是孝男<br>
+    兄弟和睦即為孝　忍讓二字把孝全　孝從難處見真孝　孝容滿面承親顏<br>
+    父母雙全正宜孝　孝思鰥寡親影單　趕緊孝來光陰快　親由我孝壽由天<br>
+    生前能孝方為孝　死後盡孝徒枉然　孝順傳家孝是寶　孝性溫和孝味甘<br>
+    羊羔跪乳尚知孝　烏鴉反哺孝親顏　為人若是不知孝　不如禽獸實可憐<br>
+    百行萬善孝為首　當知孝字是根源　念佛行善也是孝　孝仗佛力超九天<br>
+    大哉孝乎大哉孝　孝矣無窮孝無邊　此篇句句不離孝　離孝人倫顛倒顛<br>
+    念得十遍千個孝　念得百遍萬孝全　千遍萬遍常常念　消災免難百孝篇
+  </div></details>
+</section>
+
+</main>
+
+<footer>神奇身心靈學苑 · 八字命理速查 · 內部教學使用</footer>
+
+<script>
+function setTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  document.documentElement.style.colorScheme = (t === 'light') ? 'light' : 'dark';
+  ['Dark','Light','Large'].forEach(function(n){
+    document.getElementById('btn'+n).classList.toggle('on', n.toLowerCase() === t);
+  });
+  try{ localStorage.setItem('bazi-theme', t); }catch(e){}
+}
+try{
+  var saved = localStorage.getItem('bazi-theme');
+  if(saved){ setTheme(saved); }
+}catch(e){}
+// ===== 分類主選單 =====
+var CATS = {
+  base:   {name:'基礎入門', secs:['rules','board','basic','cycle','hour']},
+  stem:   {name:'十天干',   secs:['stems','health']},
+  branch: {name:'十二地支', secs:['branches','mhk','clash','hehun']},
+  adv:    {name:'干支進階速查', secs:['hiddenstem','nayin','changsheng','kongwang','pattern']},
+  god:    {name:'十神',     secs:['gods','lookup']},
+  appx:   {name:'附錄',     secs:['fu','filial']}
+};
+var allSecs = [];
+Object.keys(CATS).forEach(function(k){ allSecs = allSecs.concat(CATS[k].secs); });
+
+function hideAllSecs(){
+  allSecs.forEach(function(id){
+    var s = document.getElementById(id);
+    if(s){ s.classList.add('hidden'); }
+  });
+}
+function openCat(key){
+  var cat = CATS[key];
+  if(!cat){ return; }
+  hideAllSecs();
+  var main = document.querySelector('main');
+  cat.secs.forEach(function(id){
+    var s = document.getElementById(id);
+    if(s){ s.classList.remove('hidden'); main.appendChild(s); }
+  });
+  document.getElementById('home').style.display = 'none';
+  document.getElementById('backbar').style.display = 'flex';
+  document.getElementById('cattitle').textContent = cat.name;
+  // 子導覽
+  var sub = document.getElementById('subnav');
+  sub.innerHTML = '';
+  if(cat.secs.length > 1){
+    cat.secs.forEach(function(id){
+      var s = document.getElementById(id);
+      if(!s){ return; }
+      var h = s.querySelector('h2');
+      var label = h ? h.textContent.replace(/^./,'') : id;
+      var b = document.createElement('button');
+      b.textContent = label;
+      b.onclick = function(){ s.scrollIntoView({behavior:'smooth'}); };
+      sub.appendChild(b);
+    });
+    sub.style.display = 'flex';
+  }else{
+    sub.style.display = 'none';
+  }
+  window.scrollTo(0, 0);
+}
+function goHome(){
+  hideAllSecs();
+  document.getElementById('home').style.display = 'grid';
+  document.getElementById('backbar').style.display = 'none';
+  document.getElementById('subnav').style.display = 'none';
+  window.scrollTo(0, 0);
+}
+hideAllSecs();
+
+// ===== 合婚合盤 =====
+var BR = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+var LIUHE = {'子丑':1,'寅亥':1,'卯戌':1,'辰酉':1,'巳申':1,'午未':1};
+var SANHE = [['申','子','辰'],['亥','卯','未'],['寅','午','戌'],['巳','酉','丑']];
+var CHONG = {'子午':1,'丑未':1,'寅申':1,'卯酉':1,'辰戌':1,'巳亥':1};
+var HAI = {'子未':1,'丑午':1,'寅巳':1,'卯辰':1,'申亥':1,'酉戌':1};
+function hhRel(a, b){
+  if(a === b){ return '同'; }
+  var k1 = a+b, k2 = b+a;
+  if(LIUHE[k1] || LIUHE[k2]){ return '合'; }
+  for(var i=0;i<4;i++){ if(SANHE[i].indexOf(a)>-1 && SANHE[i].indexOf(b)>-1){ return '合'; } }
+  if(CHONG[k1] || CHONG[k2]){ return '沖'; }
+  if(HAI[k1] || HAI[k2]){ return '害'; }
+  return '無';
+}
+var HHTEXT = {
+  '年':{'合':'雙方家長會互相走動、往來','沖':'雙方家庭背景不同','害':'雙方家長互不往來','同':'家庭背景一致','無':'雙方家長互不往來'},
+  '月':{'合':'心心相印、好溝通、能達到共識','沖':'互動多且刺激，但容易爭吵、意見多','害':'相敬如賓也易相敬如冰，彼此會藏秘密','同':'處世態度一致能協調，熟了卻沒刺激感','無':'沒有好壞之分'},
+  '日':{'合':'情被合住，性生活協調、圓滿','沖':'性生活刺激，但也容易會要求對方','害':'睡覺時間不同、同床機會不多，除非小別勝新婚','同':'性生活協調、美滿','無':'—'},
+  '時':{'合':'對孩子的管教觀念一致','沖':'教養觀念不同，會有意見','害':'教養觀念意見不一，甚至各用各的方法','同':'（課堂補充）','無':'—'}
+};
+var HHCROSS = {
+  '合':'比較會為對方著想，會尊重、會禮讓',
+  '沖':'會越看越討厭，而且意見很多、不相讓',
+  '害':'會越來越不溝通，無言相對',
+  '同':'處世頻率相同（課堂補充）','無':'—'
+};
+var HHCOLOR = {'合':'#b3382e','同':'#c9a15a','沖':'#5583c9','害':'#9aa0ab'};
+(function(){
+  for(var s=0;s<8;s++){
+    var sel = document.getElementById((s<4?'m':'f')+(s%4));
+    if(!sel){ continue; }
+    BR.forEach(function(b){
+      var o = document.createElement('option');
+      o.value = b; o.textContent = b;
+      sel.appendChild(o);
+    });
+  }
+})();
+function hhCalc(){
+  var m = [], f = [];
+  for(var i=0;i<4;i++){
+    m.push(document.getElementById('m'+i).value);
+    f.push(document.getElementById('f'+i).value);
+  }
+  var X = {0:315, 1:225, 2:135, 3:45};
+  var svg = '';
+  var labels = ['年','月','日','時'];
+  for(var i=0;i<4;i++){
+    svg += '<text x="'+X[i]+'" y="38" text-anchor="middle" font-size="22" fill="var(--tx)" font-weight="700">'+m[i]+'</text>';
+    svg += '<text x="'+X[i]+'" y="168" text-anchor="middle" font-size="22" fill="var(--tx)" font-weight="700">'+f[i]+'</text>';
+    svg += '<text x="'+X[i]+'" y="16" text-anchor="middle" font-size="10" fill="var(--tx2)">'+labels[i]+'柱</text>';
+  }
+  svg += '<text x="12" y="38" font-size="11" fill="var(--tx2)">男</text><text x="12" y="168" font-size="11" fill="var(--tx2)">女</text>';
+  var silk = 0, bad = 0, lines = [], results = [];
+  for(var i=0;i<4;i++){
+    var r = hhRel(m[i], f[i]);
+    results.push({name:labels[i]+'柱', rel:r, text:HHTEXT[labels[i]][r]});
+    if(r !== '無'){
+      lines.push({x1:X[i], y1:48, x2:X[i], y2:150, rel:r});
+      if(r==='合'||r==='同'){ silk++; }else{ bad++; }
+    }
+  }
+  var rc1 = hhRel(m[2], f[1]);
+  var rc2 = hhRel(m[1], f[2]);
+  results.push({name:'男→女（男日支×女月支）', rel:rc1, text:(rc1==='無'?'—':'男對女：'+HHCROSS[rc1])});
+  results.push({name:'女→男（女日支×男月支）', rel:rc2, text:(rc2==='無'?'—':'女對男：'+HHCROSS[rc2])});
+  if(rc1 !== '無'){ lines.push({x1:X[2], y1:48, x2:X[1], y2:150, rel:rc1, arrow:true}); if(rc1==='合'||rc1==='同'){silk++;}else{bad++;} }
+  if(rc2 !== '無'){ lines.push({x1:X[2], y1:150, x2:X[1], y2:48, rel:rc2, arrow:true}); if(rc2==='合'||rc2==='同'){silk++;}else{bad++;} }
+  var crossed = (rc1 !== '無' && rc2 !== '無');
+  lines.forEach(function(l){
+    svg += '<line x1="'+l.x1+'" y1="'+l.y1+'" x2="'+l.x2+'" y2="'+l.y2+'" stroke="'+HHCOLOR[l.rel]+'" stroke-width="2.5" stroke-linecap="round"'+(l.rel==='害'?' stroke-dasharray="5,5"':'')+' opacity=".85"/>';
+    if(l.arrow){
+      var ang = Math.atan2(l.y2-l.y1, l.x2-l.x1);
+      var ax = l.x2 - Math.cos(ang)*4, ay = l.y2 - Math.sin(ang)*4;
+      var s = 7;
+      var p1x = ax - Math.cos(ang-0.5)*s, p1y = ay - Math.sin(ang-0.5)*s;
+      var p2x = ax - Math.cos(ang+0.5)*s, p2y = ay - Math.sin(ang+0.5)*s;
+      svg += '<polygon points="'+ax+','+ay+' '+p1x+','+p1y+' '+p2x+','+p2y+'" fill="'+HHCOLOR[l.rel]+'" opacity=".85"/>';
+    }
+  });
+  document.getElementById('hhsvg').innerHTML = svg;
+  var html = '<div class="tblwrap"><table><tr><th>比對</th><th>關係</th><th>解讀</th></tr>';
+  results.forEach(function(r){
+    var c = HHCOLOR[r.rel] || 'var(--tx2)';
+    html += '<tr><td>'+r.name+'</td><td style="color:'+c+'; font-weight:700;">'+r.rel+'</td><td style="text-align:left;">'+(r.text||'—')+'</td></tr>';
+  });
+  html += '</table></div>';
+  html += '<p style="text-align:center; margin-top:8px;"><b>情絲：'+silk+' 條</b>（合＋同）'+(bad?'　沖害：'+bad+' 條':'')+'　｜　日月情絲'+(crossed?'<b style="color:var(--red);">有交叉</b>——雙方互動糾纏深':'<b>無交叉</b>')+'</p>';
+  document.getElementById('hhresult').innerHTML = html;
+}
+// ===== 水墨開場 =====
+document.body.style.overflow = 'hidden';
+
+// ---- WebGL 穩定流體（墨流し）----
+(function(){
+  var canvas = document.getElementById('fluid');
+  if(!canvas){ return; }
+  var gl = canvas.getContext('webgl2', {alpha:false, depth:false, stencil:false, antialias:false});
+  var isGL2 = !!gl;
+  if(!gl){ gl = canvas.getContext('webgl', {alpha:false, depth:false, stencil:false, antialias:false}); }
+  if(!gl){ canvas.style.display = 'none'; return; }
+  var halfExt = null, linearExt = null;
+  if(isGL2){
+    gl.getExtension('EXT_color_buffer_float');
+    linearExt = gl.getExtension('OES_texture_float_linear');
+  }else{
+    halfExt = gl.getExtension('OES_texture_half_float');
+    linearExt = gl.getExtension('OES_texture_half_float_linear');
+    if(!halfExt){ canvas.style.display = 'none'; return; }
+  }
+  var HALF = isGL2 ? gl.HALF_FLOAT : halfExt.HALF_FLOAT_OES;
+  var FILT = linearExt ? gl.LINEAR : gl.NEAREST;
+
+  function resize(){
+    canvas.width = Math.min(window.innerWidth, 1280) * (window.devicePixelRatio > 1 ? 1.5 : 1);
+    canvas.height = canvas.width * window.innerHeight / window.innerWidth;
+  }
+  resize();
+
+  var VERT = 'precision highp float;attribute vec2 aP;varying vec2 vUv;varying vec2 vL;varying vec2 vR;varying vec2 vT;varying vec2 vB;uniform vec2 texel;void main(){vUv=aP*.5+.5;vL=vUv-vec2(texel.x,0.);vR=vUv+vec2(texel.x,0.);vT=vUv+vec2(0.,texel.y);vB=vUv-vec2(0.,texel.y);gl_Position=vec4(aP,0.,1.);}';
+  function compile(type, src){
+    var s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+    return s;
+  }
+  function program(fsrc){
+    var p = gl.createProgram();
+    gl.attachShader(p, compile(gl.VERTEX_SHADER, VERT));
+    gl.attachShader(p, compile(gl.FRAGMENT_SHADER, fsrc));
+    gl.bindAttribLocation(p, 0, 'aP');
+    gl.linkProgram(p);
+    p.u = {};
+    var n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS);
+    for(var i=0;i<n;i++){ var u = gl.getActiveUniform(p, i); p.u[u.name] = gl.getUniformLocation(p, u.name); }
+    return p;
+  }
+  var pAdvect = program('precision highp float;varying vec2 vUv;uniform sampler2D uVel;uniform sampler2D uSrc;uniform vec2 texel;uniform float dt;uniform float diss;void main(){vec2 c=vUv-dt*texture2D(uVel,vUv).xy*texel;gl_FragColor=diss*texture2D(uSrc,c);}');
+  var pSplat = program('precision highp float;varying vec2 vUv;uniform sampler2D uT;uniform vec3 color;uniform vec2 point;uniform float radius;uniform float aspect;void main(){vec2 d=vUv-point;d.x*=aspect;vec3 s=exp(-dot(d,d)/radius)*color;gl_FragColor=vec4(texture2D(uT,vUv).xyz+s,1.);}');
+  var pCurl = program('precision highp float;varying vec2 vL;varying vec2 vR;varying vec2 vT;varying vec2 vB;uniform sampler2D uVel;void main(){float L=texture2D(uVel,vL).y;float R=texture2D(uVel,vR).y;float T=texture2D(uVel,vT).x;float B=texture2D(uVel,vB).x;gl_FragColor=vec4(.5*(R-L-T+B),0.,0.,1.);}');
+  var pVort = program('precision highp float;varying vec2 vUv;varying vec2 vL;varying vec2 vR;varying vec2 vT;varying vec2 vB;uniform sampler2D uVel;uniform sampler2D uCurl;uniform float curl;uniform float dt;void main(){float L=texture2D(uCurl,vL).x;float R=texture2D(uCurl,vR).x;float T=texture2D(uCurl,vT).x;float B=texture2D(uCurl,vB).x;float C=texture2D(uCurl,vUv).x;vec2 f=.5*vec2(abs(T)-abs(B),abs(R)-abs(L));f/=length(f)+1e-4;f*=curl*C;f.y*=-1.;vec2 v=texture2D(uVel,vUv).xy+f*dt;gl_FragColor=vec4(clamp(v,-1000.,1000.),0.,1.);}');
+  var pDiv = program('precision highp float;varying vec2 vL;varying vec2 vR;varying vec2 vT;varying vec2 vB;uniform sampler2D uVel;void main(){float L=texture2D(uVel,vL).x;float R=texture2D(uVel,vR).x;float T=texture2D(uVel,vT).y;float B=texture2D(uVel,vB).y;gl_FragColor=vec4(.5*(R-L+T-B),0.,0.,1.);}');
+  var pPress = program('precision highp float;varying vec2 vUv;varying vec2 vL;varying vec2 vR;varying vec2 vT;varying vec2 vB;uniform sampler2D uP;uniform sampler2D uDiv;void main(){float L=texture2D(uP,vL).x;float R=texture2D(uP,vR).x;float T=texture2D(uP,vT).x;float B=texture2D(uP,vB).x;float d=texture2D(uDiv,vUv).x;gl_FragColor=vec4((L+R+T+B-d)*.25,0.,0.,1.);}');
+  var pGrad = program('precision highp float;varying vec2 vUv;varying vec2 vL;varying vec2 vR;varying vec2 vT;varying vec2 vB;uniform sampler2D uP;uniform sampler2D uVel;void main(){float L=texture2D(uP,vL).x;float R=texture2D(uP,vR).x;float T=texture2D(uP,vT).x;float B=texture2D(uP,vB).x;vec2 v=texture2D(uVel,vUv).xy-vec2(R-L,T-B);gl_FragColor=vec4(v,0.,1.);}');
+  var pShow = program('precision highp float;varying vec2 vUv;uniform sampler2D uDye;uniform vec3 paper;uniform float mode;void main(){vec3 d=texture2D(uDye,vUv).rgb;vec3 c=mode>0.5?paper+d:paper-d;gl_FragColor=vec4(c,1.);}');
+
+  var quad = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(0);
+  gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+
+  function fbo(w, h, comps){
+    var ifmt, fmt;
+    if(isGL2){ ifmt = comps===2 ? gl.RG16F : (comps===1 ? gl.R16F : gl.RGBA16F); fmt = comps===2 ? gl.RG : (comps===1 ? gl.RED : gl.RGBA); }
+    else{ ifmt = gl.RGBA; fmt = gl.RGBA; }
+    var t = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, t);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, FILT);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, FILT);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texImage2D(gl.TEXTURE_2D, 0, ifmt, w, h, 0, fmt, HALF, null);
+    var f = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, f);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t, 0);
+    return {t:t, f:f, w:w, h:h, tx:1/w, ty:1/h};
+  }
+  function dfbo(w, h, c){ return {a:fbo(w,h,c), b:fbo(w,h,c), swap:function(){var t=this.a;this.a=this.b;this.b=t;}}; }
+
+  var SIM = 100, DYE = 440;
+  var ar = canvas.width / canvas.height;
+  var vel = dfbo(SIM, Math.round(SIM/ar)||SIM, 2);
+  var dye = dfbo(DYE, Math.round(DYE/ar)||DYE, 4);
+  var prs = dfbo(SIM, Math.round(SIM/ar)||SIM, 1);
+  var div = fbo(SIM, Math.round(SIM/ar)||SIM, 1);
+  var crl = fbo(SIM, Math.round(SIM/ar)||SIM, 1);
+
+  function bindTex(t, unit){ gl.activeTexture(gl.TEXTURE0+unit); gl.bindTexture(gl.TEXTURE_2D, t); return unit; }
+  function blit(target){
+    gl.bindFramebuffer(gl.FRAMEBUFFER, target ? target.f : null);
+    gl.viewport(0, 0, target ? target.w : canvas.width, target ? target.h : canvas.height);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
+
+  var isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+  var PAPER = isDark ? [0.098,0.106,0.118] : [0.961,0.945,0.902];
+  var COLORS = isDark
+    ? [[0.42,0.44,0.47],[0.5,0.1,0.07],[0.55,0.4,0.14]]
+    : [[0.62,0.6,0.58],[0.12,0.55,0.55],[0.14,0.3,0.56]];
+
+  function splat(x, y, dx, dy, color){
+    gl.useProgram(pSplat);
+    gl.uniform1i(pSplat.u.uT, bindTex(vel.a.t, 0));
+    gl.uniform1f(pSplat.u.aspect, ar);
+    gl.uniform2f(pSplat.u.point, x, y);
+    gl.uniform3f(pSplat.u.color, dx, dy, 0);
+    gl.uniform1f(pSplat.u.radius, 0.0016);
+    blit(vel.b); vel.swap();
+    gl.uniform1i(pSplat.u.uT, bindTex(dye.a.t, 0));
+    gl.uniform3f(pSplat.u.color, color[0]*0.22, color[1]*0.22, color[2]*0.22);
+    gl.uniform1f(pSplat.u.radius, 0.00045);
+    blit(dye.b); dye.swap();
+  }
+
+  var last = performance.now();
+  function step(){
+    var now = performance.now();
+    var dt = Math.min((now-last)/1000, 0.02); last = now;
+    gl.useProgram(pCurl);
+    gl.uniform2f(pCurl.u.texel, vel.a.tx, vel.a.ty);
+    gl.uniform1i(pCurl.u.uVel, bindTex(vel.a.t, 0));
+    blit(crl);
+    gl.useProgram(pVort);
+    gl.uniform2f(pVort.u.texel, vel.a.tx, vel.a.ty);
+    gl.uniform1i(pVort.u.uVel, bindTex(vel.a.t, 0));
+    gl.uniform1i(pVort.u.uCurl, bindTex(crl.t, 1));
+    gl.uniform1f(pVort.u.curl, 26);
+    gl.uniform1f(pVort.u.dt, dt);
+    blit(vel.b); vel.swap();
+    gl.useProgram(pDiv);
+    gl.uniform2f(pDiv.u.texel, vel.a.tx, vel.a.ty);
+    gl.uniform1i(pDiv.u.uVel, bindTex(vel.a.t, 0));
+    blit(div);
+    gl.useProgram(pPress);
+    gl.uniform2f(pPress.u.texel, prs.a.tx, prs.a.ty);
+    gl.uniform1i(pPress.u.uDiv, bindTex(div.t, 1));
+    for(var i=0;i<20;i++){
+      gl.uniform1i(pPress.u.uP, bindTex(prs.a.t, 0));
+      blit(prs.b); prs.swap();
+    }
+    gl.useProgram(pGrad);
+    gl.uniform2f(pGrad.u.texel, prs.a.tx, prs.a.ty);
+    gl.uniform1i(pGrad.u.uP, bindTex(prs.a.t, 0));
+    gl.uniform1i(pGrad.u.uVel, bindTex(vel.a.t, 1));
+    blit(vel.b); vel.swap();
+    gl.useProgram(pAdvect);
+    gl.uniform2f(pAdvect.u.texel, vel.a.tx, vel.a.ty);
+    gl.uniform1f(pAdvect.u.dt, dt);
+    gl.uniform1f(pAdvect.u.diss, 0.999);
+    gl.uniform1i(pAdvect.u.uVel, bindTex(vel.a.t, 0));
+    gl.uniform1i(pAdvect.u.uSrc, bindTex(vel.a.t, 0));
+    blit(vel.b); vel.swap();
+    gl.uniform1f(pAdvect.u.diss, 0.9985);
+    gl.uniform1i(pAdvect.u.uVel, bindTex(vel.a.t, 0));
+    gl.uniform1i(pAdvect.u.uSrc, bindTex(dye.a.t, 1));
+    blit(dye.b); dye.swap();
+    gl.useProgram(pShow);
+    gl.uniform1i(pShow.u.uDye, bindTex(dye.a.t, 0));
+    gl.uniform3f(pShow.u.paper, PAPER[0], PAPER[1], PAPER[2]);
+    gl.uniform1f(pShow.u.mode, isDark ? 1 : 0);
+    blit(null);
+  }
+
+  // ---- 三筆墨的編排：點、行筆、暈開 ----
+  var strokes = [
+    {c:0, t0:0.1,  t1:0.5, path:[[0.24,0.62],[0.35,0.72],[0.42,0.55],[0.33,0.40],[0.50,0.34],[0.62,0.42]]},
+    {c:1, t0:0.5,  t1:0.9, path:[[0.72,0.68],[0.62,0.76],[0.55,0.60],[0.66,0.47],[0.58,0.36],[0.44,0.40]]},
+    {c:2, t0:0.9,  t1:1.3, path:[[0.42,0.28],[0.52,0.22],[0.60,0.34],[0.52,0.48],[0.62,0.60],[0.74,0.55]]}
+  ];
+  function samplePath(p, t){
+    var seg = (p.length-1) * t, i = Math.min(Math.floor(seg), p.length-2), f = seg - i;
+    return [p[i][0] + (p[i+1][0]-p[i][0])*f, p[i][1] + (p[i+1][1]-p[i][1])*f];
+  }
+  var startT = performance.now();
+  var prev = {};
+  function choreo(){
+    var t = (performance.now()-startT)/1000;
+    strokes.forEach(function(s, idx){
+      if(t < s.t0 || t > s.t1){ return; }
+      var lt = (t-s.t0)/(s.t1-s.t0);
+      var pos = samplePath(s.path, lt);
+      var pp = prev[idx] || pos;
+      var dx = (pos[0]-pp[0])*3200, dy = (pos[1]-pp[1])*3200;
+      splat(pos[0], pos[1], dx, dy, COLORS[s.c]);
+      prev[idx] = pos;
+    });
+  }
+  // 手指/滑鼠劃過也能流墨
+  var pPrev = null;
+  function pointerMove(e){
+    var r = canvas.getBoundingClientRect();
+    var x = (e.clientX-r.left)/r.width, y = 1-(e.clientY-r.top)/r.height;
+    if(pPrev){
+      splat(x, y, (x-pPrev[0])*2600, (y-pPrev[1])*2600, COLORS[0]);
+    }
+    pPrev = [x, y];
+  }
+  canvas.addEventListener('pointermove', pointerMove);
+  canvas.addEventListener('pointerleave', function(){ pPrev = null; });
+
+  var running = true;
+  window.fluidStop = function(){ running = false; };
+  (function loop(){
+    if(!running){ return; }
+    choreo();
+    step();
+    requestAnimationFrame(loop);
+  })();
+})();
+
+function enterSite(e){
+  var sp = document.getElementById('splash');
+  if(!sp || sp.dataset.leaving){ return; }
+  sp.dataset.leaving = '1';
+  // 從點擊處（或畫面中央）炸開墨暈
+  var b = document.createElement('div');
+  b.id = 'burst';
+  b.style.left = (e && e.clientX ? e.clientX : window.innerWidth/2) + 'px';
+  b.style.top = (e && e.clientY ? e.clientY : window.innerHeight/2) + 'px';
+  document.body.appendChild(b);
+  requestAnimationFrame(function(){ b.classList.add('go'); });
+  setTimeout(function(){
+    sp.classList.add('gone');
+    document.body.style.overflow = '';
+  }, 500);
+  setTimeout(function(){
+    if(sp.parentNode){ sp.parentNode.removeChild(sp); }
+    if(b.parentNode){ b.parentNode.removeChild(b); }
+    if(window.fluidStop){ window.fluidStop(); }
+  }, 1600);
+}
+// 動畫播完自動進站（觸碰畫布可玩墨流）
+setTimeout(function(){ enterSite(null); }, 1800);
+</script>
+</body>
+</html>
