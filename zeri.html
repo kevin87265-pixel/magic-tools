@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#191b21">
+<title>通書擇日｜MIIRAGIC 內部工具</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#191b21; --panel:#20232c; --panel2:#262a34; --line:#333846;
+  --ink:#f0ece1; --ink2:#b9bcc6; --muted:#83879360;
+  --mutedtxt:#868b98;
+  --yi:#7cc394; --yi-bg:#1d3226; --ji:#e07358; --ji-bg:#361f1c;
+  --gold:#d4ac54; --gold-bg:#332b17;
+  --indigo:#7d9bd1; --indigo-bg:#1e2636;
+  --shadow:0 8px 30px rgba(0,0,0,.4);
+  --r:14px;
+  --fs:15px;
+}
+html{background:var(--bg);color-scheme:dark;}
+html[data-theme="light"]{
+  --bg:#efe9db; --panel:#faf6ec; --panel2:#f2ecdd; --line:#d8cfbb;
+  --ink:#2a2620; --ink2:#5a554b; --mutedtxt:#8a8474;
+  --yi:#2f7d4e; --yi-bg:#e2efe4; --ji:#b8442b; --ji-bg:#f3e3dd;
+  --gold:#9a7418; --gold-bg:#f0e6cd; --indigo:#3a5896; --indigo-bg:#e2e8f4;
+  --shadow:0 6px 24px rgba(80,60,30,.14);
+  color-scheme:light;
+}
+html[data-big="1"]{--fs:17px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:"Noto Sans TC",system-ui,sans-serif;
+  font-size:var(--fs);line-height:1.7;
+  -webkit-text-size-adjust:100%;
+  padding-bottom:60px;
+}
+.serif{font-family:"Noto Serif TC",serif;}
+.wrap{max-width:860px;margin:0 auto;padding:0 16px;}
+
+/* header */
+header{border-bottom:1px solid var(--line);padding:22px 0 16px;position:relative;}
+.brand{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;}
+.brand h1{font-family:"Noto Serif TC",serif;font-weight:900;font-size:1.7rem;letter-spacing:.08em;}
+.brand .sub{color:var(--mutedtxt);font-size:.82rem;letter-spacing:.04em;}
+.toggles{position:absolute;top:20px;right:16px;display:flex;gap:6px;}
+.tg{background:var(--panel);border:1px solid var(--line);color:var(--ink2);
+  border-radius:9px;padding:5px 11px;font-size:.78rem;cursor:pointer;font-family:inherit;}
+.tg:hover{border-color:var(--indigo);color:var(--ink);}
+.tg.on{background:var(--indigo-bg);border-color:var(--indigo);color:var(--indigo);}
+
+/* tabs */
+.tabs{display:flex;gap:4px;margin:18px 0 6px;border-bottom:1px solid var(--line);}
+.tab{flex:1;text-align:center;padding:11px 4px;cursor:pointer;color:var(--mutedtxt);
+  font-weight:500;font-size:.95rem;border-bottom:2px solid transparent;margin-bottom:-1px;
+  font-family:"Noto Serif TC",serif;letter-spacing:.06em;}
+.tab.on{color:var(--gold);border-bottom-color:var(--gold);}
+.tab:hover{color:var(--ink);}
+
+.panel{display:none;padding:18px 0 40px;}
+.panel.on{display:block;}
+
+/* controls */
+.ctl{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:6px;}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field label{font-size:.76rem;color:var(--mutedtxt);letter-spacing:.03em;}
+input,select{background:var(--panel);border:1px solid var(--line);color:var(--ink);
+  border-radius:10px;padding:9px 12px;font-family:inherit;font-size:.95rem;color-scheme:dark light;}
+input:focus,select:focus{outline:none;border-color:var(--indigo);}
+.btn{background:var(--gold-bg);border:1px solid var(--gold);color:var(--gold);
+  border-radius:10px;padding:9px 18px;font-family:"Noto Serif TC",serif;font-weight:700;
+  letter-spacing:.08em;cursor:pointer;font-size:.95rem;}
+.btn:hover{filter:brightness(1.15);}
+.btn.ghost{background:var(--panel);border-color:var(--line);color:var(--ink2);}
+.mini{font-size:.78rem;color:var(--mutedtxt);margin-top:4px;}
+
+/* date card (signature) */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:var(--shadow);overflow:hidden;margin-top:16px;}
+.cardhd{padding:16px 20px;border-bottom:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;}
+.gdate{font-family:"Noto Serif TC",serif;font-weight:700;font-size:1.15rem;}
+.gdate .wk{color:var(--mutedtxt);font-weight:400;font-size:.85rem;margin-left:8px;}
+.ldate{color:var(--gold);font-size:.9rem;margin-top:2px;font-family:"Noto Serif TC",serif;letter-spacing:.05em;}
+.ganzhi-line{font-family:"Noto Serif TC",serif;font-weight:700;font-size:1.15rem;color:var(--ink);letter-spacing:.06em;margin-top:4px;}
+.ganzhi-line b{color:var(--gold);font-weight:700;}
+.gzgrid{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid var(--line);}
+.gzcell{text-align:center;padding:18px 6px;border-left:1px solid var(--line);
+  font-family:"Noto Serif TC",serif;font-weight:900;font-size:1.85rem;letter-spacing:.08em;line-height:1.2;}
+.gzcell:first-child{border-left:none;}
+.gzcell .u{font-size:.72rem;font-weight:400;color:var(--mutedtxt);display:block;margin-bottom:4px;letter-spacing:.1em;}
+.gzcell.day{background:var(--gold-bg);color:var(--gold);}
+.gzcell.day .u{color:var(--gold);}
+@media(max-width:560px){.gzcell{font-size:1.5rem;padding:14px 4px;}}
+
+/* three pillars */
+.pillars{display:flex;gap:0;text-align:center;}
+.pil{flex:1;padding:16px 6px;border-right:1px solid var(--line);}
+.pil:last-child{border-right:none;}
+.pil .k{font-size:.72rem;color:var(--mutedtxt);letter-spacing:.1em;margin-bottom:6px;}
+.pil .gz{font-family:"Noto Serif TC",serif;font-weight:900;font-size:1.75rem;letter-spacing:.06em;line-height:1.15;}
+.pil .wx{font-size:.72rem;color:var(--ink2);margin-top:3px;}
+
+/* yi/ji columns */
+.yiji{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--line);}
+.yiji .col{padding:16px 20px;}
+.yiji .col.yi{background:var(--yi-bg);border-right:1px solid var(--line);}
+.yiji .col.ji{background:var(--ji-bg);}
+.yiji .lab{font-family:"Noto Serif TC",serif;font-weight:900;font-size:1.3rem;margin-bottom:8px;letter-spacing:.1em;}
+.yiji .yi .lab{color:var(--yi);} .yiji .ji .lab{color:var(--ji);}
+.yiji .items{display:flex;flex-wrap:wrap;gap:6px;}
+.chip{border-radius:8px;padding:4px 10px;font-size:.86rem;border:1px solid transparent;}
+.yi .chip{background:#0000;border-color:var(--yi);color:var(--yi);}
+.ji .chip{background:#0000;border-color:var(--ji);color:var(--ji);}
+.chip.star{font-weight:700;}
+.none{color:var(--mutedtxt);font-size:.86rem;}
+
+/* detail grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;
+  background:var(--line);border-top:1px solid var(--line);}
+.cell{background:var(--panel);padding:12px 16px;}
+.cell .k{font-size:.72rem;color:var(--mutedtxt);letter-spacing:.05em;margin-bottom:3px;}
+.cell .v{font-size:.95rem;font-family:"Noto Serif TC",serif;}
+.cell .v.g{color:var(--yi);} .cell .v.b{color:var(--ji);}
+
+/* shensha rows */
+.ss{padding:14px 20px;border-top:1px solid var(--line);}
+.ss .row{display:flex;gap:8px;align-items:baseline;margin-bottom:6px;flex-wrap:wrap;}
+.ss .row:last-child{margin-bottom:0;}
+.ss .tag{font-size:.74rem;font-family:"Noto Serif TC",serif;letter-spacing:.08em;min-width:44px;padding-top:1px;}
+.ss .tag.g{color:var(--gold);} .ss .tag.b{color:var(--ji);}
+.badge{font-size:.8rem;padding:2px 9px;border-radius:7px;border:1px solid var(--line);}
+.badge.g{background:var(--gold-bg);border-color:var(--gold);color:var(--gold);}
+.badge.b{background:var(--ji-bg);border-color:var(--ji);color:var(--ji);}
+
+/* 吉時 */
+.hours{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--line);border-top:1px solid var(--line);}
+.hr{background:var(--panel);padding:9px 4px;text-align:center;}
+.hr .z{font-family:"Noto Serif TC",serif;font-weight:700;}
+.hr .t{font-size:.64rem;color:var(--mutedtxt);}
+.hr .m{font-size:.68rem;margin-top:2px;}
+.hr.good{background:var(--yi-bg);} .hr.good .m{color:var(--yi);}
+.hr.bad .m{color:var(--ji);}
+
+/* 用事擇日 results */
+.results{margin-top:16px;display:flex;flex-direction:column;gap:8px;}
+.rrow{background:var(--panel);border:1px solid var(--line);border-radius:11px;
+  padding:12px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;flex-wrap:wrap;}
+.rrow:hover{border-color:var(--gold);}
+.rrow .rank{font-family:"Noto Serif TC",serif;font-weight:900;font-size:1.1rem;color:var(--gold);min-width:26px;}
+.rrow .rd{font-family:"Noto Serif TC",serif;font-weight:700;min-width:120px;}
+.rrow .rgz{color:var(--ink2);font-size:.85rem;min-width:120px;}
+.rrow .rv{margin-left:auto;font-family:"Noto Serif TC",serif;font-weight:700;letter-spacing:.06em;}
+.rv.vgood{color:var(--yi);} .rv.vok{color:var(--gold);} .rv.vbad{color:var(--ji);}
+.rrow .rnote{width:100%;font-size:.78rem;color:var(--mutedtxt);}
+
+.hint{background:var(--panel);border:1px dashed var(--line);border-radius:12px;
+  padding:14px 18px;color:var(--ink2);font-size:.88rem;margin-top:14px;line-height:1.75;}
+.hint b{color:var(--gold);font-weight:700;}
+.warn{color:var(--ji);}
+.foot{color:var(--mutedtxt);font-size:.76rem;text-align:center;padding:24px 0 8px;line-height:1.9;}
+
+/* 用事橫幅 */
+.catbanner{padding:10px 20px;border-top:1px solid var(--line);font-family:"Noto Serif TC",serif;font-size:1rem;letter-spacing:.04em;}
+.catbanner b{font-weight:900;font-size:1.15rem;}
+.catbanner.cbg-y{background:var(--yi-bg);color:var(--yi);}
+.catbanner.cbg-j{background:var(--ji-bg);color:var(--ji);}
+.catbanner.cbg-p{background:var(--panel2);color:var(--ink2);}
+
+/* 複製按鈕 */
+.copybtn{margin-top:8px;background:var(--indigo-bg);border:1px solid var(--indigo);color:var(--indigo);
+  border-radius:9px;padding:6px 14px;font-family:"Noto Serif TC",serif;font-weight:700;font-size:.82rem;
+  letter-spacing:.06em;cursor:pointer;}
+.copybtn:hover{filter:brightness(1.15);}
+.copybtn.copied{background:var(--yi-bg);border-color:var(--yi);color:var(--yi);}
+.rcopy{margin-left:8px;background:var(--indigo-bg);border:1px solid var(--indigo);color:var(--indigo);
+  border-radius:8px;padding:5px 11px;font-size:.78rem;font-family:"Noto Serif TC",serif;font-weight:700;cursor:pointer;}
+.rcopy:hover{filter:brightness(1.15);}
+.rcopy.copied{background:var(--yi-bg);border-color:var(--yi);color:var(--yi);}
+
+/* toast */
+#toast{position:fixed;left:50%;bottom:34px;transform:translateX(-50%) translateY(20px);
+  background:var(--indigo);color:#fff;padding:11px 22px;border-radius:24px;font-size:.9rem;font-weight:500;
+  box-shadow:0 8px 26px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:.25s;z-index:99;white-space:nowrap;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* 命盤（傳統排盤：由右到左、干上支下） */
+.chart{display:flex;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:4px 0 2px;}
+.chart .col{flex:1;text-align:center;padding:12px 4px;border-left:1px solid var(--line);display:flex;flex-direction:column;align-items:center;}
+.chart .col:first-child{border-left:none;}
+.chart .col.zhu{background:var(--gold-bg);}
+.chart .cl{font-size:.74rem;color:var(--mutedtxt);letter-spacing:.1em;height:18px;}
+.chart .col.zhu .cl{color:var(--gold);font-weight:700;}
+.chart .cmark{height:20px;margin:4px 0 2px;display:flex;align-items:center;}
+.chart .cyuan{font-size:.56rem;color:var(--gold);border:1px solid var(--gold);border-radius:4px;padding:0 4px;line-height:1.4;}
+.chart .cg,.chart .cz{font-family:"Noto Serif TC",serif;font-weight:900;font-size:2rem;line-height:1.28;}
+.chart .cn{font-size:.66rem;color:var(--mutedtxt);margin-top:8px;letter-spacing:.02em;}
+.chart .cs{font-size:.68rem;color:var(--indigo);margin-top:2px;}
+/* 五行配色（深淺兩色系皆可讀） */
+.wx-木{color:#3f9d57;} .wx-火{color:#d0533f;} .wx-土{color:#b07d34;} .wx-金{color:#c69a2e;} .wx-水{color:#3f7fc4;}
+
+/* 課單預覽視窗（可編輯） */
+.modal{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.62);overflow:auto;padding:18px 14px 40px;}
+.modal.open{display:block;}
+.modal-bar{position:sticky;top:0;z-index:2;max-width:210mm;margin:0 auto 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;
+  background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:10px 14px;box-shadow:0 6px 20px rgba(0,0,0,.3);flex-wrap:wrap;}
+.modal-bar .mtip{font-size:.78rem;color:var(--mutedtxt);}
+.modal-bar .mbtns{display:flex;gap:8px;}
+.mbtn{border-radius:9px;padding:7px 16px;font-family:"Noto Serif TC",serif;font-weight:700;font-size:.85rem;letter-spacing:.06em;cursor:pointer;border:1px solid;}
+.mbtn.pri{background:var(--gold-bg);border-color:var(--gold);color:var(--gold);}
+.mbtn.sec{background:var(--panel2);border-color:var(--line);color:var(--ink2);}
+.mbtn:hover{filter:brightness(1.15);}
+#sheet{display:block;background:#fff;max-width:210mm;margin:0 auto;box-shadow:0 12px 44px rgba(0,0,0,.4);}
+.sheet-inner[contenteditable]{outline:none;}
+.sheet-inner [contenteditable="true"]:focus{background:#fff7de;border-radius:3px;box-shadow:0 0 0 2px #e8cf7a;}
+.sh-edit{border-bottom:1px dashed #bbb;min-width:60px;display:inline-block;padding:0 4px;}
+
+/* 課單（列印用，固定白底黑字） */
+.sheet-inner{background:#fff;color:#1a1a1a;font-family:"Noto Serif TC",serif;padding:14mm 16mm;max-width:210mm;margin:0 auto;}
+.sh-h{text-align:center;border-bottom:2px solid #1a1a1a;padding-bottom:8px;margin-bottom:12px;}
+.sh-h .t{font-size:24px;font-weight:900;letter-spacing:.3em;}
+.sh-h .s{font-size:12px;color:#666;margin-top:3px;letter-spacing:.1em;}
+.sh-cat{text-align:center;font-size:18px;font-weight:700;margin:8px 0 12px;letter-spacing:.15em;}
+.sh-cat .v{padding:2px 12px;border:1.5px solid #1a1a1a;border-radius:4px;margin-left:8px;}
+.sh-row{display:flex;border-bottom:1px solid #ddd;padding:6px 2px;font-size:13.5px;}
+.sh-row .lk{width:92px;color:#666;flex-shrink:0;}
+.sh-row .lv{flex:1;font-weight:500;}
+.sh-pil{display:flex;text-align:center;margin:10px 0;border:1px solid #1a1a1a;}
+.sh-pil>div{flex:1;padding:9px 4px;border-right:1px solid #ccc;}
+.sh-pil>div:last-child{border-right:none;}
+.sh-pil .pk{font-size:11px;color:#666;}
+.sh-pil .pv{font-size:22px;font-weight:900;letter-spacing:.08em;margin:2px 0;}
+.sh-pil .pn{font-size:11px;color:#888;}
+.sh-yi{color:#0a6b3a;font-weight:700;}
+.sh-ji{color:#b02a15;font-weight:700;}
+.sh-good{color:#0a6b3a;font-weight:700;}
+.sh-ft{margin-top:24px;padding-top:12px;border-top:1px solid #ccc;display:flex;justify-content:space-between;font-size:12px;color:#666;}
+.printbtn{margin-top:8px;margin-left:8px;background:var(--gold-bg);border:1px solid var(--gold);color:var(--gold);
+  border-radius:9px;padding:6px 14px;font-family:"Noto Serif TC",serif;font-weight:700;font-size:.82rem;letter-spacing:.06em;cursor:pointer;}
+.printbtn:hover{filter:brightness(1.15);}
+
+@media print{
+  html,body{background:#fff !important;}
+  .wrap{display:none !important;}
+  .modal.open{position:static !important;background:#fff !important;padding:0 !important;overflow:visible !important;display:block !important;}
+  .modal:not(.open){display:none !important;}
+  .modal-bar{display:none !important;}
+  #sheet{box-shadow:none !important;}
+  #toast{display:none !important;}
+  @page{margin:0;size:A4;}
+}
+
+/* 造命 overlay */
+.overlay{border-top:1px solid var(--line);padding:14px 20px;background:var(--indigo-bg);}
+.overlay .ttl{font-family:"Noto Serif TC",serif;font-weight:700;color:var(--indigo);margin-bottom:8px;letter-spacing:.06em;}
+.omark{display:flex;gap:8px;align-items:baseline;margin-bottom:5px;font-size:.9rem;}
+.omark .dot{font-weight:700;}
+.omark .dot.g{color:var(--yi);} .omark .dot.b{color:var(--ji);} .omark .dot.n{color:var(--ink2);}
+@media(max-width:560px){
+  .pil .gz{font-size:1.5rem;}
+  .yiji{grid-template-columns:1fr;}
+  .yiji .col.yi{border-right:none;border-bottom:1px solid var(--line);}
+  .hours{grid-template-columns:repeat(4,1fr);}
+  .brand h1{font-size:1.4rem;}
+  .toggles{position:static;margin-top:10px;justify-content:flex-end;}
+
+  /* 控制列：輸入/選單填滿好點按 */
+  .ctl{gap:12px;}
+  .ctl .field{flex:1 1 100%;}
+  .ctl input,.ctl select{width:100%;padding:11px 12px;font-size:1rem;}
+  .ctl .btn{flex:1 1 auto;padding:11px 18px;}
+  /* 造命：年月日三下拉平均分配、時辰整寬 */
+  #p-ming .ctl .field:first-child > div{display:flex;}
+  #p-ming .ctl .field:first-child select{flex:1;min-width:0 !important;}
+  #p-ming #mingHour{width:100%;}
+  #p-ming .ctl .btn{flex:1 1 calc(50% - 5px);}
+
+  /* 用事擇日清單列：兩行乾淨排版 */
+  .rrow{gap:6px 10px;padding:12px 14px;}
+  .rrow .rank{order:1;}
+  .rrow .rd{order:2;min-width:auto;}
+  .rrow .rv{order:3;margin-left:auto;}
+  .rrow .rcopy{order:4;padding:6px 14px;}
+  .rrow .rgz{order:5;width:100%;min-width:auto;}
+  .rrow .rnote{order:6;}
+
+  /* 課單預覽：手機縮小內距，內容不擠 */
+  .sheet-inner{padding:20px 16px;}
+  .sh-h .t{font-size:21px;letter-spacing:.2em;}
+  .sh-pil .pv{font-size:20px;}
+  .sh-row{font-size:13px;}
+  .sh-row .lk{width:78px;}
+  .modal{padding:12px 8px 30px;}
+  .modal-bar{padding:9px 12px;}
+  .modal-bar .mtip{flex:1 1 100%;}
+  .modal-bar .mbtns{flex:1 1 100%;}
+  .modal-bar .mbtn{flex:1;}
+
+  /* 每日卡片：標頭鈕不擠 */
+  .cardhd{gap:8px;}
+  .copybtn,.printbtn{margin-top:6px;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand">
+    <h1>通書擇日</h1>
+    <span class="sub">MIIRAGIC 內部工具 · 依《協紀辨方書》建除神煞法 · 節氣精算 2020–2035</span>
+  </div>
+  <div class="toggles">
+    <button class="tg" id="tgTheme">亮</button>
+    <button class="tg" id="tgBig">大字</button>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="tab on" data-p="day">每日查詢</div>
+  <div class="tab" data-p="find">用事擇日</div>
+  <div class="tab" data-p="ming">造命對照</div>
+</nav>
+
+<!-- ===== 每日查詢 ===== -->
+<section class="panel on" id="p-day">
+  <div class="ctl">
+    <div class="field">
+      <label>選擇日期（國曆）</label>
+      <input type="date" id="dayDate">
+    </div>
+    <div class="field">
+      <label>要辦的事（複製時帶入）</label>
+      <select id="dayCat"></select>
+    </div>
+    <button class="btn" id="dayToday">今天</button>
+  </div>
+  <div id="dayOut"></div>
+</section>
+
+<!-- ===== 用事擇日 ===== -->
+<section class="panel" id="p-find">
+  <div class="ctl">
+    <div class="field">
+      <label>要辦的事</label>
+      <select id="findCat"></select>
+    </div>
+    <div class="field">
+      <label>起（國曆）</label>
+      <input type="date" id="findStart">
+    </div>
+    <div class="field">
+      <label>迄（國曆）</label>
+      <input type="date" id="findEnd">
+    </div>
+    <button class="btn" id="findGo">找吉日</button>
+  </div>
+  <div class="mini">結果依該用事之宜忌評分排序，自動避開歲破／月破／四廢／往亡等凶日。點任一列可看完整通書。</div>
+  <div id="findMing" class="mini"></div>
+  <div id="findOut" class="results"></div>
+</section>
+
+<!-- ===== 造命對照 ===== -->
+<section class="panel" id="p-ming">
+  <div class="hint">
+    <b>造命對照</b>只做<b>客觀標示</b>，不替你下判斷。輸入客人生辰後，系統會在每日查詢與用事擇日結果上疊加：是否沖客人生肖、天乙貴人／祿／驛馬是否到位、擇日日柱與客人日主的五行生剋、日支對客人的刑冲害。<span class="warn">用神取捨與最終定案，仍由老師決定。</span>
+  </div>
+  <div class="ctl" style="margin-top:14px;">
+    <div class="field">
+      <label>客人生日（國曆）</label>
+      <div style="display:flex;gap:6px;">
+        <select id="mingY" style="min-width:92px;"></select>
+        <select id="mingM" style="min-width:64px;"></select>
+        <select id="mingD" style="min-width:64px;"></select>
+      </div>
+    </div>
+    <div class="field">
+      <label>時辰（可留空）</label>
+      <select id="mingHour"></select>
+    </div>
+    <button class="btn" id="mingSet">設定客人</button>
+    <button class="btn ghost" id="mingClear">清除</button>
+  </div>
+  <div id="mingBazi"></div>
+</section>
+
+<div class="foot">
+  曆算引擎已對照權威黃曆（汉程）驗證：日干支、二十八宿、建除、黃黑道、農曆、節氣全數符合。<br>
+  宜忌採建除十二神為本、吉神凶煞為輔（協紀方法論）；各家通書取用略有出入，重大用事請對照慣用通書。<br>
+  © MIIRAGIC 神奇身心靈學苑 · 內部使用
+</div>
+</div>
+<div id="sheetModal" class="modal">
+  <div class="modal-bar">
+    <span class="mtip">課單預覽 · 可直接點文字修改（客戶姓名、備註、擇日人皆可編輯）</span>
+    <div class="mbtns">
+      <button class="mbtn pri" id="sheetPrint">列印 / 存 PDF</button>
+      <button class="mbtn sec" id="sheetClose">關閉</button>
+    </div>
+  </div>
+  <div id="sheet"></div>
+</div>
+<script>
+"use strict";
+const JQ={"1939":{"立春":"1939-02-05 01:10","雨水":"1939-02-19 21:09","驚蟄":"1939-03-06 19:26","春分":"1939-03-21 20:28","清明":"1939-04-06 00:37","穀雨":"1939-04-21 07:54","立夏":"1939-05-06 18:20","小滿":"1939-05-22 07:26","芒種":"1939-06-06 22:51","夏至":"1939-06-22 15:39","小暑":"1939-07-08 09:18","大暑":"1939-07-24 02:36","立秋":"1939-08-08 19:03","處暑":"1939-08-24 09:30","白露":"1939-09-08 21:41","秋分":"1939-09-24 06:49","寒露":"1939-10-09 12:56","霜降":"1939-10-24 15:45","立冬":"1939-11-08 15:43","小雪":"1939-11-23 12:58","大雪":"1939-12-08 08:16","冬至":"1939-12-23 02:05","小寒":"1939-01-06 13:27","大寒":"1939-01-21 06:50"},"1940":{"立春":"1940-02-05 07:07","雨水":"1940-02-20 03:03","驚蟄":"1940-03-06 01:23","春分":"1940-03-21 02:23","清明":"1940-04-05 06:34","穀雨":"1940-04-20 13:50","立夏":"1940-05-06 00:15","小滿":"1940-05-21 13:22","芒種":"1940-06-06 04:43","夏至":"1940-06-21 21:36","小暑":"1940-07-07 15:07","大暑":"1940-07-23 08:34","立秋":"1940-08-08 00:51","處暑":"1940-08-23 15:28","白露":"1940-09-08 03:29","秋分":"1940-09-23 12:45","寒露":"1940-10-08 18:42","霜降":"1940-10-23 21:39","立冬":"1940-11-07 21:26","小雪":"1940-11-22 18:48","大雪":"1940-12-07 13:58","冬至":"1940-12-22 07:54","小寒":"1940-01-06 19:23","大寒":"1940-01-21 12:43"},"1941":{"立春":"1941-02-04 12:50","雨水":"1941-02-19 08:56","驚蟄":"1941-03-06 07:10","春分":"1941-03-21 08:20","清明":"1941-04-05 12:25","穀雨":"1941-04-20 19:50","立夏":"1941-05-06 06:10","小滿":"1941-05-21 19:23","芒種":"1941-06-06 10:39","夏至":"1941-06-22 03:33","小暑":"1941-07-07 21:03","大暑":"1941-07-23 14:26","立秋":"1941-08-08 06:45","處暑":"1941-08-23 21:16","白露":"1941-09-08 09:23","秋分":"1941-09-23 18:32","寒露":"1941-10-09 00:38","霜降":"1941-10-24 03:27","立冬":"1941-11-08 03:23","小雪":"1941-11-23 00:38","大雪":"1941-12-07 19:56","冬至":"1941-12-22 13:44","小寒":"1941-01-06 01:04","大寒":"1941-01-20 18:33"},"1942":{"立春":"1942-02-04 18:48","雨水":"1942-02-19 14:46","驚蟄":"1942-03-06 13:08","春分":"1942-03-21 14:10","清明":"1942-04-05 18:23","穀雨":"1942-04-21 01:38","立夏":"1942-05-06 12:06","小滿":"1942-05-22 01:08","芒種":"1942-06-06 16:32","夏至":"1942-06-22 09:15","小暑":"1942-07-08 02:51","大暑":"1942-07-23 20:06","立秋":"1942-08-08 12:30","處暑":"1942-08-24 02:57","白露":"1942-09-08 15:06","秋分":"1942-09-24 00:16","寒露":"1942-10-09 06:22","霜降":"1942-10-24 09:15","立冬":"1942-11-08 09:11","小雪":"1942-11-23 06:30","大雪":"1942-12-08 01:46","冬至":"1942-12-22 19:39","小寒":"1942-01-06 07:02","大寒":"1942-01-21 00:23"},"1943":{"立春":"1943-02-05 00:40","雨水":"1943-02-19 20:40","驚蟄":"1943-03-06 18:58","春分":"1943-03-21 20:02","清明":"1943-04-06 00:11","穀雨":"1943-04-21 07:31","立夏":"1943-05-06 17:53","小滿":"1943-05-22 07:02","芒種":"1943-06-06 22:18","夏至":"1943-06-22 15:12","小暑":"1943-07-08 08:38","大暑":"1943-07-24 02:04","立秋":"1943-08-08 18:18","處暑":"1943-08-24 08:54","白露":"1943-09-08 20:54","秋分":"1943-09-24 06:11","寒露":"1943-10-09 12:10","霜降":"1943-10-24 15:08","立冬":"1943-11-08 14:58","小雪":"1943-11-23 12:21","大雪":"1943-12-08 07:33","冬至":"1943-12-23 01:29","小寒":"1943-01-06 12:54","大寒":"1943-01-21 06:18"},"1944":{"立春":"1944-02-05 06:22","雨水":"1944-02-20 02:26","驚蟄":"1944-03-06 00:40","春分":"1944-03-21 01:48","清明":"1944-04-05 05:53","穀雨":"1944-04-20 13:17","立夏":"1944-05-05 23:39","小滿":"1944-05-21 12:50","芒種":"1944-06-06 04:10","夏至":"1944-06-21 21:02","小暑":"1944-07-07 14:35","大暑":"1944-07-23 07:55","立秋":"1944-08-08 00:18","處暑":"1944-08-23 14:46","白露":"1944-09-08 02:55","秋分":"1944-09-23 12:01","寒露":"1944-10-08 18:08","霜降":"1944-10-23 20:56","立冬":"1944-11-07 20:54","小雪":"1944-11-22 18:07","大雪":"1944-12-07 13:27","冬至":"1944-12-22 07:15","小寒":"1944-01-06 18:39","大寒":"1944-01-21 12:07"},"1945":{"立春":"1945-02-04 12:19","雨水":"1945-02-19 08:15","驚蟄":"1945-03-06 06:38","春分":"1945-03-21 07:37","清明":"1945-04-05 11:52","穀雨":"1945-04-20 19:07","立夏":"1945-05-06 05:36","小滿":"1945-05-21 18:40","芒種":"1945-06-06 10:05","夏至":"1945-06-22 02:52","小暑":"1945-07-07 20:27","大暑":"1945-07-23 13:45","立秋":"1945-08-08 06:05","處暑":"1945-08-23 20:35","白露":"1945-09-08 08:38","秋分":"1945-09-23 17:49","寒露":"1945-10-08 23:48","霜降":"1945-10-24 02:43","立冬":"1945-11-08 02:34","小雪":"1945-11-22 23:55","大雪":"1945-12-07 19:07","冬至":"1945-12-22 13:03","小寒":"1945-01-06 00:34","大寒":"1945-01-20 17:53"},"1946":{"立春":"1946-02-04 18:03","雨水":"1946-02-19 14:08","驚蟄":"1946-03-06 12:24","春分":"1946-03-21 13:32","清明":"1946-04-05 17:38","穀雨":"1946-04-21 01:02","立夏":"1946-05-06 11:21","小滿":"1946-05-22 00:34","芒種":"1946-06-06 15:48","夏至":"1946-06-22 08:44","小暑":"1946-07-08 02:10","大暑":"1946-07-23 19:36","立秋":"1946-08-08 11:51","處暑":"1946-08-24 02:26","白露":"1946-09-08 14:27","秋分":"1946-09-23 23:40","寒露":"1946-10-09 05:40","霜降":"1946-10-24 08:34","立冬":"1946-11-08 08:27","小雪":"1946-11-23 05:46","大雪":"1946-12-08 00:59","冬至":"1946-12-22 18:53","小寒":"1946-01-06 06:16","大寒":"1946-01-20 23:44"},"1947":{"立春":"1947-02-04 23:50","雨水":"1947-02-19 19:52","驚蟄":"1947-03-06 18:08","春分":"1947-03-21 19:12","清明":"1947-04-05 23:20","穀雨":"1947-04-21 06:39","立夏":"1947-05-06 17:03","小滿":"1947-05-22 06:09","芒種":"1947-06-06 21:31","夏至":"1947-06-22 14:19","小暑":"1947-07-08 07:56","大暑":"1947-07-24 01:14","立秋":"1947-08-08 17:41","處暑":"1947-08-24 08:09","白露":"1947-09-08 20:21","秋分":"1947-09-24 05:28","寒露":"1947-10-09 11:37","霜降":"1947-10-24 14:25","立冬":"1947-11-08 14:24","小雪":"1947-11-23 11:37","大雪":"1947-12-08 06:56","冬至":"1947-12-23 00:42","小寒":"1947-01-06 12:06","大寒":"1947-01-21 05:31"},"1948":{"立春":"1948-02-05 05:42","雨水":"1948-02-20 01:36","驚蟄":"1948-03-05 23:57","春分":"1948-03-21 00:56","清明":"1948-04-05 05:09","穀雨":"1948-04-20 12:24","立夏":"1948-05-05 22:52","小滿":"1948-05-21 11:57","芒種":"1948-06-06 03:20","夏至":"1948-06-21 20:10","小暑":"1948-07-07 13:43","大暑":"1948-07-23 07:07","立秋":"1948-08-07 23:26","處暑":"1948-08-23 14:02","白露":"1948-09-08 02:05","秋分":"1948-09-23 11:21","寒露":"1948-10-08 17:20","霜降":"1948-10-23 20:17","立冬":"1948-11-07 20:06","小雪":"1948-11-22 17:28","大雪":"1948-12-07 12:37","冬至":"1948-12-22 06:33","小寒":"1948-01-06 18:00","大寒":"1948-01-21 11:18"},"1949":{"立春":"1949-02-04 11:23","雨水":"1949-02-19 07:27","驚蟄":"1949-03-06 05:39","春分":"1949-03-21 06:48","清明":"1949-04-05 10:51","穀雨":"1949-04-20 18:17","立夏":"1949-05-06 04:36","小滿":"1949-05-21 17:50","芒種":"1949-06-06 09:06","夏至":"1949-06-22 02:02","小暑":"1949-07-07 19:31","大暑":"1949-07-23 12:56","立秋":"1949-08-08 05:14","處暑":"1949-08-23 19:48","白露":"1949-09-08 07:54","秋分":"1949-09-23 17:05","寒露":"1949-10-08 23:10","霜降":"1949-10-24 02:02","立冬":"1949-11-08 01:59","小雪":"1949-11-22 23:16","大雪":"1949-12-07 18:33","冬至":"1949-12-22 12:23","小寒":"1949-01-05 23:41","大寒":"1949-01-20 17:08"},"1950":{"立春":"1950-02-04 17:20","雨水":"1950-02-19 13:17","驚蟄":"1950-03-06 11:35","春分":"1950-03-21 12:34","清明":"1950-04-05 16:44","穀雨":"1950-04-20 23:59","立夏":"1950-05-06 10:24","小滿":"1950-05-21 23:27","芒種":"1950-06-06 14:51","夏至":"1950-06-22 07:35","小暑":"1950-07-08 01:13","大暑":"1950-07-23 18:29","立秋":"1950-08-08 10:55","處暑":"1950-08-24 01:23","白露":"1950-09-08 13:33","秋分":"1950-09-23 22:43","寒露":"1950-10-09 04:51","霜降":"1950-10-24 07:44","立冬":"1950-11-08 07:43","小雪":"1950-11-23 05:02","大雪":"1950-12-08 00:21","冬至":"1950-12-22 18:13","小寒":"1950-01-06 05:39","大寒":"1950-01-20 22:59"},"1951":{"立春":"1951-02-04 23:13","雨水":"1951-02-19 19:09","驚蟄":"1951-03-06 17:26","春分":"1951-03-21 18:25","清明":"1951-04-05 22:32","穀雨":"1951-04-21 05:48","立夏":"1951-05-06 16:09","小滿":"1951-05-22 05:15","芒種":"1951-06-06 20:32","夏至":"1951-06-22 13:24","小暑":"1951-07-08 06:53","大暑":"1951-07-24 00:20","立秋":"1951-08-08 16:37","處暑":"1951-08-24 07:16","白露":"1951-09-08 19:18","秋分":"1951-09-24 04:37","寒露":"1951-10-09 10:36","霜降":"1951-10-24 13:36","立冬":"1951-11-08 13:27","小雪":"1951-11-23 10:51","大雪":"1951-12-08 06:02","冬至":"1951-12-23 00:00","小寒":"1951-01-06 11:30","大寒":"1951-01-21 04:51"},"1952":{"立春":"1952-02-05 04:52","雨水":"1952-02-20 00:56","驚蟄":"1952-03-05 23:07","春分":"1952-03-21 00:13","清明":"1952-04-05 04:14","穀雨":"1952-04-20 11:36","立夏":"1952-05-05 21:53","小滿":"1952-05-21 11:03","芒種":"1952-06-06 02:20","夏至":"1952-06-21 19:12","小暑":"1952-07-07 12:44","大暑":"1952-07-23 06:07","立秋":"1952-08-07 22:31","處暑":"1952-08-23 13:03","白露":"1952-09-08 01:13","秋分":"1952-09-23 10:23","寒露":"1952-10-08 16:32","霜降":"1952-10-23 19:22","立冬":"1952-11-07 19:21","小雪":"1952-11-22 16:35","大雪":"1952-12-07 11:55","冬至":"1952-12-22 05:43","小寒":"1952-01-06 17:09","大寒":"1952-01-21 10:38"},"1953":{"立春":"1953-02-04 10:46","雨水":"1953-02-19 06:41","驚蟄":"1953-03-06 05:02","春分":"1953-03-21 06:00","清明":"1953-04-05 10:12","穀雨":"1953-04-20 17:25","立夏":"1953-05-06 03:52","小滿":"1953-05-21 16:52","芒種":"1953-06-06 08:16","夏至":"1953-06-22 00:59","小暑":"1953-07-07 18:34","大暑":"1953-07-23 11:52","立秋":"1953-08-08 04:14","處暑":"1953-08-23 18:45","白露":"1953-09-08 06:53","秋分":"1953-09-23 16:06","寒露":"1953-10-08 22:10","霜降":"1953-10-24 01:06","立冬":"1953-11-08 01:01","小雪":"1953-11-22 22:22","大雪":"1953-12-07 17:37","冬至":"1953-12-22 11:31","小寒":"1953-01-05 23:02","大寒":"1953-01-20 16:21"},"1954":{"立春":"1954-02-04 16:30","雨水":"1954-02-19 12:32","驚蟄":"1954-03-06 10:48","春分":"1954-03-21 11:53","清明":"1954-04-05 15:58","穀雨":"1954-04-20 23:19","立夏":"1954-05-06 09:38","小滿":"1954-05-21 22:47","芒種":"1954-06-06 14:01","夏至":"1954-06-22 06:54","小暑":"1954-07-08 00:19","大暑":"1954-07-23 17:44","立秋":"1954-08-08 09:58","處暑":"1954-08-24 00:35","白露":"1954-09-08 12:37","秋分":"1954-09-23 21:55","寒露":"1954-10-09 03:57","霜降":"1954-10-24 06:56","立冬":"1954-11-08 06:50","小雪":"1954-11-23 04:14","大雪":"1954-12-07 23:28","冬至":"1954-12-22 17:24","小寒":"1954-01-06 04:45","大寒":"1954-01-20 22:11"},"1955":{"立春":"1955-02-04 22:17","雨水":"1955-02-19 18:18","驚蟄":"1955-03-06 16:31","春分":"1955-03-21 17:35","清明":"1955-04-05 21:38","穀雨":"1955-04-21 04:57","立夏":"1955-05-06 15:18","小滿":"1955-05-22 04:24","芒種":"1955-06-06 19:43","夏至":"1955-06-22 12:31","小暑":"1955-07-08 06:06","大暑":"1955-07-23 23:24","立秋":"1955-08-08 15:50","處暑":"1955-08-24 06:18","白露":"1955-09-08 18:31","秋分":"1955-09-24 03:40","寒露":"1955-10-09 09:52","霜降":"1955-10-24 12:43","立冬":"1955-11-08 12:45","小雪":"1955-11-23 10:01","大雪":"1955-12-08 05:23","冬至":"1955-12-22 23:11","小寒":"1955-01-06 10:35","大寒":"1955-01-21 04:01"},"1956":{"立春":"1956-02-05 04:12","雨水":"1956-02-20 00:05","驚蟄":"1956-03-05 22:25","春分":"1956-03-20 23:20","清明":"1956-04-05 03:31","穀雨":"1956-04-20 10:43","立夏":"1956-05-05 21:10","小滿":"1956-05-21 10:12","芒種":"1956-06-06 01:36","夏至":"1956-06-21 18:24","小暑":"1956-07-07 11:58","大暑":"1956-07-23 05:20","立秋":"1956-08-07 21:40","處暑":"1956-08-23 12:15","白露":"1956-09-08 00:19","秋分":"1956-09-23 09:35","寒露":"1956-10-08 15:36","霜降":"1956-10-23 18:34","立冬":"1956-11-07 18:26","小雪":"1956-11-22 15:50","大雪":"1956-12-07 11:02","冬至":"1956-12-22 04:59","小寒":"1956-01-06 16:30","大寒":"1956-01-21 09:48"},"1957":{"立春":"1957-02-04 09:54","雨水":"1957-02-19 05:58","驚蟄":"1957-03-06 04:10","春分":"1957-03-21 05:16","清明":"1957-04-05 09:18","穀雨":"1957-04-20 16:41","立夏":"1957-05-06 02:58","小滿":"1957-05-21 16:10","芒種":"1957-06-06 07:24","夏至":"1957-06-22 00:20","小暑":"1957-07-07 17:48","大暑":"1957-07-23 11:14","立秋":"1957-08-08 03:31","處暑":"1957-08-23 18:07","白露":"1957-09-08 06:11","秋分":"1957-09-23 15:25","寒露":"1957-10-08 21:29","霜降":"1957-10-24 00:24","立冬":"1957-11-08 00:19","小雪":"1957-11-22 21:39","大雪":"1957-12-07 16:56","冬至":"1957-12-22 10:49","小寒":"1957-01-05 22:10","大寒":"1957-01-20 15:38"},"1958":{"立春":"1958-02-04 15:49","雨水":"1958-02-19 11:48","驚蟄":"1958-03-06 10:04","春分":"1958-03-21 11:05","清明":"1958-04-05 15:12","穀雨":"1958-04-20 22:26","立夏":"1958-05-06 08:49","小滿":"1958-05-21 21:51","芒種":"1958-06-06 13:12","夏至":"1958-06-22 05:56","小暑":"1958-07-07 23:33","大暑":"1958-07-23 16:50","立秋":"1958-08-08 09:17","處暑":"1958-08-23 23:45","白露":"1958-09-08 11:58","秋分":"1958-09-23 21:08","寒露":"1958-10-09 03:19","霜降":"1958-10-24 06:11","立冬":"1958-11-08 06:11","小雪":"1958-11-23 03:29","大雪":"1958-12-07 22:49","冬至":"1958-12-22 16:39","小寒":"1958-01-06 04:04","大寒":"1958-01-20 21:28"},"1959":{"立春":"1959-02-04 21:42","雨水":"1959-02-19 17:37","驚蟄":"1959-03-06 15:56","春分":"1959-03-21 16:54","清明":"1959-04-05 21:02","穀雨":"1959-04-21 04:16","立夏":"1959-05-06 14:38","小滿":"1959-05-22 03:41","芒種":"1959-06-06 18:59","夏至":"1959-06-22 11:49","小暑":"1959-07-08 05:19","大暑":"1959-07-23 22:45","立秋":"1959-08-08 15:04","處暑":"1959-08-24 05:43","白露":"1959-09-08 17:47","秋分":"1959-09-24 03:08","寒露":"1959-10-09 09:09","霜降":"1959-10-24 12:11","立冬":"1959-11-08 12:02","小雪":"1959-11-23 09:27","大雪":"1959-12-08 04:37","冬至":"1959-12-22 22:34","小寒":"1959-01-06 09:58","大寒":"1959-01-21 03:19"},"1960":{"立春":"1960-02-05 03:23","雨水":"1960-02-19 23:26","驚蟄":"1960-03-05 21:36","春分":"1960-03-20 22:42","清明":"1960-04-05 02:43","穀雨":"1960-04-20 10:05","立夏":"1960-05-05 20:22","小滿":"1960-05-21 09:33","芒種":"1960-06-06 00:48","夏至":"1960-06-21 17:42","小暑":"1960-07-07 11:12","大暑":"1960-07-23 04:37","立秋":"1960-08-07 20:59","處暑":"1960-08-23 11:34","白露":"1960-09-07 23:45","秋分":"1960-09-23 08:58","寒露":"1960-10-08 15:08","霜降":"1960-10-23 18:01","立冬":"1960-11-07 18:01","小雪":"1960-11-22 15:18","大雪":"1960-12-07 10:37","冬至":"1960-12-22 04:26","小寒":"1960-01-06 15:42","大寒":"1960-01-21 09:10"},"1961":{"立春":"1961-02-04 09:22","雨水":"1961-02-19 05:16","驚蟄":"1961-03-06 03:35","春分":"1961-03-21 04:32","清明":"1961-04-05 08:42","穀雨":"1961-04-20 15:55","立夏":"1961-05-06 02:21","小滿":"1961-05-21 15:22","芒種":"1961-06-06 06:45","夏至":"1961-06-21 23:30","小暑":"1961-07-07 17:06","大暑":"1961-07-23 10:23","立秋":"1961-08-08 02:48","處暑":"1961-08-23 17:18","白露":"1961-09-08 05:29","秋分":"1961-09-23 14:42","寒露":"1961-10-08 20:51","霜降":"1961-10-23 23:47","立冬":"1961-11-07 23:46","小雪":"1961-11-22 21:07","大雪":"1961-12-07 16:26","冬至":"1961-12-22 10:19","小寒":"1961-01-05 21:42","大寒":"1961-01-20 15:01"},"1962":{"立春":"1962-02-04 15:17","雨水":"1962-02-19 11:14","驚蟄":"1962-03-06 09:29","春分":"1962-03-21 10:29","清明":"1962-04-05 14:34","穀雨":"1962-04-20 21:50","立夏":"1962-05-06 08:09","小滿":"1962-05-21 21:16","芒種":"1962-06-06 12:31","夏至":"1962-06-22 05:24","小暑":"1962-07-07 22:51","大暑":"1962-07-23 16:18","立秋":"1962-08-08 08:33","處暑":"1962-08-23 23:12","白露":"1962-09-08 11:15","秋分":"1962-09-23 20:36","寒露":"1962-10-09 02:38","霜降":"1962-10-24 05:40","立冬":"1962-11-08 05:35","小雪":"1962-11-23 03:01","大雪":"1962-12-07 22:16","冬至":"1962-12-22 16:14","小寒":"1962-01-06 03:35","大寒":"1962-01-20 20:58"},"1963":{"立春":"1963-02-04 21:07","雨水":"1963-02-19 17:08","驚蟄":"1963-03-06 15:17","春分":"1963-03-21 16:19","清明":"1963-04-05 20:18","穀雨":"1963-04-21 03:35","立夏":"1963-05-06 13:51","小滿":"1963-05-22 02:57","芒種":"1963-06-06 18:14","夏至":"1963-06-22 11:03","小暑":"1963-07-08 04:37","大暑":"1963-07-23 21:59","立秋":"1963-08-08 14:25","處暑":"1963-08-24 04:57","白露":"1963-09-08 17:11","秋分":"1963-09-24 02:23","寒露":"1963-10-09 08:36","霜降":"1963-10-24 11:28","立冬":"1963-11-08 11:32","小雪":"1963-11-23 08:49","大雪":"1963-12-08 04:12","冬至":"1963-12-22 22:01","小寒":"1963-01-06 09:26","大寒":"1963-01-21 02:53"},"1964":{"立春":"1964-02-05 03:04","雨水":"1964-02-19 22:57","驚蟄":"1964-03-05 21:15","春分":"1964-03-20 22:09","清明":"1964-04-05 02:18","穀雨":"1964-04-20 09:27","立夏":"1964-05-05 19:50","小滿":"1964-05-21 08:49","芒種":"1964-06-06 00:11","夏至":"1964-06-21 16:56","小暑":"1964-07-07 10:31","大暑":"1964-07-23 03:52","立秋":"1964-08-07 20:16","處暑":"1964-08-23 10:51","白露":"1964-09-07 23:00","秋分":"1964-09-23 08:16","寒露":"1964-10-08 14:21","霜降":"1964-10-23 17:20","立冬":"1964-11-07 17:15","小雪":"1964-11-22 14:38","大雪":"1964-12-07 09:53","冬至":"1964-12-22 03:49","小寒":"1964-01-06 15:22","大寒":"1964-01-21 08:41"},"1965":{"立春":"1965-02-04 08:46","雨水":"1965-02-19 04:47","驚蟄":"1965-03-06 03:00","春分":"1965-03-21 04:04","清明":"1965-04-05 08:06","穀雨":"1965-04-20 15:26","立夏":"1965-05-06 01:41","小滿":"1965-05-21 14:50","芒種":"1965-06-06 06:01","夏至":"1965-06-21 22:55","小暑":"1965-07-07 16:20","大暑":"1965-07-23 09:47","立秋":"1965-08-08 02:04","處暑":"1965-08-23 16:42","白露":"1965-09-08 04:47","秋分":"1965-09-23 14:05","寒露":"1965-10-08 20:10","霜降":"1965-10-23 23:09","立冬":"1965-11-07 23:06","小雪":"1965-11-22 20:28","大雪":"1965-12-07 15:45","冬至":"1965-12-22 09:40","小寒":"1965-01-05 21:02","大寒":"1965-01-20 14:29"},"1966":{"立春":"1966-02-04 14:37","雨水":"1966-02-19 10:37","驚蟄":"1966-03-06 08:50","春分":"1966-03-21 09:52","清明":"1966-04-05 13:56","穀雨":"1966-04-20 21:11","立夏":"1966-05-06 07:30","小滿":"1966-05-21 20:31","芒種":"1966-06-06 11:49","夏至":"1966-06-22 04:33","小暑":"1966-07-07 22:06","大暑":"1966-07-23 15:22","立秋":"1966-08-08 07:48","處暑":"1966-08-23 22:17","白露":"1966-09-08 10:32","秋分":"1966-09-23 19:43","寒露":"1966-10-09 01:57","霜降":"1966-10-24 04:51","立冬":"1966-11-08 04:55","小雪":"1966-11-23 02:14","大雪":"1966-12-07 21:37","冬至":"1966-12-22 15:28","小寒":"1966-01-06 02:54","大寒":"1966-01-20 20:19"},"1967":{"立春":"1967-02-04 20:30","雨水":"1967-02-19 16:23","驚蟄":"1967-03-06 14:41","春分":"1967-03-21 15:36","清明":"1967-04-05 19:44","穀雨":"1967-04-21 02:55","立夏":"1967-05-06 13:17","小滿":"1967-05-22 02:18","芒種":"1967-06-06 17:36","夏至":"1967-06-22 10:23","小暑":"1967-07-08 03:53","大暑":"1967-07-23 21:16","立秋":"1967-08-08 13:35","處暑":"1967-08-24 04:12","白露":"1967-09-08 16:17","秋分":"1967-09-24 01:37","寒露":"1967-10-09 07:41","霜降":"1967-10-24 10:43","立冬":"1967-11-08 10:37","小雪":"1967-11-23 08:04","大雪":"1967-12-08 03:17","冬至":"1967-12-22 21:16","小寒":"1967-01-06 08:48","大寒":"1967-01-21 02:07"},"1968":{"立春":"1968-02-05 02:07","雨水":"1968-02-19 22:08","驚蟄":"1968-03-05 20:17","春分":"1968-03-20 21:21","清明":"1968-04-05 01:20","穀雨":"1968-04-20 08:40","立夏":"1968-05-05 18:55","小滿":"1968-05-21 08:05","芒種":"1968-06-05 23:18","夏至":"1968-06-21 16:13","小暑":"1968-07-07 09:41","大暑":"1968-07-23 03:07","立秋":"1968-08-07 19:27","處暑":"1968-08-23 10:02","白露":"1968-09-07 22:11","秋分":"1968-09-23 07:26","寒露":"1968-10-08 13:34","霜降":"1968-10-23 16:29","立冬":"1968-11-07 16:29","小雪":"1968-11-22 13:49","大雪":"1968-12-07 09:08","冬至":"1968-12-22 03:00","小寒":"1968-01-06 14:26","大寒":"1968-01-21 07:53"},"1969":{"立春":"1969-02-04 07:59","雨水":"1969-02-19 03:54","驚蟄":"1969-03-06 02:10","春分":"1969-03-21 03:08","清明":"1969-04-05 07:14","穀雨":"1969-04-20 14:26","立夏":"1969-05-06 00:49","小滿":"1969-05-21 13:49","芒種":"1969-06-06 05:11","夏至":"1969-06-21 21:54","小暑":"1969-07-07 15:31","大暑":"1969-07-23 08:48","立秋":"1969-08-08 01:14","處暑":"1969-08-23 15:43","白露":"1969-09-08 03:55","秋分":"1969-09-23 13:06","寒露":"1969-10-08 19:16","霜降":"1969-10-23 22:10","立冬":"1969-11-07 22:11","小雪":"1969-11-22 19:31","大雪":"1969-12-07 14:51","冬至":"1969-12-22 08:43","小寒":"1969-01-05 20:17","大寒":"1969-01-20 13:38"},"1970":{"立春":"1970-02-04 13:45","雨水":"1970-02-19 09:41","驚蟄":"1970-03-06 07:58","春分":"1970-03-21 08:56","清明":"1970-04-05 13:01","穀雨":"1970-04-20 20:14","立夏":"1970-05-06 06:33","小滿":"1970-05-21 19:37","芒種":"1970-06-06 10:52","夏至":"1970-06-22 03:42","小暑":"1970-07-07 21:10","大暑":"1970-07-23 14:36","立秋":"1970-08-08 06:53","處暑":"1970-08-23 21:33","白露":"1970-09-08 09:37","秋分":"1970-09-23 18:59","寒露":"1970-10-09 01:01","霜降":"1970-10-24 04:04","立冬":"1970-11-08 03:57","小雪":"1970-11-23 01:24","大雪":"1970-12-07 20:37","冬至":"1970-12-22 14:35","小寒":"1970-01-06 02:01","大寒":"1970-01-20 19:23"},"1971":{"立春":"1971-02-04 19:26","雨水":"1971-02-19 15:27","驚蟄":"1971-03-06 13:35","春分":"1971-03-21 14:38","清明":"1971-04-05 18:36","穀雨":"1971-04-21 01:53","立夏":"1971-05-06 12:07","小滿":"1971-05-22 01:14","芒種":"1971-06-06 16:28","夏至":"1971-06-22 09:19","小暑":"1971-07-08 02:50","大暑":"1971-07-23 20:14","立秋":"1971-08-08 12:40","處暑":"1971-08-24 03:15","白露":"1971-09-08 15:29","秋分":"1971-09-24 00:44","寒露":"1971-10-09 06:58","霜降":"1971-10-24 09:52","立冬":"1971-11-08 09:56","小雪":"1971-11-23 07:13","大雪":"1971-12-08 02:35","冬至":"1971-12-22 20:23","小寒":"1971-01-06 07:45","大寒":"1971-01-21 01:13"},"1972":{"立春":"1972-02-05 01:19","雨水":"1972-02-19 21:11","驚蟄":"1972-03-05 19:27","春分":"1972-03-20 20:21","清明":"1972-04-05 00:28","穀雨":"1972-04-20 07:37","立夏":"1972-05-05 18:00","小滿":"1972-05-21 06:59","芒種":"1972-06-05 22:21","夏至":"1972-06-21 15:05","小暑":"1972-07-07 08:42","大暑":"1972-07-23 02:02","立秋":"1972-08-07 18:28","處暑":"1972-08-23 09:03","白露":"1972-09-07 21:15","秋分":"1972-09-23 06:32","寒露":"1972-10-08 12:41","霜降":"1972-10-23 15:41","立冬":"1972-11-07 15:39","小雪":"1972-11-22 13:02","大雪":"1972-12-07 08:18","冬至":"1972-12-22 02:13","小寒":"1972-01-06 13:41","大寒":"1972-01-21 06:58"},"1973":{"立春":"1973-02-04 07:04","雨水":"1973-02-19 03:01","驚蟄":"1973-03-06 01:12","春分":"1973-03-21 02:12","清明":"1973-04-05 06:13","穀雨":"1973-04-20 13:30","立夏":"1973-05-05 23:46","小滿":"1973-05-21 12:53","芒種":"1973-06-06 04:06","夏至":"1973-06-21 21:00","小暑":"1973-07-07 14:27","大暑":"1973-07-23 07:55","立秋":"1973-08-08 00:12","處暑":"1973-08-23 14:53","白露":"1973-09-08 02:59","秋分":"1973-09-23 12:21","寒露":"1973-10-08 18:26","霜降":"1973-10-23 21:30","立冬":"1973-11-07 21:27","小雪":"1973-11-22 18:54","大雪":"1973-12-07 14:10","冬至":"1973-12-22 08:08","小寒":"1973-01-05 19:25","大寒":"1973-01-20 12:48"},"1974":{"立春":"1974-02-04 13:00","雨水":"1974-02-19 08:58","驚蟄":"1974-03-06 07:06","春分":"1974-03-21 08:06","清明":"1974-04-05 12:04","穀雨":"1974-04-20 19:18","立夏":"1974-05-06 05:33","小滿":"1974-05-21 18:35","芒種":"1974-06-06 09:51","夏至":"1974-06-22 02:37","小暑":"1974-07-07 20:10","大暑":"1974-07-23 13:29","立秋":"1974-08-08 05:57","處暑":"1974-08-23 20:28","白露":"1974-09-08 08:45","秋分":"1974-09-23 17:58","寒露":"1974-10-09 00:14","霜降":"1974-10-24 03:10","立冬":"1974-11-08 03:18","小雪":"1974-11-23 00:38","大雪":"1974-12-07 20:04","冬至":"1974-12-22 13:55","小寒":"1974-01-06 01:20","大寒":"1974-01-20 18:45"},"1975":{"立春":"1975-02-04 18:59","雨水":"1975-02-19 14:49","驚蟄":"1975-03-06 13:05","春分":"1975-03-21 13:56","清明":"1975-04-05 18:01","穀雨":"1975-04-21 01:07","立夏":"1975-05-06 11:26","小滿":"1975-05-22 00:23","芒種":"1975-06-06 15:41","夏至":"1975-06-22 08:26","小暑":"1975-07-08 01:59","大暑":"1975-07-23 19:21","立秋":"1975-08-08 11:44","處暑":"1975-08-24 02:23","白露":"1975-09-08 14:33","秋分":"1975-09-23 23:54","寒露":"1975-10-09 06:02","霜降":"1975-10-24 09:05","立冬":"1975-11-08 09:02","小雪":"1975-11-23 06:30","大雪":"1975-12-08 01:46","冬至":"1975-12-22 19:45","小寒":"1975-01-06 07:17","大寒":"1975-01-21 00:36"},"1976":{"立春":"1976-02-05 00:39","雨水":"1976-02-19 20:39","驚蟄":"1976-03-05 18:47","春分":"1976-03-20 19:49","清明":"1976-04-04 23:46","穀雨":"1976-04-20 07:02","立夏":"1976-05-05 17:13","小滿":"1976-05-21 06:20","芒種":"1976-06-05 21:30","夏至":"1976-06-21 14:23","小暑":"1976-07-07 07:50","大暑":"1976-07-23 01:18","立秋":"1976-08-07 17:38","處暑":"1976-08-23 08:18","白露":"1976-09-07 20:28","秋分":"1976-09-23 05:48","寒露":"1976-10-08 11:58","霜降":"1976-10-23 14:58","立冬":"1976-11-07 14:58","小雪":"1976-11-22 12:21","大雪":"1976-12-07 07:40","冬至":"1976-12-22 01:35","小寒":"1976-01-06 12:57","大寒":"1976-01-21 06:24"},"1977":{"立春":"1977-02-04 06:33","雨水":"1977-02-19 02:30","驚蟄":"1977-03-06 00:44","春分":"1977-03-21 01:42","清明":"1977-04-05 05:46","穀雨":"1977-04-20 12:57","立夏":"1977-05-05 23:16","小滿":"1977-05-21 12:14","芒種":"1977-06-06 03:32","夏至":"1977-06-21 20:13","小暑":"1977-07-07 13:48","大暑":"1977-07-23 07:03","立秋":"1977-08-07 23:30","處暑":"1977-08-23 14:00","白露":"1977-09-08 02:15","秋分":"1977-09-23 11:29","寒露":"1977-10-08 17:44","霜降":"1977-10-23 20:40","立冬":"1977-11-07 20:45","小雪":"1977-11-22 18:06","大雪":"1977-12-07 13:30","冬至":"1977-12-22 07:22","小寒":"1977-01-05 18:51","大寒":"1977-01-20 12:14"},"1978":{"立春":"1978-02-04 12:26","雨水":"1978-02-19 08:20","驚蟄":"1978-03-06 06:37","春分":"1978-03-21 07:33","清明":"1978-04-05 11:39","穀雨":"1978-04-20 18:49","立夏":"1978-05-06 05:08","小滿":"1978-05-21 18:08","芒種":"1978-06-06 09:23","夏至":"1978-06-22 02:09","小暑":"1978-07-07 19:36","大暑":"1978-07-23 13:00","立秋":"1978-08-08 05:17","處暑":"1978-08-23 19:56","白露":"1978-09-08 08:02","秋分":"1978-09-23 17:25","寒露":"1978-10-08 23:31","霜降":"1978-10-24 02:37","立冬":"1978-11-08 02:34","小雪":"1978-11-23 00:04","大雪":"1978-12-07 19:19","冬至":"1978-12-22 13:20","小寒":"1978-01-06 00:42","大寒":"1978-01-20 18:03"},"1979":{"立春":"1979-02-04 18:12","雨水":"1979-02-19 14:13","驚蟄":"1979-03-06 12:19","春分":"1979-03-21 13:21","清明":"1979-04-05 17:17","穀雨":"1979-04-21 00:35","立夏":"1979-05-06 10:47","小滿":"1979-05-21 23:53","芒種":"1979-06-06 15:05","夏至":"1979-06-22 07:56","小暑":"1979-07-08 01:24","大暑":"1979-07-23 18:48","立秋":"1979-08-08 11:11","處暑":"1979-08-24 01:46","白露":"1979-09-08 13:59","秋分":"1979-09-23 23:16","寒露":"1979-10-09 05:30","霜降":"1979-10-24 08:28","立冬":"1979-11-08 08:33","小雪":"1979-11-23 05:54","大雪":"1979-12-08 01:18","冬至":"1979-12-22 19:09","小寒":"1979-01-06 06:31","大寒":"1979-01-20 23:59"},"1980":{"立春":"1980-02-05 00:09","雨水":"1980-02-19 20:01","驚蟄":"1980-03-05 18:16","春分":"1980-03-20 19:09","清明":"1980-04-04 23:14","穀雨":"1980-04-20 06:22","立夏":"1980-05-05 16:44","小滿":"1980-05-21 05:41","芒種":"1980-06-05 21:03","夏至":"1980-06-21 13:46","小暑":"1980-07-07 07:23","大暑":"1980-07-23 00:41","立秋":"1980-08-07 17:08","處暑":"1980-08-23 07:40","白露":"1980-09-07 19:53","秋分":"1980-09-23 05:08","寒露":"1980-10-08 11:19","霜降":"1980-10-23 14:17","立冬":"1980-11-07 14:18","小雪":"1980-11-22 11:41","大雪":"1980-12-07 07:01","冬至":"1980-12-22 00:56","小寒":"1980-01-06 12:28","大寒":"1980-01-21 05:48"},"1981":{"立春":"1981-02-04 05:55","雨水":"1981-02-19 01:51","驚蟄":"1981-03-06 00:04","春分":"1981-03-21 01:02","清明":"1981-04-05 05:04","穀雨":"1981-04-20 12:18","立夏":"1981-05-05 22:34","小滿":"1981-05-21 11:39","芒種":"1981-06-06 02:52","夏至":"1981-06-21 19:44","小暑":"1981-07-07 13:11","大暑":"1981-07-23 06:39","立秋":"1981-08-07 22:56","處暑":"1981-08-23 13:37","白露":"1981-09-08 01:42","秋分":"1981-09-23 11:04","寒露":"1981-10-08 17:09","霜降":"1981-10-23 20:12","立冬":"1981-11-07 20:08","小雪":"1981-11-22 17:36","大雪":"1981-12-07 12:51","冬至":"1981-12-22 06:50","小寒":"1981-01-05 18:12","大寒":"1981-01-20 11:36"},"1982":{"立春":"1982-02-04 11:45","雨水":"1982-02-19 07:46","驚蟄":"1982-03-06 05:54","春分":"1982-03-21 06:55","清明":"1982-04-05 10:52","穀雨":"1982-04-20 18:07","立夏":"1982-05-06 04:20","小滿":"1982-05-21 17:22","芒種":"1982-06-06 08:36","夏至":"1982-06-22 01:22","小暑":"1982-07-07 18:54","大暑":"1982-07-23 12:15","立秋":"1982-08-08 04:41","處暑":"1982-08-23 19:15","白露":"1982-09-08 07:31","秋分":"1982-09-23 16:46","寒露":"1982-10-08 23:02","霜降":"1982-10-24 01:57","立冬":"1982-11-08 02:03","小雪":"1982-11-22 23:23","大雪":"1982-12-07 18:47","冬至":"1982-12-22 12:37","小寒":"1982-01-06 00:02","大寒":"1982-01-20 17:30"},"1983":{"立春":"1983-02-04 17:39","雨水":"1983-02-19 13:30","驚蟄":"1983-03-06 11:47","春分":"1983-03-21 12:38","清明":"1983-04-05 16:44","穀雨":"1983-04-20 23:49","立夏":"1983-05-06 10:10","小滿":"1983-05-21 23:06","芒種":"1983-06-06 14:25","夏至":"1983-06-22 07:08","小暑":"1983-07-08 00:43","大暑":"1983-07-23 18:04","立秋":"1983-08-08 10:29","處暑":"1983-08-24 01:07","白露":"1983-09-08 13:20","秋分":"1983-09-23 22:41","寒露":"1983-10-09 04:51","霜降":"1983-10-24 07:54","立冬":"1983-11-08 07:52","小雪":"1983-11-23 05:18","大雪":"1983-12-08 00:34","冬至":"1983-12-22 18:30","小寒":"1983-01-06 05:58","大寒":"1983-01-20 23:16"},"1984":{"立春":"1984-02-04 23:18","雨水":"1984-02-19 19:16","驚蟄":"1984-03-05 17:24","春分":"1984-03-20 18:24","清明":"1984-04-04 22:21","穀雨":"1984-04-20 05:37","立夏":"1984-05-05 15:50","小滿":"1984-05-21 04:57","芒種":"1984-06-05 20:08","夏至":"1984-06-21 13:02","小暑":"1984-07-07 06:29","大暑":"1984-07-22 23:58","立秋":"1984-08-07 16:18","處暑":"1984-08-23 07:00","白露":"1984-09-07 19:09","秋分":"1984-09-23 04:33","寒露":"1984-10-08 10:42","霜降":"1984-10-23 13:45","立冬":"1984-11-07 13:45","小雪":"1984-11-22 11:10","大雪":"1984-12-07 06:28","冬至":"1984-12-22 00:23","小寒":"1984-01-06 11:41","大寒":"1984-01-21 05:05"},"1985":{"立春":"1985-02-04 05:12","雨水":"1985-02-19 01:07","驚蟄":"1985-03-05 23:16","春分":"1985-03-21 00:13","清明":"1985-04-05 04:13","穀雨":"1985-04-20 11:25","立夏":"1985-05-05 21:42","小滿":"1985-05-21 10:42","芒種":"1985-06-06 01:59","夏至":"1985-06-21 18:44","小暑":"1985-07-07 12:18","大暑":"1985-07-23 05:36","立秋":"1985-08-07 22:04","處暑":"1985-08-23 12:35","白露":"1985-09-08 00:53","秋分":"1985-09-23 10:07","寒露":"1985-10-08 16:24","霜降":"1985-10-23 19:21","立冬":"1985-11-07 19:29","小雪":"1985-11-22 16:50","大雪":"1985-12-07 12:16","冬至":"1985-12-22 06:08","小寒":"1985-01-05 17:35","大寒":"1985-01-20 10:57"},"1986":{"立春":"1986-02-04 11:07","雨水":"1986-02-19 06:57","驚蟄":"1986-03-06 05:12","春分":"1986-03-21 06:02","清明":"1986-04-05 10:06","穀雨":"1986-04-20 17:12","立夏":"1986-05-06 03:30","小滿":"1986-05-21 16:27","芒種":"1986-06-06 07:44","夏至":"1986-06-22 00:29","小暑":"1986-07-07 18:00","大暑":"1986-07-23 11:24","立秋":"1986-08-08 03:45","處暑":"1986-08-23 18:25","白露":"1986-09-08 06:34","秋分":"1986-09-23 15:59","寒露":"1986-10-08 22:07","霜降":"1986-10-24 01:14","立冬":"1986-11-08 01:12","小雪":"1986-11-22 22:43","大雪":"1986-12-07 18:00","冬至":"1986-12-22 12:01","小寒":"1986-01-05 23:28","大寒":"1986-01-20 16:46"},"1987":{"立春":"1987-02-04 16:51","雨水":"1987-02-19 12:49","驚蟄":"1987-03-06 10:53","春分":"1987-03-21 11:52","清明":"1987-04-05 15:44","穀雨":"1987-04-20 22:57","立夏":"1987-05-06 09:05","小滿":"1987-05-21 22:09","芒種":"1987-06-06 13:18","夏至":"1987-06-22 06:10","小暑":"1987-07-07 23:38","大暑":"1987-07-23 17:06","立秋":"1987-08-08 09:29","處暑":"1987-08-24 00:09","白露":"1987-09-08 12:23","秋分":"1987-09-23 21:45","寒露":"1987-10-09 03:59","霜降":"1987-10-24 07:00","立冬":"1987-11-08 07:05","小雪":"1987-11-23 04:29","大雪":"1987-12-07 23:52","冬至":"1987-12-22 17:46","小寒":"1987-01-06 05:12","大寒":"1987-01-20 22:40"},"1988":{"立春":"1988-02-04 22:43","雨水":"1988-02-19 18:35","驚蟄":"1988-03-05 16:47","春分":"1988-03-20 17:39","清明":"1988-04-04 21:39","穀雨":"1988-04-20 04:45","立夏":"1988-05-05 15:02","小滿":"1988-05-21 03:56","芒種":"1988-06-05 19:15","夏至":"1988-06-21 11:56","小暑":"1988-07-07 05:32","大暑":"1988-07-22 22:51","立秋":"1988-08-07 15:20","處暑":"1988-08-23 05:54","白露":"1988-09-07 18:12","秋分":"1988-09-23 03:29","寒露":"1988-10-08 09:44","霜降":"1988-10-23 12:44","立冬":"1988-11-07 12:49","小雪":"1988-11-22 10:12","大雪":"1988-12-07 05:34","冬至":"1988-12-21 23:28","小寒":"1988-01-06 11:03","大寒":"1988-01-21 04:24"},"1989":{"立春":"1989-02-04 04:27","雨水":"1989-02-19 00:20","驚蟄":"1989-03-05 22:34","春分":"1989-03-20 23:28","清明":"1989-04-05 03:29","穀雨":"1989-04-20 10:38","立夏":"1989-05-05 20:53","小滿":"1989-05-21 09:53","芒種":"1989-06-06 01:05","夏至":"1989-06-21 17:52","小暑":"1989-07-07 11:19","大暑":"1989-07-23 04:45","立秋":"1989-08-07 21:03","處暑":"1989-08-23 11:46","白露":"1989-09-07 23:53","秋分":"1989-09-23 09:19","寒露":"1989-10-08 15:27","霜降":"1989-10-23 18:35","立冬":"1989-11-07 18:33","小雪":"1989-11-22 16:04","大雪":"1989-12-07 11:21","冬至":"1989-12-22 05:22","小寒":"1989-01-05 16:46","大寒":"1989-01-20 10:07"},"1990":{"立春":"1990-02-04 10:13","雨水":"1990-02-19 06:13","驚蟄":"1990-03-06 04:19","春分":"1990-03-21 05:19","清明":"1990-04-05 09:12","穀雨":"1990-04-20 16:26","立夏":"1990-05-06 02:35","小滿":"1990-05-21 15:37","芒種":"1990-06-06 06:46","夏至":"1990-06-21 23:32","小暑":"1990-07-07 17:00","大暑":"1990-07-23 10:21","立秋":"1990-08-08 02:45","處暑":"1990-08-23 17:20","白露":"1990-09-08 05:37","秋分":"1990-09-23 14:55","寒露":"1990-10-08 21:14","霜降":"1990-10-24 00:14","立冬":"1990-11-08 00:23","小雪":"1990-11-22 21:47","大雪":"1990-12-07 17:14","冬至":"1990-12-22 11:06","小寒":"1990-01-05 22:33","大寒":"1990-01-20 16:01"},"1991":{"立春":"1991-02-04 16:08","雨水":"1991-02-19 11:58","驚蟄":"1991-03-06 10:12","春分":"1991-03-21 11:02","清明":"1991-04-05 15:04","穀雨":"1991-04-20 22:08","立夏":"1991-05-06 08:26","小滿":"1991-05-21 21:20","芒種":"1991-06-06 12:38","夏至":"1991-06-22 05:18","小暑":"1991-07-07 22:52","大暑":"1991-07-23 16:11","立秋":"1991-08-08 08:37","處暑":"1991-08-23 23:12","白露":"1991-09-08 11:27","秋分":"1991-09-23 20:47","寒露":"1991-10-09 03:01","霜降":"1991-10-24 06:05","立冬":"1991-11-08 06:08","小雪":"1991-11-23 03:36","大雪":"1991-12-07 22:56","冬至":"1991-12-22 16:53","小寒":"1991-01-06 04:28","大寒":"1991-01-20 21:47"},"1992":{"立春":"1992-02-04 21:48","雨水":"1992-02-19 17:43","驚蟄":"1992-03-05 15:52","春分":"1992-03-20 16:48","清明":"1992-04-04 20:45","穀雨":"1992-04-20 03:57","立夏":"1992-05-05 14:08","小滿":"1992-05-21 03:12","芒種":"1992-06-05 18:22","夏至":"1992-06-21 11:14","小暑":"1992-07-07 04:40","大暑":"1992-07-22 22:09","立秋":"1992-08-07 14:27","處暑":"1992-08-23 05:10","白露":"1992-09-07 17:18","秋分":"1992-09-23 02:42","寒露":"1992-10-08 08:51","霜降":"1992-10-23 11:57","立冬":"1992-11-07 11:56","小雪":"1992-11-22 09:25","大雪":"1992-12-07 04:44","冬至":"1992-12-21 22:43","小寒":"1992-01-06 10:08","大寒":"1992-01-21 03:32"},"1993":{"立春":"1993-02-04 03:37","雨水":"1993-02-18 23:35","驚蟄":"1993-03-05 21:42","春分":"1993-03-20 22:40","清明":"1993-04-05 02:37","穀雨":"1993-04-20 09:49","立夏":"1993-05-05 20:01","小滿":"1993-05-21 09:01","芒種":"1993-06-06 00:15","夏至":"1993-06-21 16:59","小暑":"1993-07-07 10:32","大暑":"1993-07-23 03:50","立秋":"1993-08-07 20:18","處暑":"1993-08-23 10:50","白露":"1993-09-07 23:07","秋分":"1993-09-23 08:22","寒露":"1993-10-08 14:39","霜降":"1993-10-23 17:37","立冬":"1993-11-07 17:45","小雪":"1993-11-22 15:06","大雪":"1993-12-07 10:33","冬至":"1993-12-22 04:26","小寒":"1993-01-05 15:56","大寒":"1993-01-20 09:22"},"1994":{"立春":"1994-02-04 09:30","雨水":"1994-02-19 05:21","驚蟄":"1994-03-06 03:37","春分":"1994-03-21 04:27","清明":"1994-04-05 08:31","穀雨":"1994-04-20 15:36","立夏":"1994-05-06 01:54","小滿":"1994-05-21 14:49","芒種":"1994-06-06 06:05","夏至":"1994-06-21 22:48","小暑":"1994-07-07 16:19","大暑":"1994-07-23 09:41","立秋":"1994-08-08 02:04","處暑":"1994-08-23 16:44","白露":"1994-09-08 04:55","秋分":"1994-09-23 14:19","寒露":"1994-10-08 20:29","霜降":"1994-10-23 23:36","立冬":"1994-11-07 23:35","小雪":"1994-11-22 21:05","大雪":"1994-12-07 16:22","冬至":"1994-12-22 10:22","小寒":"1994-01-05 21:48","大寒":"1994-01-20 15:07"},"1995":{"立春":"1995-02-04 15:13","雨水":"1995-02-19 11:11","驚蟄":"1995-03-06 09:16","春分":"1995-03-21 10:14","清明":"1995-04-05 14:07","穀雨":"1995-04-20 21:21","立夏":"1995-05-06 07:29","小滿":"1995-05-21 20:33","芒種":"1995-06-06 11:42","夏至":"1995-06-22 04:34","小暑":"1995-07-07 22:00","大暑":"1995-07-23 15:29","立秋":"1995-08-08 07:51","處暑":"1995-08-23 22:34","白露":"1995-09-08 10:48","秋分":"1995-09-23 20:12","寒露":"1995-10-09 02:27","霜降":"1995-10-24 05:31","立冬":"1995-11-08 05:35","小雪":"1995-11-23 03:01","大雪":"1995-12-07 22:22","冬至":"1995-12-22 16:17","小寒":"1995-01-06 03:34","大寒":"1995-01-20 21:00"},"1996":{"立春":"1996-02-04 21:08","雨水":"1996-02-19 17:00","驚蟄":"1996-03-05 15:09","春分":"1996-03-20 16:03","清明":"1996-04-04 20:02","穀雨":"1996-04-20 03:09","立夏":"1996-05-05 13:26","小滿":"1996-05-21 02:23","芒種":"1996-06-05 17:40","夏至":"1996-06-21 10:23","小暑":"1996-07-07 03:59","大暑":"1996-07-22 21:18","立秋":"1996-08-07 13:49","處暑":"1996-08-23 04:23","白露":"1996-09-07 16:42","秋分":"1996-09-23 02:00","寒露":"1996-10-08 08:19","霜降":"1996-10-23 11:18","立冬":"1996-11-07 11:26","小雪":"1996-11-22 08:49","大雪":"1996-12-07 04:14","冬至":"1996-12-21 22:06","小寒":"1996-01-06 09:31","大寒":"1996-01-21 02:52"},"1997":{"立春":"1997-02-04 03:02","雨水":"1997-02-18 22:51","驚蟄":"1997-03-05 21:04","春分":"1997-03-20 21:54","清明":"1997-04-05 01:56","穀雨":"1997-04-20 09:02","立夏":"1997-05-05 19:19","小滿":"1997-05-21 08:18","芒種":"1997-06-05 23:32","夏至":"1997-06-21 16:19","小暑":"1997-07-07 09:49","大暑":"1997-07-23 03:15","立秋":"1997-08-07 19:36","處暑":"1997-08-23 10:18","白露":"1997-09-07 22:28","秋分":"1997-09-23 07:55","寒露":"1997-10-08 14:04","霜降":"1997-10-23 17:14","立冬":"1997-11-07 17:14","小雪":"1997-11-22 14:47","大雪":"1997-12-07 10:05","冬至":"1997-12-22 04:07","小寒":"1997-01-05 15:24","大寒":"1997-01-20 08:43"},"1998":{"立春":"1998-02-04 08:56","雨水":"1998-02-19 04:54","驚蟄":"1998-03-06 02:57","春分":"1998-03-21 03:54","清明":"1998-04-05 07:44","穀雨":"1998-04-20 14:56","立夏":"1998-05-06 01:03","小滿":"1998-05-21 14:05","芒種":"1998-06-06 05:13","夏至":"1998-06-21 22:02","小暑":"1998-07-07 15:30","大暑":"1998-07-23 08:55","立秋":"1998-08-08 01:19","處暑":"1998-08-23 15:59","白露":"1998-09-08 04:16","秋分":"1998-09-23 13:37","寒露":"1998-10-08 19:56","霜降":"1998-10-23 22:59","立冬":"1998-11-07 23:08","小雪":"1998-11-22 20:34","大雪":"1998-12-07 16:01","冬至":"1998-12-22 09:56","小寒":"1998-01-05 21:18","大寒":"1998-01-20 14:46"},"1999":{"立春":"1999-02-04 14:57","雨水":"1999-02-19 10:47","驚蟄":"1999-03-06 08:58","春分":"1999-03-21 09:46","清明":"1999-04-05 13:44","穀雨":"1999-04-20 20:46","立夏":"1999-05-06 07:01","小滿":"1999-05-21 19:52","芒種":"1999-06-06 11:09","夏至":"1999-06-22 03:49","小暑":"1999-07-07 21:25","大暑":"1999-07-23 14:44","立秋":"1999-08-08 07:14","處暑":"1999-08-23 21:51","白露":"1999-09-08 10:10","秋分":"1999-09-23 19:31","寒露":"1999-10-09 01:48","霜降":"1999-10-24 04:52","立冬":"1999-11-08 04:58","小雪":"1999-11-23 02:25","大雪":"1999-12-07 21:48","冬至":"1999-12-22 15:44","小寒":"1999-01-06 03:17","大寒":"1999-01-20 20:37"},"2000":{"立春":"2000-02-04 20:40","雨水":"2000-02-19 16:33","驚蟄":"2000-03-05 14:42","春分":"2000-03-20 15:35","清明":"2000-04-04 19:31","穀雨":"2000-04-20 02:39","立夏":"2000-05-05 12:49","小滿":"2000-05-21 01:49","芒種":"2000-06-05 16:58","夏至":"2000-06-21 09:47","小暑":"2000-07-07 03:13","大暑":"2000-07-22 20:42","立秋":"2000-08-07 13:03","處暑":"2000-08-23 03:48","白露":"2000-09-07 15:59","秋分":"2000-09-23 01:27","寒露":"2000-10-08 07:38","霜降":"2000-10-23 10:47","立冬":"2000-11-07 10:48","小雪":"2000-11-22 08:19","大雪":"2000-12-07 03:37","冬至":"2000-12-21 21:37","小寒":"2000-01-06 09:00","大寒":"2000-01-21 02:23"},"2001":{"立春":"2001-02-04 02:29","雨水":"2001-02-18 22:27","驚蟄":"2001-03-05 20:32","春分":"2001-03-20 21:30","清明":"2001-04-05 01:24","穀雨":"2001-04-20 08:35","立夏":"2001-05-05 18:45","小滿":"2001-05-21 07:44","芒種":"2001-06-05 22:53","夏至":"2001-06-21 15:37","小暑":"2001-07-07 09:06","大暑":"2001-07-23 02:26","立秋":"2001-08-07 18:52","處暑":"2001-08-23 09:27","白露":"2001-09-07 21:46","秋分":"2001-09-23 07:04","寒露":"2001-10-08 13:24","霜降":"2001-10-23 16:25","立冬":"2001-11-07 16:36","小雪":"2001-11-22 14:00","大雪":"2001-12-07 09:28","冬至":"2001-12-22 03:21","小寒":"2001-01-05 14:49","大寒":"2001-01-20 08:16"},"2002":{"立春":"2002-02-04 08:24","雨水":"2002-02-19 04:13","驚蟄":"2002-03-06 02:27","春分":"2002-03-21 03:16","清明":"2002-04-05 07:18","穀雨":"2002-04-20 14:20","立夏":"2002-05-06 00:37","小滿":"2002-05-21 13:29","芒種":"2002-06-06 04:45","夏至":"2002-06-21 21:24","小暑":"2002-07-07 14:56","大暑":"2002-07-23 08:14","立秋":"2002-08-08 00:39","處暑":"2002-08-23 15:16","白露":"2002-09-08 03:31","秋分":"2002-09-23 12:55","寒露":"2002-10-08 19:09","霜降":"2002-10-23 22:18","立冬":"2002-11-07 22:22","小雪":"2002-11-22 19:53","大雪":"2002-12-07 15:14","冬至":"2002-12-22 09:14","小寒":"2002-01-05 20:43","大寒":"2002-01-20 14:02"},"2003":{"立春":"2003-02-04 14:06","雨水":"2003-02-19 10:01","驚蟄":"2003-03-06 08:05","春分":"2003-03-21 09:00","清明":"2003-04-05 12:52","穀雨":"2003-04-20 20:03","立夏":"2003-05-06 06:10","小滿":"2003-05-21 19:12","芒種":"2003-06-06 10:19","夏至":"2003-06-22 03:10","小暑":"2003-07-07 20:35","大暑":"2003-07-23 14:04","立秋":"2003-08-08 06:24","處暑":"2003-08-23 21:08","白露":"2003-09-08 09:20","秋分":"2003-09-23 18:46","寒露":"2003-10-09 01:00","霜降":"2003-10-24 04:08","立冬":"2003-11-08 04:13","小雪":"2003-11-23 01:43","大雪":"2003-12-07 21:05","冬至":"2003-12-22 15:03","小寒":"2003-01-06 02:28","大寒":"2003-01-20 19:53"},"2004":{"立春":"2004-02-04 19:56","雨水":"2004-02-19 15:49","驚蟄":"2004-03-05 13:55","春分":"2004-03-20 14:48","清明":"2004-04-04 18:43","穀雨":"2004-04-20 01:50","立夏":"2004-05-05 12:02","小滿":"2004-05-21 00:59","芒種":"2004-06-05 16:13","夏至":"2004-06-21 08:56","小暑":"2004-07-07 02:31","大暑":"2004-07-22 19:50","立秋":"2004-08-07 12:19","處暑":"2004-08-23 02:53","白露":"2004-09-07 15:13","秋分":"2004-09-23 00:29","寒露":"2004-10-08 06:49","霜降":"2004-10-23 09:48","立冬":"2004-11-07 09:58","小雪":"2004-11-22 07:21","大雪":"2004-12-07 02:48","冬至":"2004-12-21 20:41","小寒":"2004-01-06 08:18","大寒":"2004-01-21 01:42"},"2005":{"立春":"2005-02-04 01:43","雨水":"2005-02-18 21:32","驚蟄":"2005-03-05 19:45","春分":"2005-03-20 20:33","清明":"2005-04-05 00:34","穀雨":"2005-04-20 07:37","立夏":"2005-05-05 17:53","小滿":"2005-05-21 06:47","芒種":"2005-06-05 22:02","夏至":"2005-06-21 14:46","小暑":"2005-07-07 08:16","大暑":"2005-07-23 01:40","立秋":"2005-08-07 18:03","處暑":"2005-08-23 08:45","白露":"2005-09-07 20:56","秋分":"2005-09-23 06:22","寒露":"2005-10-08 12:33","霜降":"2005-10-23 15:42","立冬":"2005-11-07 15:42","小雪":"2005-11-22 13:15","大雪":"2005-12-07 08:33","冬至":"2005-12-22 02:35","小寒":"2005-01-05 14:03","大寒":"2005-01-20 07:21"},"2006":{"立春":"2006-02-04 07:27","雨水":"2006-02-19 03:25","驚蟄":"2006-03-06 01:28","春分":"2006-03-21 02:25","清明":"2006-04-05 06:15","穀雨":"2006-04-20 13:25","立夏":"2006-05-05 23:30","小滿":"2006-05-21 12:31","芒種":"2006-06-06 03:36","夏至":"2006-06-21 20:25","小暑":"2006-07-07 13:51","大暑":"2006-07-23 07:17","立秋":"2006-08-07 23:40","處暑":"2006-08-23 14:22","白露":"2006-09-08 02:39","秋分":"2006-09-23 12:03","寒露":"2006-10-08 18:21","霜降":"2006-10-23 21:26","立冬":"2006-11-07 21:34","小雪":"2006-11-22 19:01","大雪":"2006-12-07 14:26","冬至":"2006-12-22 08:21","小寒":"2006-01-05 19:47","大寒":"2006-01-20 13:15"},"2007":{"立春":"2007-02-04 13:18","雨水":"2007-02-19 09:09","驚蟄":"2007-03-06 07:18","春分":"2007-03-21 08:07","清明":"2007-04-05 12:04","穀雨":"2007-04-20 19:07","立夏":"2007-05-06 05:20","小滿":"2007-05-21 18:11","芒種":"2007-06-06 09:26","夏至":"2007-06-22 02:06","小暑":"2007-07-07 19:41","大暑":"2007-07-23 13:00","立秋":"2007-08-08 05:31","處暑":"2007-08-23 20:07","白露":"2007-09-08 08:29","秋分":"2007-09-23 17:51","寒露":"2007-10-09 00:11","霜降":"2007-10-24 03:15","立冬":"2007-11-08 03:24","小雪":"2007-11-23 00:49","大雪":"2007-12-07 20:14","冬至":"2007-12-22 14:07","小寒":"2007-01-06 01:40","大寒":"2007-01-20 19:00"},"2008":{"立春":"2008-02-04 19:00","雨水":"2008-02-19 14:49","驚蟄":"2008-03-05 12:58","春分":"2008-03-20 13:48","清明":"2008-04-04 17:45","穀雨":"2008-04-20 00:51","立夏":"2008-05-05 11:03","小滿":"2008-05-21 00:00","芒種":"2008-06-05 15:11","夏至":"2008-06-21 07:59","小暑":"2008-07-07 01:26","大暑":"2008-07-22 18:54","立秋":"2008-08-07 11:16","處暑":"2008-08-23 02:02","白露":"2008-09-07 14:14","秋分":"2008-09-22 23:44","寒露":"2008-10-08 05:56","霜降":"2008-10-23 09:08","立冬":"2008-11-07 09:10","小雪":"2008-11-22 06:44","大雪":"2008-12-07 02:02","冬至":"2008-12-21 20:03","小寒":"2008-01-06 07:24","大寒":"2008-01-21 00:43"},"2009":{"立春":"2009-02-04 00:50","雨水":"2009-02-18 20:46","驚蟄":"2009-03-05 18:48","春分":"2009-03-20 19:43","清明":"2009-04-04 23:34","穀雨":"2009-04-20 06:44","立夏":"2009-05-05 16:51","小滿":"2009-05-21 05:51","芒種":"2009-06-05 20:59","夏至":"2009-06-21 13:45","小暑":"2009-07-07 07:13","大暑":"2009-07-23 00:36","立秋":"2009-08-07 17:01","處暑":"2009-08-23 07:38","白露":"2009-09-07 19:57","秋分":"2009-09-23 05:19","寒露":"2009-10-08 11:40","霜降":"2009-10-23 14:43","立冬":"2009-11-07 14:56","小雪":"2009-11-22 12:22","大雪":"2009-12-07 07:52","冬至":"2009-12-22 01:46","小寒":"2009-01-05 13:14","大寒":"2009-01-20 06:40"},"2010":{"立春":"2010-02-04 06:47","雨水":"2010-02-19 02:35","驚蟄":"2010-03-06 00:46","春分":"2010-03-21 01:31","清明":"2010-04-05 05:30","穀雨":"2010-04-20 12:29","立夏":"2010-05-05 22:44","小滿":"2010-05-21 11:34","芒種":"2010-06-06 02:49","夏至":"2010-06-21 19:28","小暑":"2010-07-07 13:02","大暑":"2010-07-23 06:21","立秋":"2010-08-07 22:49","處暑":"2010-08-23 13:26","白露":"2010-09-08 01:45","秋分":"2010-09-23 11:09","寒露":"2010-10-08 17:27","霜降":"2010-10-23 20:35","立冬":"2010-11-07 20:42","小雪":"2010-11-22 18:14","大雪":"2010-12-07 13:38","冬至":"2010-12-22 07:38","小寒":"2010-01-05 19:08","大寒":"2010-01-20 12:27"},"2011":{"立春":"2011-02-04 12:32","雨水":"2011-02-19 08:25","驚蟄":"2011-03-06 06:29","春分":"2011-03-21 07:20","清明":"2011-04-05 11:11","穀雨":"2011-04-20 18:17","立夏":"2011-05-06 04:22","小滿":"2011-05-21 17:20","芒種":"2011-06-06 08:27","夏至":"2011-06-22 01:16","小暑":"2011-07-07 18:41","大暑":"2011-07-23 12:11","立秋":"2011-08-08 04:33","處暑":"2011-08-23 19:20","白露":"2011-09-08 07:34","秋分":"2011-09-23 17:04","寒露":"2011-10-08 23:19","霜降":"2011-10-24 02:30","立冬":"2011-11-08 02:35","小雪":"2011-11-23 00:08","大雪":"2011-12-07 19:29","冬至":"2011-12-22 13:30","小寒":"2011-01-06 00:54","大寒":"2011-01-20 18:18"},"2012":{"立春":"2012-02-04 18:22","雨水":"2012-02-19 14:17","驚蟄":"2012-03-05 12:20","春分":"2012-03-20 13:14","清明":"2012-04-04 17:05","穀雨":"2012-04-20 00:12","立夏":"2012-05-05 10:19","小滿":"2012-05-20 23:15","芒種":"2012-06-05 14:25","夏至":"2012-06-21 07:08","小暑":"2012-07-07 00:40","大暑":"2012-07-22 18:00","立秋":"2012-08-07 10:30","處暑":"2012-08-23 01:06","白露":"2012-09-07 13:28","秋分":"2012-09-22 22:48","寒露":"2012-10-08 05:11","霜降":"2012-10-23 08:13","立冬":"2012-11-07 08:25","小雪":"2012-11-22 05:49","大雪":"2012-12-07 01:18","冬至":"2012-12-21 19:11","小寒":"2012-01-06 06:44","大寒":"2012-01-21 00:09"},"2013":{"立春":"2013-02-04 00:13","雨水":"2013-02-18 20:01","驚蟄":"2013-03-05 18:14","春分":"2013-03-20 19:01","清明":"2013-04-04 23:02","穀雨":"2013-04-20 06:03","立夏":"2013-05-05 16:18","小滿":"2013-05-21 05:09","芒種":"2013-06-05 20:23","夏至":"2013-06-21 13:03","小暑":"2013-07-07 06:34","大暑":"2013-07-22 23:55","立秋":"2013-08-07 16:20","處暑":"2013-08-23 07:01","白露":"2013-09-07 19:16","秋分":"2013-09-23 04:43","寒露":"2013-10-08 10:58","霜降":"2013-10-23 14:09","立冬":"2013-11-07 14:14","小雪":"2013-11-22 11:48","大雪":"2013-12-07 07:08","冬至":"2013-12-22 01:11","小寒":"2013-01-05 12:33","大寒":"2013-01-20 05:51"},"2014":{"立春":"2014-02-04 06:03","雨水":"2014-02-19 01:59","驚蟄":"2014-03-06 00:01","春分":"2014-03-21 00:56","清明":"2014-04-05 04:46","穀雨":"2014-04-20 11:55","立夏":"2014-05-05 21:59","小滿":"2014-05-21 10:59","芒種":"2014-06-06 02:03","夏至":"2014-06-21 18:51","小暑":"2014-07-07 12:14","大暑":"2014-07-23 05:41","立秋":"2014-08-07 22:02","處暑":"2014-08-23 12:46","白露":"2014-09-08 01:01","秋分":"2014-09-23 10:29","寒露":"2014-10-08 16:47","霜降":"2014-10-23 19:57","立冬":"2014-11-07 20:06","小雪":"2014-11-22 17:38","大雪":"2014-12-07 13:04","冬至":"2014-12-22 07:02","小寒":"2014-01-05 18:24","大寒":"2014-01-20 11:51"},"2015":{"立春":"2015-02-04 11:58","雨水":"2015-02-19 07:49","驚蟄":"2015-03-06 05:55","春分":"2015-03-21 06:45","清明":"2015-04-05 10:39","穀雨":"2015-04-20 17:41","立夏":"2015-05-06 03:52","小滿":"2015-05-21 16:44","芒種":"2015-06-06 07:58","夏至":"2015-06-22 00:37","小暑":"2015-07-07 18:12","大暑":"2015-07-23 11:30","立秋":"2015-08-08 04:01","處暑":"2015-08-23 18:37","白露":"2015-09-08 06:59","秋分":"2015-09-23 16:20","寒露":"2015-10-08 22:43","霜降":"2015-10-24 01:47","立冬":"2015-11-08 01:59","小雪":"2015-11-22 23:25","大雪":"2015-12-07 18:53","冬至":"2015-12-22 12:48","小寒":"2015-01-06 00:20","大寒":"2015-01-20 17:43"},"2016":{"立春":"2016-02-04 17:45","雨水":"2016-02-19 13:33","驚蟄":"2016-03-05 11:43","春分":"2016-03-20 12:30","清明":"2016-04-04 16:27","穀雨":"2016-04-19 23:29","立夏":"2016-05-05 09:41","小滿":"2016-05-20 22:36","芒種":"2016-06-05 13:48","夏至":"2016-06-21 06:34","小暑":"2016-07-07 00:03","大暑":"2016-07-22 17:30","立秋":"2016-08-07 09:53","處暑":"2016-08-23 00:38","白露":"2016-09-07 12:51","秋分":"2016-09-22 22:21","寒露":"2016-10-08 04:33","霜降":"2016-10-23 07:45","立冬":"2016-11-07 07:47","小雪":"2016-11-22 05:22","大雪":"2016-12-07 00:41","冬至":"2016-12-21 18:44","小寒":"2016-01-06 06:08","大寒":"2016-01-20 23:27"},"2017":{"立春":"2017-02-03 23:34","雨水":"2017-02-18 19:31","驚蟄":"2017-03-05 17:33","春分":"2017-03-20 18:28","清明":"2017-04-04 22:17","穀雨":"2017-04-20 05:26","立夏":"2017-05-05 15:31","小滿":"2017-05-21 04:30","芒種":"2017-06-05 19:36","夏至":"2017-06-21 12:24","小暑":"2017-07-07 05:50","大暑":"2017-07-22 23:15","立秋":"2017-08-07 15:39","處暑":"2017-08-23 06:20","白露":"2017-09-07 18:38","秋分":"2017-09-23 04:01","寒露":"2017-10-08 10:21","霜降":"2017-10-23 13:26","立冬":"2017-11-07 13:37","小雪":"2017-11-22 11:04","大雪":"2017-12-07 06:32","冬至":"2017-12-22 00:28","小寒":"2017-01-05 11:56","大寒":"2017-01-20 05:23"},"2018":{"立春":"2018-02-04 05:28","雨水":"2018-02-19 01:18","驚蟄":"2018-03-05 23:28","春分":"2018-03-21 00:15","清明":"2018-04-05 04:12","穀雨":"2018-04-20 11:12","立夏":"2018-05-05 21:25","小滿":"2018-05-21 10:14","芒種":"2018-06-06 01:29","夏至":"2018-06-21 18:07","小暑":"2018-07-07 11:41","大暑":"2018-07-23 05:00","立秋":"2018-08-07 21:30","處暑":"2018-08-23 12:08","白露":"2018-09-08 00:29","秋分":"2018-09-23 09:54","寒露":"2018-10-08 16:14","霜降":"2018-10-23 19:22","立冬":"2018-11-07 19:31","小雪":"2018-11-22 17:00","大雪":"2018-12-07 12:25","冬至":"2018-12-22 06:22","小寒":"2018-01-05 17:49","大寒":"2018-01-20 11:09"},"2019":{"立春":"2019-02-04 11:14","雨水":"2019-02-19 07:03","驚蟄":"2019-03-06 05:09","春分":"2019-03-21 05:58","清明":"2019-04-05 09:50","穀雨":"2019-04-20 16:54","立夏":"2019-05-06 03:02","小滿":"2019-05-21 15:58","芒種":"2019-06-06 07:05","夏至":"2019-06-21 23:54","小暑":"2019-07-07 17:20","大暑":"2019-07-23 10:50","立秋":"2019-08-08 03:12","處暑":"2019-08-23 18:01","白露":"2019-09-08 06:16","秋分":"2019-09-23 15:49","寒露":"2019-10-08 22:05","霜降":"2019-10-24 01:19","立冬":"2019-11-08 01:24","小雪":"2019-11-22 22:58","大雪":"2019-12-07 18:18","冬至":"2019-12-22 12:19","小寒":"2019-01-05 23:38","大寒":"2019-01-20 16:59"},"2020":{"立春":"2020-02-04 17:03","雨水":"2020-02-19 12:57","驚蟄":"2020-03-05 10:57","春分":"2020-03-20 11:49","清明":"2020-04-04 15:38","穀雨":"2020-04-19 22:45","立夏":"2020-05-05 08:51","小滿":"2020-05-20 21:49","芒種":"2020-06-05 12:58","夏至":"2020-06-21 05:43","小暑":"2020-07-06 23:14","大暑":"2020-07-22 16:36","立秋":"2020-08-07 09:06","處暑":"2020-08-22 23:45","白露":"2020-09-07 12:08","秋分":"2020-09-22 21:30","寒露":"2020-10-08 03:55","霜降":"2020-10-23 06:59","立冬":"2020-11-07 07:13","小雪":"2020-11-22 04:39","大雪":"2020-12-07 00:09","冬至":"2020-12-21 18:02","小寒":"2020-01-06 05:30","大寒":"2020-01-20 22:54"},"2021":{"立春":"2021-02-03 22:59","雨水":"2021-02-18 18:44","驚蟄":"2021-03-05 16:53","春分":"2021-03-20 17:37","清明":"2021-04-04 21:34","穀雨":"2021-04-20 04:33","立夏":"2021-05-05 14:46","小滿":"2021-05-21 03:36","芒種":"2021-06-05 18:51","夏至":"2021-06-21 11:31","小暑":"2021-07-07 05:05","大暑":"2021-07-22 22:26","立秋":"2021-08-07 14:53","處暑":"2021-08-23 05:34","白露":"2021-09-07 17:52","秋分":"2021-09-23 03:20","寒露":"2021-10-08 09:39","霜降":"2021-10-23 12:51","立冬":"2021-11-07 12:58","小雪":"2021-11-22 10:33","大雪":"2021-12-07 05:57","冬至":"2021-12-21 23:59","小寒":"2021-01-05 11:23","大寒":"2021-01-20 04:40"},"2022":{"立春":"2022-02-04 04:50","雨水":"2022-02-19 00:42","驚蟄":"2022-03-05 22:43","春分":"2022-03-20 23:33","清明":"2022-04-05 03:20","穀雨":"2022-04-20 10:24","立夏":"2022-05-05 20:25","小滿":"2022-05-21 09:22","芒種":"2022-06-06 00:25","夏至":"2022-06-21 17:13","小暑":"2022-07-07 10:37","大暑":"2022-07-23 04:07","立秋":"2022-08-07 20:29","處暑":"2022-08-23 11:16","白露":"2022-09-07 23:32","秋分":"2022-09-23 09:04","寒露":"2022-10-08 15:22","霜降":"2022-10-23 18:36","立冬":"2022-11-07 18:45","小雪":"2022-11-22 16:20","大雪":"2022-12-07 11:46","冬至":"2022-12-22 05:47","小寒":"2022-01-05 17:14","大寒":"2022-01-20 10:38"},"2023":{"立春":"2023-02-04 10:42","雨水":"2023-02-19 06:34","驚蟄":"2023-03-06 04:36","春分":"2023-03-21 05:24","清明":"2023-04-05 09:13","穀雨":"2023-04-20 16:13","立夏":"2023-05-06 02:18","小滿":"2023-05-21 15:08","芒種":"2023-06-06 06:17","夏至":"2023-06-21 22:57","小暑":"2023-07-07 16:30","大暑":"2023-07-23 09:50","立秋":"2023-08-08 02:22","處暑":"2023-08-23 17:01","白露":"2023-09-08 05:26","秋分":"2023-09-23 14:49","寒露":"2023-10-08 21:15","霜降":"2023-10-24 00:21","立冬":"2023-11-08 00:35","小雪":"2023-11-22 22:03","大雪":"2023-12-07 17:33","冬至":"2023-12-22 11:27","小寒":"2023-01-05 23:04","大寒":"2023-01-20 16:29"},"2024":{"立春":"2024-02-04 16:26","雨水":"2024-02-19 12:13","驚蟄":"2024-03-05 10:22","春分":"2024-03-20 11:06","清明":"2024-04-04 15:02","穀雨":"2024-04-19 21:59","立夏":"2024-05-05 08:10","小滿":"2024-05-20 20:59","芒種":"2024-06-05 12:09","夏至":"2024-06-21 04:50","小暑":"2024-07-06 22:20","大暑":"2024-07-22 15:44","立秋":"2024-08-07 08:09","處暑":"2024-08-22 22:55","白露":"2024-09-07 11:11","秋分":"2024-09-22 20:43","寒露":"2024-10-08 03:00","霜降":"2024-10-23 06:14","立冬":"2024-11-07 06:19","小雪":"2024-11-22 03:56","大雪":"2024-12-06 23:16","冬至":"2024-12-21 17:20","小寒":"2024-01-06 04:49","大寒":"2024-01-20 22:07"},"2025":{"立春":"2025-02-03 22:10","雨水":"2025-02-18 18:06","驚蟄":"2025-03-05 16:07","春分":"2025-03-20 17:01","清明":"2025-04-04 20:48","穀雨":"2025-04-20 03:56","立夏":"2025-05-05 13:57","小滿":"2025-05-21 02:54","芒種":"2025-06-05 17:56","夏至":"2025-06-21 10:42","小暑":"2025-07-07 04:04","大暑":"2025-07-22 21:29","立秋":"2025-08-07 13:51","處暑":"2025-08-23 04:33","白露":"2025-09-07 16:51","秋分":"2025-09-23 02:19","寒露":"2025-10-08 08:41","霜降":"2025-10-23 11:51","立冬":"2025-11-07 12:04","小雪":"2025-11-22 09:35","大雪":"2025-12-07 05:04","冬至":"2025-12-21 23:03","小寒":"2025-01-05 10:32","大寒":"2025-01-20 04:00"},"2026":{"立春":"2026-02-04 04:01","雨水":"2026-02-18 23:51","驚蟄":"2026-03-05 21:58","春分":"2026-03-20 22:45","清明":"2026-04-05 02:39","穀雨":"2026-04-20 09:39","立夏":"2026-05-05 19:49","小滿":"2026-05-21 08:37","芒種":"2026-06-05 23:48","夏至":"2026-06-21 16:25","小暑":"2026-07-07 09:57","大暑":"2026-07-23 03:13","立秋":"2026-08-07 19:42","處暑":"2026-08-23 10:18","白露":"2026-09-07 22:41","秋分":"2026-09-23 08:05","寒露":"2026-10-08 14:29","霜降":"2026-10-23 17:38","立冬":"2026-11-07 17:52","小雪":"2026-11-22 15:23","大雪":"2026-12-07 10:52","冬至":"2026-12-22 04:50","小寒":"2026-01-05 16:23","大寒":"2026-01-20 09:44"},"2027":{"立春":"2027-02-04 09:46","雨水":"2027-02-19 05:33","驚蟄":"2027-03-06 03:39","春分":"2027-03-21 04:24","清明":"2027-04-05 08:17","穀雨":"2027-04-20 15:17","立夏":"2027-05-06 01:24","小滿":"2027-05-21 14:17","芒種":"2027-06-06 05:25","夏至":"2027-06-21 22:10","小暑":"2027-07-07 15:36","大暑":"2027-07-23 09:04","立秋":"2027-08-08 01:26","處暑":"2027-08-23 16:13","白露":"2027-09-08 04:28","秋分":"2027-09-23 14:01","寒露":"2027-10-08 20:16","霜降":"2027-10-23 23:32","立冬":"2027-11-07 23:38","小雪":"2027-11-22 21:16","大雪":"2027-12-07 16:37","冬至":"2027-12-22 10:42","小寒":"2027-01-05 22:10","大寒":"2027-01-20 15:30"},"2028":{"立春":"2028-02-04 15:31","雨水":"2028-02-19 11:25","驚蟄":"2028-03-05 09:24","春分":"2028-03-20 10:17","清明":"2028-04-04 14:03","穀雨":"2028-04-19 21:09","立夏":"2028-05-05 07:12","小滿":"2028-05-20 20:09","芒種":"2028-06-05 11:15","夏至":"2028-06-21 04:01","小暑":"2028-07-06 21:30","大暑":"2028-07-22 14:53","立秋":"2028-08-07 07:21","處暑":"2028-08-22 22:00","白露":"2028-09-07 10:22","秋分":"2028-09-22 19:45","寒露":"2028-10-08 02:08","霜降":"2028-10-23 05:13","立冬":"2028-11-07 05:27","小雪":"2028-11-22 02:54","大雪":"2028-12-06 22:24","冬至":"2028-12-21 16:20","小寒":"2028-01-06 03:54","大寒":"2028-01-20 21:21"},"2029":{"立春":"2029-02-03 21:20","雨水":"2029-02-18 17:07","驚蟄":"2029-03-05 15:17","春分":"2029-03-20 16:01","清明":"2029-04-04 19:58","穀雨":"2029-04-20 02:55","立夏":"2029-05-05 13:07","小滿":"2029-05-21 01:55","芒種":"2029-06-05 17:10","夏至":"2029-06-21 09:48","小暑":"2029-07-07 03:22","大暑":"2029-07-22 20:41","立秋":"2029-08-07 13:11","處暑":"2029-08-23 03:51","白露":"2029-09-07 16:11","秋分":"2029-09-23 01:37","寒露":"2029-10-08 07:57","霜降":"2029-10-23 11:07","立冬":"2029-11-07 11:16","小雪":"2029-11-22 08:49","大雪":"2029-12-07 04:13","冬至":"2029-12-21 22:14","小寒":"2029-01-05 09:42","大寒":"2029-01-20 03:01"},"2030":{"立春":"2030-02-04 03:08","雨水":"2030-02-18 22:59","驚蟄":"2030-03-05 21:02","春分":"2030-03-20 21:51","清明":"2030-04-05 01:40","穀雨":"2030-04-20 08:43","立夏":"2030-05-05 18:45","小滿":"2030-05-21 07:40","芒種":"2030-06-05 22:44","夏至":"2030-06-21 15:31","小暑":"2030-07-07 08:55","大暑":"2030-07-23 02:25","立秋":"2030-08-07 18:47","處暑":"2030-08-23 09:36","白露":"2030-09-07 21:53","秋分":"2030-09-23 07:27","寒露":"2030-10-08 13:45","霜降":"2030-10-23 17:00","立冬":"2030-11-07 17:08","小雪":"2030-11-22 14:44","大雪":"2030-12-07 10:07","冬至":"2030-12-22 04:09","小寒":"2030-01-05 15:30","大寒":"2030-01-20 08:54"},"2031":{"立春":"2031-02-04 08:58","雨水":"2031-02-19 04:50","驚蟄":"2031-03-06 02:51","春分":"2031-03-21 03:40","清明":"2031-04-05 07:28","穀雨":"2031-04-20 14:30","立夏":"2031-05-06 00:34","小滿":"2031-05-21 13:27","芒種":"2031-06-06 04:35","夏至":"2031-06-21 21:17","小暑":"2031-07-07 14:48","大暑":"2031-07-23 08:10","立秋":"2031-08-08 00:42","處暑":"2031-08-23 15:23","白露":"2031-09-08 03:50","秋分":"2031-09-23 13:15","寒露":"2031-10-08 19:43","霜降":"2031-10-23 22:49","立冬":"2031-11-07 23:05","小雪":"2031-11-22 20:32","大雪":"2031-12-07 16:03","冬至":"2031-12-22 09:55","小寒":"2031-01-05 21:23","大寒":"2031-01-20 14:48"},"2032":{"立春":"2032-02-04 14:49","雨水":"2032-02-19 10:32","驚蟄":"2032-03-05 08:40","春分":"2032-03-20 09:21","清明":"2032-04-04 13:17","穀雨":"2032-04-19 20:13","立夏":"2032-05-05 06:25","小滿":"2032-05-20 19:14","芒種":"2032-06-05 10:27","夏至":"2032-06-21 03:08","小暑":"2032-07-06 20:40","大暑":"2032-07-22 14:04","立秋":"2032-08-07 06:32","處暑":"2032-08-22 21:18","白露":"2032-09-07 09:38","秋分":"2032-09-22 19:10","寒露":"2032-10-08 01:30","霜降":"2032-10-23 04:46","立冬":"2032-11-07 04:54","小雪":"2032-11-22 02:31","大雪":"2032-12-06 21:53","冬至":"2032-12-21 15:56","小寒":"2032-01-06 03:16","大寒":"2032-01-20 20:31"},"2033":{"立春":"2033-02-03 20:42","雨水":"2033-02-18 16:34","驚蟄":"2033-03-05 14:32","春分":"2033-03-20 15:22","清明":"2033-04-04 19:08","穀雨":"2033-04-20 02:12","立夏":"2033-05-05 12:13","小滿":"2033-05-21 01:10","芒種":"2033-06-05 16:13","夏至":"2033-06-21 09:00","小暑":"2033-07-07 02:24","大暑":"2033-07-22 19:52","立秋":"2033-08-07 12:15","處暑":"2033-08-23 03:01","白露":"2033-09-07 15:20","秋分":"2033-09-23 00:51","寒露":"2033-10-08 07:13","霜降":"2033-10-23 10:27","立冬":"2033-11-07 10:40","小雪":"2033-11-22 08:15","大雪":"2033-12-07 03:44","冬至":"2033-12-21 21:45","小寒":"2033-01-05 09:08","大寒":"2033-01-20 02:33"},"2034":{"立春":"2034-02-04 02:40","雨水":"2034-02-18 22:29","驚蟄":"2034-03-05 20:32","春分":"2034-03-20 21:17","清明":"2034-04-05 01:06","穀雨":"2034-04-20 08:03","立夏":"2034-05-05 18:09","小滿":"2034-05-21 06:57","芒種":"2034-06-05 22:06","夏至":"2034-06-21 14:44","小暑":"2034-07-07 08:17","大暑":"2034-07-23 01:36","立秋":"2034-08-07 18:09","處暑":"2034-08-23 08:47","白露":"2034-09-07 21:14","秋分":"2034-09-23 06:39","寒露":"2034-10-08 13:07","霜降":"2034-10-23 16:16","立冬":"2034-11-07 16:33","小雪":"2034-11-22 14:05","大雪":"2034-12-07 09:36","冬至":"2034-12-22 03:34","小寒":"2034-01-05 15:04","大寒":"2034-01-20 08:26"},"2035":{"立春":"2035-02-04 08:32","雨水":"2035-02-19 04:16","驚蟄":"2035-03-06 02:22","春分":"2035-03-21 03:03","清明":"2035-04-05 06:54","穀雨":"2035-04-20 13:49","立夏":"2035-05-05 23:54","小滿":"2035-05-21 12:43","芒種":"2035-06-06 03:50","夏至":"2035-06-21 20:32","小暑":"2035-07-07 14:01","大暑":"2035-07-23 07:28","立秋":"2035-08-07 23:54","處暑":"2035-08-23 14:44","白露":"2035-09-08 03:02","秋分":"2035-09-23 12:38","寒露":"2035-10-08 18:57","霜降":"2035-10-23 22:16","立冬":"2035-11-07 22:23","小雪":"2035-11-22 20:03","大雪":"2035-12-07 15:25","冬至":"2035-12-22 09:30","小寒":"2035-01-05 20:55","大寒":"2035-01-20 14:14"},"2036":{"立春":"2036-02-04 14:19","雨水":"2036-02-19 10:13","驚蟄":"2036-03-05 08:11","春分":"2036-03-20 09:02","清明":"2036-04-04 12:46","穀雨":"2036-04-19 19:50","立夏":"2036-05-05 05:49","小滿":"2036-05-20 18:44","芒種":"2036-06-05 09:46","夏至":"2036-06-21 02:31","小暑":"2036-07-06 19:57","大暑":"2036-07-22 13:22","立秋":"2036-08-07 05:48","處暑":"2036-08-22 20:32","白露":"2036-09-07 08:55","秋分":"2036-09-22 18:23","寒露":"2036-10-08 00:49","霜降":"2036-10-23 03:59","立冬":"2036-11-07 04:14","小雪":"2036-11-22 01:45","大雪":"2036-12-06 21:15","冬至":"2036-12-21 15:12","小寒":"2036-01-06 02:43","大寒":"2036-01-20 20:10"},"2037":{"立春":"2037-02-03 20:11","雨水":"2037-02-18 15:58","驚蟄":"2037-03-05 14:06","春分":"2037-03-20 14:49","清明":"2037-04-04 18:43","穀雨":"2037-04-20 01:40","立夏":"2037-05-05 11:49","小滿":"2037-05-21 00:35","芒種":"2037-06-05 15:47","夏至":"2037-06-21 08:22","小暑":"2037-07-07 01:55","大暑":"2037-07-22 19:12","立秋":"2037-08-07 11:42","處暑":"2037-08-23 02:21","白露":"2037-09-07 14:45","秋分":"2037-09-23 00:12","寒露":"2037-10-08 06:37","霜降":"2037-10-23 09:49","立冬":"2037-11-07 10:04","小雪":"2037-11-22 07:38","大雪":"2037-12-07 03:07","冬至":"2037-12-21 21:07","小寒":"2037-01-05 08:33","大寒":"2037-01-20 01:53"}};
+const SHUO={"months":[[2458460,11,0],[2458490,12,0],[2458520,1,0],[2458550,2,0],[2458579,3,0],[2458609,4,0],[2458638,5,0],[2458668,6,0],[2458697,7,0],[2458726,8,0],[2458756,9,0],[2458785,10,0],[2458814,11,0],[2458844,12,0],[2458874,1,0],[2458903,2,0],[2458933,3,0],[2458963,4,0],[2458993,4,1],[2459022,5,0],[2459052,6,0],[2459081,7,0],[2459110,8,0],[2459140,9,0],[2459169,10,0],[2459199,11,0],[2459228,12,0],[2459258,1,0],[2459287,2,0],[2459317,3,0],[2459347,4,0],[2459376,5,0],[2459406,6,0],[2459435,7,0],[2459465,8,0],[2459494,9,0],[2459524,10,0],[2459553,11,0],[2459583,12,0],[2459612,1,0],[2459642,2,0],[2459671,3,0],[2459701,4,0],[2459730,5,0],[2459760,6,0],[2459790,7,0],[2459819,8,0],[2459849,9,0],[2459878,10,0],[2459908,11,0],[2459937,12,0],[2459967,1,0],[2459996,2,0],[2460026,2,1],[2460055,3,0],[2460084,4,0],[2460114,5,0],[2460144,6,0],[2460173,7,0],[2460203,8,0],[2460233,9,0],[2460262,10,0],[2460292,11,0],[2460321,12,0],[2460351,1,0],[2460380,2,0],[2460410,3,0],[2460439,4,0],[2460468,5,0],[2460498,6,0],[2460527,7,0],[2460557,8,0],[2460587,9,0],[2460616,10,0],[2460646,11,0],[2460676,12,0],[2460705,1,0],[2460735,2,0],[2460764,3,0],[2460794,4,0],[2460823,5,0],[2460852,6,0],[2460882,6,1],[2460911,7,0],[2460941,8,0],[2460970,9,0],[2461000,10,0],[2461030,11,0],[2461060,12,0],[2461089,1,0],[2461119,2,0],[2461148,3,0],[2461178,4,0],[2461207,5,0],[2461236,6,0],[2461266,7,0],[2461295,8,0],[2461324,9,0],[2461354,10,0],[2461384,11,0],[2461414,12,0],[2461443,1,0],[2461473,2,0],[2461503,3,0],[2461532,4,0],[2461562,5,0],[2461591,6,0],[2461620,7,0],[2461650,8,0],[2461679,9,0],[2461708,10,0],[2461738,11,0],[2461768,12,0],[2461797,1,0],[2461827,2,0],[2461857,3,0],[2461887,4,0],[2461916,5,0],[2461946,5,1],[2461975,6,0],[2462004,7,0],[2462034,8,0],[2462063,9,0],[2462092,10,0],[2462122,11,0],[2462152,12,0],[2462181,1,0],[2462211,2,0],[2462241,3,0],[2462270,4,0],[2462300,5,0],[2462329,6,0],[2462359,7,0],[2462388,8,0],[2462418,9,0],[2462447,10,0],[2462476,11,0],[2462506,12,0],[2462536,1,0],[2462565,2,0],[2462595,3,0],[2462624,4,0],[2462654,5,0],[2462684,6,0],[2462713,7,0],[2462743,8,0],[2462772,9,0],[2462802,10,0],[2462831,11,0],[2462861,12,0],[2462890,1,0],[2462919,2,0],[2462949,3,0],[2462979,3,1],[2463008,4,0],[2463038,5,0],[2463067,6,0],[2463097,7,0],[2463127,8,0],[2463156,9,0],[2463186,10,0],[2463215,11,0],[2463245,12,0],[2463274,1,0],[2463304,2,0],[2463333,3,0],[2463362,4,0],[2463392,5,0],[2463421,6,0],[2463451,7,0],[2463481,8,0],[2463510,9,0],[2463540,10,0],[2463570,11,0],[2463599,12,0],[2463629,1,0],[2463658,2,0],[2463688,3,0],[2463717,4,0],[2463746,5,0],[2463776,6,0],[2463805,7,0],[2463835,8,0],[2463864,9,0],[2463894,10,0],[2463924,11,0],[2463954,11,1],[2463983,12,0],[2464013,1,0],[2464042,2,0],[2464072,3,0],[2464101,4,0],[2464130,5,0],[2464160,6,0],[2464189,7,0],[2464219,8,0],[2464248,9,0],[2464278,10,0],[2464308,11,0],[2464337,12,0],[2464367,1,0],[2464397,2,0],[2464426,3,0],[2464456,4,0],[2464485,5,0],[2464514,6,0],[2464544,7,0],[2464573,8,0],[2464602,9,0],[2464632,10,0],[2464662,11,0],[2464691,12,0],[2464721,1,0],[2464751,2,0],[2464781,3,0],[2464810,4,0],[2464840,5,0],[2464869,6,0],[2464898,6,1],[2464928,7,0],[2464957,8,0],[2464986,9,0],[2465016,10,0]],"zhengyue":[2458520,2458874,2459258,2459612,2459967,2460351,2460705,2461089,2461443,2461797,2462181,2462536,2462890,2463274,2463629,2464013,2464367,2464721]};
+const GAN="甲乙丙丁戊己庚辛壬癸".split("");
+const ZHI="子丑寅卯辰巳午未申酉戌亥".split("");
+const ANIMAL={子:"鼠",丑:"牛",寅:"虎",卯:"兔",辰:"龍",巳:"蛇",午:"馬",未:"羊",申:"猴",酉:"雞",戌:"狗",亥:"豬"};
+const GAN_WX={甲:"木",乙:"木",丙:"火",丁:"火",戊:"土",己:"土",庚:"金",辛:"金",壬:"水",癸:"水"};
+const ZHI_WX={子:"水",丑:"土",寅:"木",卯:"木",辰:"土",巳:"火",午:"火",未:"土",申:"金",酉:"金",戌:"土",亥:"水"};
+const XIU=["角","亢","氐","房","心","尾","箕","斗","牛","女","虛","危","室","壁","奎","婁","胃","昴","畢","觜","參","井","鬼","柳","星","張","翼","軫"];
+const XIU_ANIMAL={角:"蛟",亢:"龍",氐:"貉",房:"兔",心:"狐",尾:"虎",箕:"豹",斗:"獬",牛:"牛",女:"蝠",虛:"鼠",危:"燕",室:"豬",壁:"貐",奎:"狼",婁:"狗",胃:"雉",昴:"雞",畢:"烏",觜:"猴",參:"猿",井:"犴",鬼:"羊",柳:"獐",星:"馬",張:"鹿",翼:"蛇",軫:"蚓"};
+const XIU_WX={角:"木",亢:"金",氐:"土",房:"日",心:"月",尾:"火",箕:"水",斗:"木",牛:"金",女:"土",虛:"日",危:"月",室:"火",壁:"水",奎:"木",婁:"金",胃:"土",昴:"日",畢:"月",觜:"火",參:"水",井:"木",鬼:"金",柳:"土",星:"日",張:"月",翼:"火",軫:"水"};
+const JIANCHU=["建","除","滿","平","定","執","破","危","成","收","開","閉"];
+const HD12=["青龍","明堂","天刑","朱雀","金匱","天德","白虎","玉堂","天牢","玄武","司命","勾陳"];
+const HD_GOOD=new Set(["青龍","明堂","金匱","天德","玉堂","司命"]);
+const JIE12=[["立春",2],["驚蟄",3],["清明",4],["立夏",5],["芒種",6],["小暑",7],["立秋",8],["白露",9],["寒露",10],["立冬",11],["大雪",0],["小寒",1]];
+const ALL_TERMS=["立春","雨水","驚蟄","春分","清明","穀雨","立夏","小滿","芒種","夏至","小暑","大暑","立秋","處暑","白露","秋分","寒露","霜降","立冬","小雪","大雪","冬至","小寒","大寒"];
+const SILI=new Set(["春分","夏至","秋分","冬至"]);
+const SIJUE=new Set(["立春","立夏","立秋","立冬"]);
+// 胎神 60甲子（甲子=0）
+const TAISHEN=["占門碓外東南","碓磨廁外東南","廚灶爐外正南","倉庫門外正南","房床栖外正南","占門床外正南","占碓磨外正南","廚灶廁外西南","倉庫爐外西南","房床門外西南","門雞栖外西南","碓磨床外西南","廚灶碓外西南","倉庫廁外正西","房床爐外正西","占大門外正西","碓磨栖外正西","廚灶床外正西","倉庫碓外西北","房床廁外西北","占門爐外西北","碓磨門外西北","廚灶栖外西北","倉庫床外西北","房床碓房內北","占門廁房內北","碓磨爐房內北","廚灶門房內北","倉庫栖房內北","房床床房內北","占門碓房內北","碓磨廁房內北","廚灶爐房內北","倉庫門房內北","房床栖房內南","占門床房內南","占碓磨房內南","廚灶廁房內南","倉庫爐房內南","房床門房內南","門雞栖房內東","碓磨床房內東","廚灶碓房內東","倉庫廁房內東","房床爐房內東","占大門房內東","碓磨栖房內東","廚灶床房內東","倉庫碓外東北","房床廁外東北","占門爐外東北","碓磨門外東北","廚灶栖外東北","倉庫床外東北","房床碓外正東","占門廁外正東","碓磨爐外正東","廚灶門外正東","倉庫栖外正東","占房床外正東"];
+// 喜神/財神 by 日干
+const XISHEN={甲:"東北",己:"東北",乙:"西北",庚:"西北",丙:"西南",辛:"西南",丁:"正南",壬:"正南",戊:"東南",癸:"東南"};
+const CAISHEN={甲:"東北",乙:"東北",丙:"西南",丁:"西南",戊:"正北",己:"正北",庚:"正東",辛:"正東",壬:"正南",癸:"正南"};
+// 六十甲子納音（每2位一組）
+const NAYIN=["海中金","爐中火","大林木","路旁土","劍鋒金","山頭火","澗下水","城頭土","白蠟金","楊柳木","泉中水","屋上土","霹靂火","松柏木","長流水","沙中金","山下火","平地木","壁上土","金箔金","覆燈火","天河水","大驛土","釵釧金","桑柘木","大溪水","沙中土","天上火","石榴木","大海水"];
+function nayinOf(idx60){return NAYIN[Math.floor(idx60/2)];}
+function gzIndex(gz){if(!gz)return -1;const g=GAN.indexOf(gz[0]),z=ZHI.indexOf(gz[1]);for(let x=0;x<60;x++)if(x%10===g&&x%12===z)return x;return -1;}
+// 天乙貴人 by 日干 -> 地支[]
+const GUIREN={甲:["丑","未"],戊:["丑","未"],庚:["丑","未"],乙:["子","申"],己:["子","申"],丙:["亥","酉"],丁:["亥","酉"],壬:["卯","巳"],癸:["卯","巳"],辛:["午","寅"]};
+const LU={甲:"寅",乙:"卯",丙:"巳",戊:"巳",丁:"午",己:"午",庚:"申",辛:"酉",壬:"亥",癸:"子"};
+// 用事類別
+const CATS=[["JISI","祭祀祈福"],["KAIGUANG","開光點眼"],["ANXIANG","安香謝土"],["CHAODU","齋醮超度安葬"],["RUZHAI","入宅移徙"],["ANCHUANG","安床"],["DONGTU","動土破土"],["XIUZAO","修造拆卸"],["KAISHI","開市交易"],["JIAQU","嫁娶納采"],["CHUXING","出行遠行"],["QIUSI","求嗣"],["QIUYI","求醫療病"]];
+const CATNAME={};CATS.forEach(([k,n])=>CATNAME[k]=n);
+const JC_Y={建:["CHUXING","JISI"],除:["JISI","QIUYI","CHUXING"],滿:["JISI","KAIGUANG","KAISHI","XIUZAO","DONGTU","ANXIANG"],平:["XIUZAO","DONGTU"],定:["JIAQU","XIUZAO","ANCHUANG","RUZHAI","KAISHI","JISI","KAIGUANG","ANXIANG"],執:["XIUZAO","JIAQU"],破:["QIUYI"],危:["JISI","ANCHUANG","CHAODU"],成:["KAISHI","RUZHAI","JIAQU","XIUZAO","KAIGUANG","JISI","DONGTU","CHUXING","QIUSI","ANXIANG"],收:["KAISHI","RUZHAI","JIAQU","QIUSI","JISI","ANXIANG"],開:["JISI","KAIGUANG","KAISHI","RUZHAI","DONGTU","XIUZAO","CHUXING","QIUSI","QIUYI","ANXIANG"],閉:["CHAODU","ANCHUANG"]};
+const JC_J={建:["DONGTU","KAISHI"],除:["JIAQU","KAISHI","RUZHAI","ANCHUANG"],滿:["CHAODU","QIUYI"],平:["JIAQU","KAISHI","QIUYI"],定:["CHUXING","QIUYI"],執:["KAISHI","RUZHAI","CHAODU"],破:["JISI","KAIGUANG","ANXIANG","JIAQU","RUZHAI","ANCHUANG","KAISHI","DONGTU","XIUZAO","CHUXING","QIUSI","CHAODU"],危:["CHUXING","DONGTU"],成:[],收:["CHUXING","CHAODU","QIUYI"],開:["CHAODU"],閉:["KAISHI","CHUXING","KAIGUANG","QIUYI","RUZHAI"]};
+
+function jdn(y,m,d){let a=Math.floor((14-m)/12),yy=y+4800-a,mm=m+12*a-3;return d+Math.floor((153*mm+2)/5)+365*yy+Math.floor(yy/4)-Math.floor(yy/100)+Math.floor(yy/400)-32045;}
+function parseJQ(s){const[dp,tp]=s.split(" ");const[Y,M,D]=dp.split("-").map(Number);const[h,mi]=tp.split(":").map(Number);return new Date(Y,M-1,D,h,mi);}
+function seasonOf(mz){return[2,3,4].includes(mz)?"春":[5,6,7].includes(mz)?"夏":[8,9,10].includes(mz)?"秋":"冬";}
+function chong(zi){return(zi+6)%12;}
+
+function getMonthJian(dt){
+  const y=dt.getFullYear();let c=[];
+  for(const yy of[y-1,y,y+1]){if(!JQ[yy])continue;JIE12.forEach(([nm,zi],i)=>{if(JQ[yy][nm]){c.push({name:nm,date:parseJQ(JQ[yy][nm]),zhiIdx:zi,monthNo:i+1});}});}
+  c=c.filter(x=>x.date<=dt).sort((a,b)=>b.date-a.date);return c[0];
+}
+function termOnDay(y,m,d){
+  let r={term:null,sj:null};
+  for(const yy of[y-1,y,y+1]){if(!JQ[yy])continue;for(const t of ALL_TERMS){if(!JQ[yy][t])continue;
+    const jd=parseJQ(JQ[yy][t]);
+    if(jd.getFullYear()===y&&jd.getMonth()===m-1&&jd.getDate()===d)r.term=t;
+    const p=new Date(jd.getFullYear(),jd.getMonth(),jd.getDate()-1);
+    if(p.getFullYear()===y&&p.getMonth()===m-1&&p.getDate()===d){if(SILI.has(t))r.sj="四離";if(SIJUE.has(t))r.sj="四絕";}
+  }}return r;
+}
+function getYearGZ(dt){let y=dt.getFullYear();const lc=JQ[y]?parseJQ(JQ[y]["立春"]):new Date(y,1,4);if(lc&&dt<lc)y-=1;
+  const gi=((y-4)%10+10)%10,zi=((y-4)%12+12)%12;return{gan:GAN[gi],zhi:ZHI[zi],gi,zi,year:y};}
+function lunarOf(J){const M=SHUO.months;for(let i=0;i<M.length;i++){const a=M[i][0],b=(i+1<M.length)?M[i+1][0]:a+40;if(J>=a&&J<b)return{lm:M[i][1],leap:M[i][2]===1,ld:J-a+1,mlen:(i+1<M.length?M[i+1][0]-M[i][0]:30)};}return null;}
+// 嫁娶周堂（大月順夫、小月逆婦）
+function zhoutang(J){
+  const lu=lunarOf(J);if(!lu)return null;
+  const SHEN=["夫","姑","堂","翁","第","灶","廚","婦"];
+  const big=(lu.mlen===30);
+  let idx=big?((lu.ld-1)%8):(((7-(lu.ld-1))%8+8)%8);
+  const shen=SHEN[idx];
+  return{shen,big,bad:(shen==="夫"||shen==="婦"),avoid:(shen==="姑"||shen==="翁")};
+}
+function inRange(y){return JQ[y]&&JQ[y-1]&&JQ[y+1];}
+
+function pillarGZ(y,m,d,noon,hour){
+  // 通用四柱(年月日)，noon=true以正午定月建；hour可指定生時
+  const H=(hour!=null)?hour:(noon?12:0);
+  const dt=new Date(y,m-1,d,H,0);
+  const J=jdn(y,m,d);
+  const dgi=((J+9)%10+10)%10,dzi=((J+1)%12+12)%12;
+  const yr=getYearGZ(dt);
+  const mj=getMonthJian(dt);
+  if(!mj){ // 節氣表範圍外（多為造命之歷史生日）：僅回日柱與年支，月柱從缺
+    return{J,dgi,dzi,dayGan:GAN[dgi],dayZhi:ZHI[dzi],dayGZ:GAN[dgi]+ZHI[dzi],
+      year:yr,monthGZ:null,monthZhi:null,mZhiIdx:null,monthNo:null,jianMonthName:null,jianStartDate:null,outRange:true};
+  }
+  const mZhiIdx=mj.zhiIdx;
+  const startGan=(2+(yr.gi%5)*2)%10;
+  const mGanIdx=(startGan+(((mZhiIdx-2)%12+12)%12))%10;
+  return{J,dgi,dzi,dayGan:GAN[dgi],dayZhi:ZHI[dzi],dayGZ:GAN[dgi]+ZHI[dzi],
+    year:yr,monthGZ:GAN[mGanIdx]+ZHI[mZhiIdx],monthZhi:ZHI[mZhiIdx],mZhiIdx,monthNo:mj.monthNo,
+    jianMonthName:mj.name,jianStartDate:mj.date};
+}
+function dayInfo(y,m,d){
+  const p=pillarGZ(y,m,d,true);
+  const idx60=(()=>{for(let i=0;i<60;i++)if(GAN[i%10]===p.dayGan&&ZHI[i%12]===p.dayZhi)return i;return 0;})();
+  const jcIdx=((p.dzi-p.mZhiIdx)%12+12)%12;
+  const jianchu=JIANCHU[jcIdx];
+  const qlStart={0:8,6:8,1:10,7:10,2:0,8:0,3:2,9:2,4:4,10:4,5:6,11:6}[p.mZhiIdx];
+  const hdIdx=((p.dzi-qlStart)%12+12)%12;const hdShen=HD12[hdIdx];
+  const wd=new Date(y,m-1,d).getDay();
+  const zForSun=((p.dzi-wd)%12+12)%12;
+  const sx=([5,9,1].includes(zForSun))?3:([8,0,4].includes(zForSun))?10:([11,3,7].includes(zForSun))?17:24;
+  const xiu=XIU[(sx+wd)%28];
+  const chZhi=ZHI[(p.dzi+6)%12];
+  const shaMap={"申子辰":"南","亥卯未":"西","寅午戌":"北","巳酉丑":"東"};
+  let shaFang="";for(const k in shaMap){if(k.includes(p.dayZhi)){shaFang=shaMap[k];break;}}
+  const tod=termOnDay(y,m,d);
+  return Object.assign(p,{idx60,jianchu,jcIdx,hdShen,isHuangdao:HD_GOOD.has(hdShen),xiu,
+    xiuAnimal:XIU_ANIMAL[xiu],xiuWX:XIU_WX[xiu],chongZhi:chZhi,chongAnimal:ANIMAL[chZhi],
+    shaFang,weekday:wd,term:tod.term,siliOrJue:tod.sj,taishen:TAISHEN[idx60],nayin:nayinOf(idx60)});
+}
+function shensha(i){
+  const mz=i.mZhiIdx,dz=i.dzi,sea=seasonOf(mz),dgz=i.dayGZ;
+  const G=[],B=[];
+  if(dgz==={春:"戊寅",夏:"甲午",秋:"戊申",冬:"甲子"}[sea])G.push("天赦");
+  const TD={2:"丁",3:"申",4:"壬",5:"辛",6:"亥",7:"甲",8:"癸",9:"寅",10:"丙",11:"乙",0:"巳",1:"庚"}[mz];
+  if(i.dayGan===TD||i.dayZhi===TD)G.push("天德");
+  const TDH={2:"壬",3:"巳",4:"丁",5:"丙",6:"寅",7:"己",8:"戊",9:"亥",10:"辛",11:"庚",0:"申",1:"乙"}[mz];
+  if(i.dayGan===TDH||i.dayZhi===TDH)G.push("天德合");
+  const shGan=([2,6,10].includes(mz))?"丙":([8,0,4].includes(mz))?"壬":([11,3,7].includes(mz))?"甲":"庚";
+  if(i.dayGan===shGan)G.push("月德");
+  if(i.dayGan==={"丙":"辛","壬":"丁","甲":"己","庚":"乙"}[shGan])G.push("月德合");
+  const groups=[[2,6,10],[8,0,4],[11,3,7],[5,9,1]];const gOf=z=>groups.findIndex(g=>g.includes(z));
+  if(dz!==mz&&gOf(dz)===gOf(mz))G.push("三合");
+  const lh={0:1,1:0,2:11,11:2,3:10,10:3,4:9,9:4,5:8,8:5,6:7,7:6};if(lh[mz]===dz)G.push("六合");
+  if(dz==={春:10,夏:1,秋:4,冬:7}[sea])G.push("天喜");
+  if(dz===(((mz-1)+12)%12))G.push("天醫");
+  const mc={春:[11,0],夏:[2,3],秋:[4,10,1,7],冬:[8,9]}[sea];if(mc.includes(dz))G.push("母倉");
+  if(i.isHuangdao)G.push("黃道·"+i.hdShen);else B.push("黑道·"+i.hdShen);
+  if(dz===chong(i.year.zi))B.push("歲破");
+  if(dz===chong(mz))B.push("月破");
+  if(dz===(((10-(mz-2))%12+12)%12))B.push("月厭");
+  const sf={春:["庚申","辛酉"],夏:["壬子","癸亥"],秋:["甲寅","乙卯"],冬:["丙午","丁巳"]}[sea];if(sf.includes(dgz))B.push("四廢");
+  if(dz==={2:10,3:4,4:11,5:5,6:0,7:6,8:1,9:7,10:2,11:8,0:3,1:9}[mz])B.push("受死");
+  const wwN={立春:7,驚蟄:14,清明:21,立夏:8,芒種:16,小暑:24,立秋:9,白露:18,寒露:27,立冬:10,大雪:20,小寒:30}[i.jianMonthName];
+  const dsj=i.J-jdn(i.jianStartDate.getFullYear(),i.jianStartDate.getMonth()+1,i.jianStartDate.getDate())+1;
+  if(dsj===wwN)B.push("往亡");
+  if(i.siliOrJue)B.push(i.siliOrJue);
+  if(dz==={2:1,3:5,4:9,5:2,6:6,7:10,8:3,9:7,10:11,11:4,0:8,1:0}[mz])B.push("土符");
+  if(dz===5||dz===11)B.push("重日");
+  const lu=lunarOf(i.J);
+  if(lu){if([5,14,23].includes(lu.ld)&&!lu.leap)B.push("月忌");
+    if([3,7,13,18,22,27].includes(lu.ld))B.push("三娘煞");
+    if(lu.ld==={1:13,2:11,3:9,4:7,5:5,6:3,7:1,8:27,9:25,10:23,11:21,12:19}[lu.lm])B.push("楊公忌");}
+  return{G,B,lunar:lu};
+}
+function verdicts(i,ss){
+  const has=n=>ss.G.some(x=>x===n||x.startsWith(n)),hasB=n=>ss.B.some(x=>x===n||x.startsWith(n));
+  const out={};
+  for(const[k]of CATS){let s=0;
+    if(JC_Y[i.jianchu].includes(k))s+=2;
+    if(JC_J[i.jianchu].includes(k))s-=2;
+    if(has("天赦"))s+=3;
+    if(has("天德")&&!has("天德合"))s+=2; if(has("天德合"))s+=1;
+    if(has("月德")&&!has("月德合"))s+=2; if(has("月德合"))s+=1;
+    if(i.isHuangdao)s+=1;else s-=1;
+    if(has("三合")&&["JIAQU","KAISHI","RUZHAI","DONGTU","XIUZAO","QIUSI"].includes(k))s+=1;
+    if(has("六合")&&["JIAQU","KAISHI","RUZHAI"].includes(k))s+=1;
+    if(has("天喜")&&["JIAQU","JISI","QIUSI"].includes(k))s+=1;
+    if(has("天醫")&&k==="QIUYI")s+=2;
+    if(has("母倉")&&["KAISHI","DONGTU"].includes(k))s+=1;
+    if(hasB("歲破"))s-=4; if(hasB("月破"))s-=3; if(hasB("四廢"))s-=2;
+    if(hasB("受死")&&k!=="QIUYI")s-=2;
+    if(hasB("月厭")&&["JIAQU","RUZHAI","CHUXING"].includes(k))s-=1;
+    if(hasB("往亡")&&["CHUXING","JIAQU","RUZHAI","KAISHI","QIUSI"].includes(k))s-=2;
+    if((hasB("四離")||hasB("四絕"))&&["JIAQU","CHUXING","KAISHI","RUZHAI","DONGTU"].includes(k))s-=2;
+    if(hasB("土符")&&["DONGTU","XIUZAO"].includes(k))s-=2;
+    if(hasB("重日")&&k==="CHAODU")s-=1;
+    if(hasB("月忌"))s-=1;
+    if(hasB("三娘煞")&&k==="JIAQU")s-=2;
+    if(hasB("楊公忌"))s-=1;
+    if(k==="JIAQU"){const zt=zhoutang(i.J);if(zt){if(zt.bad)s=Math.min(s,-3);else if(zt.avoid)s-=1;}}
+    out[k]={score:s,v:s>=4?"大吉":s>=2?"宜":s<=-4?"大凶":s<=-2?"忌":"平"};
+  }return out;
+}
+// 吉時（青龍起時）
+function jishi(dzi){
+  const start={0:8,6:8,1:10,7:10,2:0,8:0,3:2,9:2,4:4,10:4,5:6,11:6}[dzi];
+  const HHOUR=["23–01","01–03","03–05","05–07","07–09","09–11","11–13","13–15","15–17","17–19","19–21","21–23"];
+  const out=[];
+  for(let t=0;t<12;t++){const shen=HD12[((t-start)%12+12)%12];out.push({zhi:ZHI[t],hour:HHOUR[t],shen,good:HD_GOOD.has(shen)});}
+  return out;
+}
+// ===== 造命對照 =====
+let CLIENT=null; // {y,m,d,hourZhi, 四柱}
+const WX_SHENG={木:"火",火:"土",土:"金",金:"水",水:"木"};
+const WX_KE={木:"土",土:"水",水:"火",火:"金",金:"木"};
+const XING={子:"卯",卯:"子",寅:"巳",巳:"申",申:"寅",丑:"戌",戌:"未",未:"丑",辰:"辰",午:"午",酉:"酉",亥:"亥"};
+const HAI={子:"未",丑:"午",寅:"巳",卯:"辰",辰:"卯",巳:"寅",午:"丑",未:"子",申:"亥",酉:"戌",戌:"酉",亥:"申"};
+function setClient(y,m,d,hourZhi){
+  const hourMap={子:23,丑:1,寅:3,卯:5,辰:7,巳:9,午:11,未:13,申:15,酉:17,戌:19,亥:21};
+  const p=pillarGZ(y,m,d,true,hourZhi?hourMap[hourZhi]:12);
+  let hourGZ=null;
+  if(hourZhi){const zi=ZHI.indexOf(hourZhi);const startGan=[0,2,4,6,8][p.dgi%5];hourGZ=GAN[(startGan+zi)%10]+hourZhi;}
+  CLIENT={y,m,d,hourZhi,dayGan:p.dayGan,dayZhi:p.dayZhi,dayWX:GAN_WX[p.dayGan],
+    idx60:(()=>{for(let x=0;x<60;x++)if(GAN[x%10]===p.dayGan&&ZHI[x%12]===p.dayZhi)return x;return 0;})(),
+    yearZhi:p.year.zhi,yearAnimal:ANIMAL[p.year.zhi],monthZhi:p.monthZhi,
+    yearGZ:p.year.gan+p.year.zhi,monthGZ:p.monthGZ,dayGZ:p.dayGZ,hourGZ};
+}
+// 對某擇日產生客觀標示
+function mingMarks(info){
+  if(!CLIENT)return null;
+  const m=[];const dz=info.dayZhi;const dzi=info.dzi;
+  const cYearZi=ZHI.indexOf(CLIENT.yearZhi);
+  // 沖生肖
+  if(dzi===chong(cYearZi))m.push({t:"b",s:`本日沖客人生肖（${CLIENT.yearAnimal}）— 大凶，客人本人不宜`});
+  // 三煞含客人生肖
+  const shaTri={"南":["申","子","辰"],"西":["亥","卯","未"],"北":["寅","午","戌"],"東":["巳","酉","丑"]}[info.shaFang]||[];
+  if(shaTri.includes(CLIENT.yearZhi))m.push({t:"b",s:`本日煞${info.shaFang}，正沖客人生肖三合方`});
+  // 天乙貴人
+  const gr=GUIREN[CLIENT.dayGan]||[];
+  if(gr.includes(dz))m.push({t:"g",s:`天乙貴人到（客人日主${CLIENT.dayGan}，貴人${gr.join("、")}）`});
+  // 祿
+  if(LU[CLIENT.dayGan]===dz)m.push({t:"g",s:`臨官祿到（客人日主${CLIENT.dayGan}祿在${LU[CLIENT.dayGan]}）`});
+  // 驛馬（客人年支三合）
+  const maMap={"申":"寅","子":"寅","辰":"寅","寅":"申","午":"申","戌":"申","巳":"亥","酉":"亥","丑":"亥","亥":"巳","卯":"巳","未":"巳"};
+  if(maMap[CLIENT.yearZhi]===dz)m.push({t:"n",s:`驛馬到（主動、遷移、出行）`});
+  // 五行生剋（擇日日干 對 客人日主）
+  const djWX=GAN_WX[info.dayGan],cWX=CLIENT.dayWX;
+  let rel;
+  if(djWX===cWX)rel="比和（同氣相助）";
+  else if(WX_SHENG[djWX]===cWX)rel=`日柱${djWX}生客人${cWX}（生扶）`;
+  else if(WX_SHENG[cWX]===djWX)rel=`客人${cWX}生日柱${djWX}（洩氣）`;
+  else if(WX_KE[djWX]===cWX)rel=`日柱${djWX}剋客人${cWX}（受剋）`;
+  else rel=`客人${cWX}剋日柱${djWX}（我剋、耗力）`;
+  m.push({t:rel.includes("生扶")||rel.includes("比和")?"g":(rel.includes("受剋")?"b":"n"),s:"五行："+rel});
+  // 日支 對 客人日支 刑冲害
+  const cdz=CLIENT.dayZhi;
+  if(dz===ZHI[chong(ZHI.indexOf(cdz))])m.push({t:"b",s:`日支冲客人日支（${cdz}）`});
+  if(XING[dz]===cdz&&dz!==cdz)m.push({t:"b",s:`日支刑客人日支（${cdz}）`});
+  if(HAI[dz]===cdz)m.push({t:"n",s:`日支害客人日支（${cdz}）`});
+  return m;
+}
+function mingScore(info){ // 疊加後的加減，用於用事擇日微調排序
+  if(!CLIENT)return 0;const marks=mingMarks(info);let s=0;
+  marks.forEach(x=>{if(x.s.includes("大凶"))s-=6;else if(x.t==="b")s-=2;else if(x.t==="g")s+=2;});
+  return s;
+}
+// ===== 渲染 =====
+const WKN=["日","一","二","三","四","五","六"];
+const LMON=["","正","二","三","四","五","六","七","八","九","十","冬","臘"];
+const LDAY=["","初一","初二","初三","初四","初五","初六","初七","初八","初九","初十","十一","十二","十三","十四","十五","十六","十七","十八","十九","二十","廿一","廿二","廿三","廿四","廿五","廿六","廿七","廿八","廿九","三十"];
+function lunLabel(lu){return lu?`${lu.leap?"閏":""}${LMON[lu.lm]}月${LDAY[lu.ld]}`:"";}
+function esc(s){return s;}
+
+// ===== 一鍵複製：客人吉課文字 =====
+function clientText(y,m,d,catKey){
+  const i=dayInfo(y,m,d),ss=shensha(i),v=verdicts(i,ss),lu=ss.lunar;
+  const catN=catKey?CATNAME[catKey]:null;
+  const L=[];
+  L.push(catN?`【${catN}吉課】`:"【擇日通書】");
+  L.push(`國曆　${y}年${m}月${d}日（星期${WKN[i.weekday]}）`);
+  if(lu)L.push(`農曆　${lunLabel(lu)}`);
+  if(i.term)L.push(`節氣　${i.term}`);
+  L.push("────────────");
+  if(catKey){const vv=v[catKey].v;
+    const mk=vv==="大吉"?`◎ 本日大吉，宜${catN}`:vv==="宜"?`◎ 本日宜${catN}`:vv==="平"?`○ 本日平平，可行`:`△ 本日不宜${catN}，建議另擇`;
+    L.push(mk);
+    if(catKey==="JIAQU"){const zt=zhoutang(i.J);if(zt)L.push(`嫁娶周堂：值${zt.shen}（${zt.bad?"忌婚":zt.avoid?"翁姑暫避":"宜婚"}）`);}
+  }
+  const gh=jishi(i.dzi).filter(h=>h.good).map(h=>`${h.zhi}時（${h.hour}）`);
+  L.push("吉時　"+gh.join("、"));
+  L.push(`本日沖${i.chongAnimal}、煞${i.shaFang}方（屬${i.chongAnimal}者當日迴避）`);
+  L.push(`喜神　${XISHEN[i.dayGan]}　財神　${CAISHEN[i.dayGan]}`);
+  if(CLIENT){
+    const marks=mingMarks(i);
+    const bad=marks.find(x=>x.s.includes("大凶"));
+    if(bad){L.push("────────────");L.push("※ 對照您的生辰：本日正沖，建議另擇他日");}
+    else{const gui=marks.find(x=>x.t==="g");L.push("────────────");L.push("※ 對照您的生辰：本日未沖"+(gui?("，"+gui.s.split("（")[0]):""));}
+  }
+  return L.join("\n");
+}
+function copyText(txt,btn){
+  const done=()=>{if(btn){const o=btn.textContent;btn.textContent="已複製 ✓";btn.classList.add("copied");setTimeout(()=>{btn.textContent=o;btn.classList.remove("copied");},1400);}toast("已複製，可直接貼給客人");};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(done,()=>fallbackCopy(txt,done));}
+  else fallbackCopy(txt,done);
+}
+function fallbackCopy(txt,cb){const ta=document.createElement("textarea");ta.value=txt;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();try{document.execCommand("copy");}catch(e){}document.body.removeChild(ta);cb&&cb();}
+function toast(msg){let t=document.getElementById("toast");if(!t){t=document.createElement("div");t.id="toast";document.body.appendChild(t);}t.textContent=msg;t.classList.add("show");clearTimeout(t._tm);t._tm=setTimeout(()=>t.classList.remove("show"),1800);}
+
+// ===== 課單（可編輯預覽 → 列印／存 PDF）=====
+function buildSheet(y,m,d,catKey){
+  const i=dayInfo(y,m,d),ss=shensha(i),v=verdicts(i,ss),lu=ss.lunar;
+  const catN=catKey?CATNAME[catKey]:null;
+  const gh=jishi(i.dzi).filter(h=>h.good).map(h=>`${h.zhi}時（${h.hour}）`).join("、");
+  const yi=[],ji=[];
+  CATS.forEach(([k,nm])=>{const r=v[k];if(r.v==="大吉"||r.v==="宜")yi.push(nm);else if(r.v==="忌"||r.v==="大凶")ji.push(nm);});
+  const zt=zhoutang(i.J);
+  let catLine="";
+  if(catKey){const vv=v[catKey].v;const cvt=vv==="大吉"?"大吉":vv==="宜"?"宜":vv==="平"?"平（可行）":"不宜";
+    catLine=`<div class="sh-cat">用事：${catN}<span class="v ${(vv==="忌"||vv==="大凶")?"sh-ji":"sh-yi"}">${cvt}</span></div>`;}
+  let zhoutangRow=(catKey==="JIAQU"&&zt)?`<div class="sh-row"><span class="lk">嫁娶周堂</span><span class="lv">值「${zt.shen}」— ${zt.bad?'<span class="sh-ji">忌婚（不利新人）</span>':zt.avoid?"翁姑拜堂時暫避":'<span class="sh-yi">宜婚</span>'}（${zt.big?"大月順夫":"小月逆婦"}）</span></div>`:"";
+  let mingBlock="";
+  if(CLIENT){const marks=mingMarks(i);
+    mingBlock=`<div class="sh-row"><span class="lk">造命對照</span><span class="lv">客人 ${CLIENT.yearGZ}年 ${CLIENT.dayGZ}日主（生肖${CLIENT.yearAnimal}）</span></div>`+
+      marks.map(mk=>`<div class="sh-row"><span class="lk"></span><span class="lv ${mk.t==="b"?"sh-ji":mk.t==="g"?"sh-yi":""}">${mk.t==="g"?"◎":mk.t==="b"?"✗":"○"} ${mk.s}</span></div>`).join("");
+  }
+  const today=new Date();const stamp=`${today.getFullYear()}/${today.getMonth()+1}/${today.getDate()}`;
+  return `<div class="sheet-inner" contenteditable="true" spellcheck="false">
+    <div class="sh-h"><div class="t">擇 日 課 單</div><div class="s">MIIRAGIC 神奇身心靈學苑 · 依《協紀辨方書》</div></div>
+    ${catLine}
+    <div class="sh-row"><span class="lk">客戶</span><span class="lv"><span class="sh-edit">　　　　　</span></span></div>
+    <div class="sh-pil" contenteditable="false">
+      <div><div class="pk">年柱</div><div class="pv">${i.year.gan}${i.year.zhi}</div><div class="pn">${GAN_WX[i.year.gan]}${ZHI_WX[i.year.zhi]}</div></div>
+      <div><div class="pk">月柱</div><div class="pv">${i.monthGZ}</div><div class="pn">${i.jianMonthName}後</div></div>
+      <div><div class="pk">日柱</div><div class="pv">${i.dayGZ}</div><div class="pn">${i.nayin}</div></div>
+    </div>
+    <div class="sh-row"><span class="lk">國曆</span><span class="lv">${y}年${m}月${d}日　星期${WKN[i.weekday]}</span></div>
+    <div class="sh-row"><span class="lk">農曆</span><span class="lv">${lu?lunLabel(lu):"—"}${i.term?"　·　"+i.term:""}</span></div>
+    <div class="sh-row"><span class="lk">建除·值神</span><span class="lv">${i.jianchu}日　${i.hdShen}（${i.isHuangdao?"黃道":"黑道"}）　二十八宿：${i.xiu}${i.xiuAnimal}</span></div>
+    <div class="sh-row"><span class="lk">吉時</span><span class="lv sh-good">${gh}</span></div>
+    <div class="sh-row"><span class="lk">沖·煞</span><span class="lv sh-ji">沖${i.chongAnimal}　煞${i.shaFang}方</span></div>
+    <div class="sh-row"><span class="lk">喜神·財神</span><span class="lv">喜神 ${XISHEN[i.dayGan]}　財神 ${CAISHEN[i.dayGan]}</span></div>
+    <div class="sh-row"><span class="lk">胎神占方</span><span class="lv">${i.taishen}</span></div>
+    ${zhoutangRow}
+    <div class="sh-row"><span class="lk">本日宜</span><span class="lv sh-yi">${yi.join("、")||"—"}</span></div>
+    <div class="sh-row"><span class="lk">本日忌</span><span class="lv sh-ji">${ji.join("、")||"—"}</span></div>
+    ${mingBlock}
+    <div class="sh-row"><span class="lk">備註</span><span class="lv"><span class="sh-edit">　　　　　　　　　　　　　</span></span></div>
+    <div class="sh-ft"><span>擇日：<span class="sh-edit">　　　　</span></span><span>製表日期：${stamp}</span></div>
+  </div>`;
+}
+function printSheet(y,m,d,catKey){
+  document.getElementById("sheet").innerHTML=buildSheet(y,m,d,catKey);
+  document.getElementById("sheetModal").classList.add("open");
+  document.body.style.overflow="hidden";
+}
+function closeSheet(){document.getElementById("sheetModal").classList.remove("open");document.body.style.overflow="";}
+function renderDay(y,m,d,catKey){
+  if(!inRange(y)){return `<div class="hint warn">此日期超出節氣精算範圍（2020–2035）。請選此區間內的日期，以確保月建與神煞正確。</div>`;}
+  const i=dayInfo(y,m,d);const ss=shensha(i);const v=verdicts(i,ss);const lu=ss.lunar;
+  const yi=[],ji=[];
+  CATS.forEach(([k,nm])=>{const r=v[k];
+    if(r.v==="大吉")yi.push(`<span class="chip star">${nm}★</span>`);
+    else if(r.v==="宜")yi.push(`<span class="chip">${nm}</span>`);
+    else if(r.v==="大凶")ji.push(`<span class="chip star">${nm}✗</span>`);
+    else if(r.v==="忌")ji.push(`<span class="chip">${nm}</span>`);});
+  const hrs=jishi(i.dzi);
+  const marks=mingMarks(i);
+  const lunStr=lu?("農曆"+lunLabel(lu)):"";
+  // 用事情境橫幅
+  let catBanner="";
+  if(catKey){const vv=v[catKey].v;
+    const cls=(vv==="大吉"||vv==="宜")?"cbg-y":(vv==="忌"||vv==="大凶")?"cbg-j":"cbg-p";
+    const txt=vv==="大吉"?"大吉":vv==="宜"?"宜":vv==="平"?"平（可行）":vv==="忌"?"不宜":"大凶";
+    catBanner=`<div class="catbanner ${cls}"><span>本日「${CATNAME[catKey]}」：<b>${txt}</b></span></div>`;
+  }
+  return `
+  <div class="card">
+    <div class="cardhd">
+      <div>
+        <div class="gdate">${y}年${m}月${d}日<span class="wk">星期${WKN[i.weekday]}</span></div>
+        <div class="ldate">${lunStr}${i.term?" · <b>"+i.term+"</b>":""}${i.siliOrJue?" · "+i.siliOrJue:""}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-family:'Noto Serif TC';font-weight:700;color:var(--gold);">${i.jianchu}日 · ${i.hdShen}</div>
+        <div class="mini">${i.isHuangdao?"黃道吉神":"黑道"}值日</div>
+        <button class="copybtn" data-copy="day" data-y="${y}" data-m="${m}" data-d="${d}" data-cat="${catKey||""}">複製給客人</button>
+        <button class="printbtn" data-print="1" data-y="${y}" data-m="${m}" data-d="${d}" data-cat="${catKey||""}">列印課單</button>
+      </div>
+    </div>
+    ${catBanner}
+    <div class="gzgrid">
+      <div class="gzcell"><span class="u">年</span>${i.year.gan}${i.year.zhi}</div>
+      <div class="gzcell"><span class="u">月</span>${i.monthGZ}</div>
+      <div class="gzcell day"><span class="u">日</span>${i.dayGZ}</div>
+    </div>
+    ${marks?renderMingOverlay(marks):""}
+    <div class="yiji">
+      <div class="col yi"><div class="lab">宜</div><div class="items">${yi.length?yi.join(""):'<span class="none">無明顯宜項</span>'}</div></div>
+      <div class="col ji"><div class="lab">忌</div><div class="items">${ji.length?ji.join(""):'<span class="none">無明顯忌項</span>'}</div></div>
+    </div>
+    <div class="ss">
+      <div class="row"><span class="tag g">吉神</span>${ss.G.length?ss.G.map(x=>`<span class="badge g">${x}</span>`).join(""):'<span class="none">—</span>'}</div>
+      <div class="row"><span class="tag b">凶煞</span>${ss.B.length?ss.B.map(x=>`<span class="badge b">${x}</span>`).join(""):'<span class="none">—</span>'}</div>
+    </div>
+    <div class="grid">
+      <div class="cell"><div class="k">二十八宿</div><div class="v">${i.xiu}${i.xiuAnimal}（${i.xiuWX}）</div></div>
+      <div class="cell"><div class="k">日柱納音</div><div class="v">${i.nayin}</div></div>
+      <div class="cell"><div class="k">沖 · 煞</div><div class="v b">沖${i.chongAnimal} 煞${i.shaFang}</div></div>
+      ${(()=>{const zt=zhoutang(i.J);if(!zt)return"";const cls=zt.bad?"b":zt.avoid?"":"g";const note=zt.bad?"忌婚":zt.avoid?"翁姑暫避":"宜婚";return `<div class="cell"><div class="k">嫁娶周堂</div><div class="v ${cls}">值${zt.shen}（${note}）</div></div>`;})()}
+      <div class="cell"><div class="k">胎神占方</div><div class="v">${i.taishen}</div></div>
+      <div class="cell"><div class="k">喜神方位</div><div class="v g">${XISHEN[i.dayGan]}</div></div>
+      <div class="cell"><div class="k">財神方位</div><div class="v g">${CAISHEN[i.dayGan]}</div></div>
+      <div class="cell"><div class="k">彭祖百忌</div><div class="v" style="font-size:.82rem;">${PENGZU[i.dayGan]}${PENGZU_Z[i.dayZhi]}</div></div>
+    </div>
+    <div class="hours">
+      ${hrs.map(h=>`<div class="hr ${h.good?'good':'bad'}"><div class="z">${h.zhi}</div><div class="t">${h.hour}</div><div class="m">${h.good?'吉':'凶'}</div></div>`).join("")}
+    </div>
+  </div>`;
+}
+function renderMingOverlay(marks){
+  return `<div class="overlay"><div class="ttl">造命對照（客人：${CLIENT.yearGZ}年 ${CLIENT.dayGZ}日主${CLIENT.hourGZ?" "+CLIENT.hourGZ+"時":""}）</div>
+  ${marks.map(mk=>`<div class="omark"><span class="dot ${mk.t}">${mk.t==="g"?"◎":mk.t==="b"?"✗":"○"}</span><span>${mk.s}</span></div>`).join("")}
+  </div>`;
+}
+const PENGZU={甲:"甲不開倉財物耗散 ",乙:"乙不栽植千株不長 ",丙:"丙不修灶必見災殃 ",丁:"丁不剃頭頭必生瘡 ",戊:"戊不受田田主不祥 ",己:"己不破券二比並亡 ",庚:"庚不經絡織機虛張 ",辛:"辛不合醬主人不嘗 ",壬:"壬不決水更難提防 ",癸:"癸不詞訟理弱敵強 "};
+const PENGZU_Z={子:"子不問卜自惹禍殃",丑:"丑不冠帶主不還鄉",寅:"寅不祭祀神鬼不嘗",卯:"卯不穿井水泉不香",辰:"辰不哭泣必主重喪",巳:"巳不遠行財物伏藏",午:"午不苫蓋屋主更張",未:"未不服藥毒氣入腸",申:"申不安床鬼祟入房",酉:"酉不會客醉坐顛狂",戌:"戌不喫犬作怪上床",亥:"亥不嫁娶不利新郎"};
+// ===== 用事擇日 =====
+function findGoodDays(catKey,y1,m1,d1,y2,m2,d2){
+  const J1=jdn(y1,m1,d1),J2=jdn(y2,m2,d2);
+  if(J2<J1)return{err:"迄日不可早於起日"};
+  if(J2-J1>366)return{err:"範圍請控制在一年以內"};
+  const rows=[];
+  for(let J=J1;J<=J2;J++){
+    // JDN -> date
+    let a=J+32044,b=Math.floor((4*a+3)/146097),c=a-Math.floor(146097*b/4);
+    let dd=Math.floor((4*c+3)/1461),e=c-Math.floor(1461*dd/4),mm=Math.floor((5*e+2)/153);
+    const day=e-Math.floor((153*mm+2)/5)+1,month=mm+3-12*Math.floor(mm/10),year=100*b+dd-4800+Math.floor(mm/10);
+    if(!inRange(year))continue;
+    const i=dayInfo(year,month,day);const ss=shensha(i);const v=verdicts(i,ss);
+    let sc=v[catKey].score;
+    const mAdj=mingScore(i);sc+=mAdj;
+    const mm2=mingMarks(i);
+    let note=`${i.jianchu}日 · ${i.hdShen} · ${ss.G.filter(x=>!x.startsWith("黃道")&&!x.startsWith("黑道")).join("、")||"無特殊吉神"}`;
+    if(ss.B.filter(x=>!x.startsWith("黑道")&&!x.startsWith("黃道")).length)note+=` · 忌:${ss.B.filter(x=>!x.startsWith("黑道")).join("、")}`;
+    let clientBad=false;
+    if(mm2){const chg=mm2.find(x=>x.s.includes("大凶"));if(chg){clientBad=true;note+=` · ⚠${chg.s}`;}}
+    rows.push({year,month,day,gz:i.dayGZ,animal:ANIMAL[i.dayZhi],score:sc,rawV:v[catKey].v,note,clientBad,
+      lunar:ss.lunar});
+  }
+  // 只留 宜/大吉（score>=2）且非客人大凶；依分數排序
+  let good=rows.filter(r=>r.score>=2&&!r.clientBad).sort((a,b)=>b.score-a.score||jdn(a.year,a.month,a.day)-jdn(b.year,b.month,b.day));
+  return{good:good.slice(0,30),total:rows.length};
+}
+function renderFind(catKey,r){
+  if(r.err)return`<div class="hint warn">${r.err}</div>`;
+  if(!r.good.length)return`<div class="hint">此範圍內查無「${CATNAME[catKey]}」的宜用吉日（已排除凶日${CLIENT?"與沖客人之日":""}）。可放寬日期範圍再試。</div>`;
+  return r.good.map((g,idx)=>{
+    const cls=g.score>=5?"vgood":g.score>=3?"vgood":"vok";
+    const vt=g.score>=6?"上上":g.score>=4?"上吉":"次吉";
+    const lu=g.lunar;const lstr=lu?`農曆${["","正","二","三","四","五","六","七","八","九","十","冬","臘"][lu.lm]}月${lu.ld}`:"";
+    return `<div class="rrow" data-y="${g.year}" data-m="${g.month}" data-d="${g.day}">
+      <span class="rank">${idx+1}</span>
+      <span class="rd">${g.month}/${g.day}（${WKN[new Date(g.year,g.month-1,g.day).getDay()]}）</span>
+      <span class="rgz">${g.gz}日 沖${g.animal} · ${lstr}</span>
+      <span class="rv ${cls}">${vt}</span>
+      <button class="rcopy" data-y="${g.year}" data-m="${g.month}" data-d="${g.day}" data-cat="${catKey}">複製</button>
+      <span class="rnote">${g.note}</span>
+    </div>`;
+  }).join("");
+}
+
+// ===== UI 綁定 =====
+const $=s=>document.querySelector(s);
+function todayStr(){const t=new Date();return`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,"0")}-${String(t.getDate()).padStart(2,"0")}`;}
+function parseInput(v){if(!v)return null;const[y,m,d]=v.split("-").map(Number);return{y,m,d};}
+
+// tabs
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));
+  document.querySelectorAll(".panel").forEach(x=>x.classList.remove("on"));
+  t.classList.add("on");$("#p-"+t.dataset.p).classList.add("on");
+}));
+// toggles
+$("#tgTheme").addEventListener("click",function(){
+  const h=document.documentElement;const light=h.getAttribute("data-theme")==="light";
+  if(light){h.removeAttribute("data-theme");h.style.colorScheme="dark";this.textContent="亮";document.querySelector('meta[name=theme-color]').content="#191b21";}
+  else{h.setAttribute("data-theme","light");h.style.colorScheme="light";this.textContent="暗";document.querySelector('meta[name=theme-color]').content="#efe9db";}
+});
+$("#tgBig").addEventListener("click",function(){
+  const h=document.documentElement;const big=h.getAttribute("data-big")==="1";
+  if(big){h.removeAttribute("data-big");this.classList.remove("on");}else{h.setAttribute("data-big","1");this.classList.add("on");}
+});
+
+// 課單預覽視窗
+$("#sheetPrint").addEventListener("click",()=>window.print());
+$("#sheetClose").addEventListener("click",closeSheet);
+$("#sheetModal").addEventListener("click",e=>{if(e.target.id==="sheetModal")closeSheet();});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&document.getElementById("sheetModal").classList.contains("open"))closeSheet();});
+
+// 每日查詢
+const dayCatSel=$("#dayCat");
+const optNone=document.createElement("option");optNone.value="";optNone.textContent="（不指定，看全日）";dayCatSel.appendChild(optNone);
+CATS.forEach(([k,n])=>{const o=document.createElement("option");o.value=k;o.textContent=n;dayCatSel.appendChild(o);});
+function doDay(){const p=parseInput($("#dayDate").value);if(!p)return;$("#dayOut").innerHTML=renderDay(p.y,p.m,p.d,dayCatSel.value||null);}
+$("#dayDate").addEventListener("change",doDay);
+dayCatSel.addEventListener("change",doDay);
+$("#dayToday").addEventListener("click",()=>{$("#dayDate").value=todayStr();doDay();});
+
+// 複製／列印鈕（事件委派）
+document.addEventListener("click",e=>{
+  const pb=e.target.closest(".printbtn");
+  if(pb){e.stopPropagation();printSheet(+pb.dataset.y,+pb.dataset.m,+pb.dataset.d,pb.dataset.cat||null);return;}
+  const b=e.target.closest(".copybtn,.rcopy");if(!b)return;
+  e.stopPropagation();
+  const txt=clientText(+b.dataset.y,+b.dataset.m,+b.dataset.d,b.dataset.cat||null);
+  copyText(txt,b);
+});
+
+// 用事擇日
+const sel=$("#findCat");CATS.forEach(([k,n])=>{const o=document.createElement("option");o.value=k;o.textContent=n;sel.appendChild(o);});
+function doFind(){
+  const k=sel.value;const a=parseInput($("#findStart").value),b=parseInput($("#findEnd").value);
+  if(!a||!b)return;const r=findGoodDays(k,a.y,a.m,a.d,b.y,b.m,b.d);
+  $("#findMing").innerHTML=CLIENT?`已套用客人：${CLIENT.yearGZ}年 ${CLIENT.dayGZ}日主 → 已排除沖客人之日，並優先貴人/祿到之日`:"";
+  $("#findOut").innerHTML=renderFind(k,r);
+  document.querySelectorAll("#findOut .rrow").forEach(row=>row.addEventListener("click",(ev)=>{
+    if(ev.target.closest(".rcopy"))return;
+    document.querySelector('.tab[data-p="day"]').click();
+    $("#dayDate").value=`${row.dataset.y}-${String(row.dataset.m).padStart(2,"0")}-${String(row.dataset.d).padStart(2,"0")}`;
+    dayCatSel.value=k;
+    doDay();window.scrollTo({top:0,behavior:"smooth"});
+  }));
+}
+$("#findGo").addEventListener("click",doFind);
+
+// 造命
+const hsel=$("#mingHour");
+const hopt=[["","不指定時辰"],["子","子 23–01"],["丑","丑 01–03"],["寅","寅 03–05"],["卯","卯 05–07"],["辰","辰 07–09"],["巳","巳 09–11"],["午","午 11–13"],["未","未 13–15"],["申","申 15–17"],["酉","酉 17–19"],["戌","戌 19–21"],["亥","亥 21–23"]];
+hopt.forEach(([v,t])=>{const o=document.createElement("option");o.value=v;o.textContent=t;hsel.appendChild(o);});
+// 年/月/日 下拉
+const mYsel=$("#mingY"),mMsel=$("#mingM"),mDsel=$("#mingD");
+const curY=new Date().getFullYear();
+for(let yy=curY;yy>=1940;yy--){const o=document.createElement("option");o.value=yy;o.textContent=yy+"年";mYsel.appendChild(o);}
+for(let mm=1;mm<=12;mm++){const o=document.createElement("option");o.value=mm;o.textContent=mm+"月";mMsel.appendChild(o);}
+function fillDays(){const y=+mYsel.value,m=+mMsel.value;const dim=new Date(y,m,0).getDate();const cur=+mDsel.value||1;mDsel.innerHTML="";for(let dd=1;dd<=dim;dd++){const o=document.createElement("option");o.value=dd;o.textContent=dd+"日";mDsel.appendChild(o);}mDsel.value=Math.min(cur,dim);}
+mYsel.value=1990;mMsel.value=1;fillDays();
+mYsel.addEventListener("change",fillDays);mMsel.addEventListener("change",fillDays);
+function renderBazi(){
+  if(!CLIENT){$("#mingBazi").innerHTML="";return;}
+  // 由右到左：時 日 月 年（年在最右）
+  const cols=[
+    {lab:"時",gz:CLIENT.hourGZ},
+    {lab:"日",gz:CLIENT.dayGZ,zhu:true},
+    {lab:"月",gz:CLIENT.monthGZ},
+    {lab:"年",gz:CLIENT.yearGZ,animal:CLIENT.yearAnimal}
+  ];
+  const colHTML=cols.map(c=>{
+    if(!c.gz)return `<div class="col${c.zhu?" zhu":""}"><div class="cl">${c.lab}</div><div class="cmark"></div><div class="cg">—</div><div class="cz">—</div><div class="cn">${c.lab==="時"?"未填時辰":c.lab==="月"?"範圍外":""}</div></div>`;
+    const g=c.gz[0],z=c.gz[1];const idx=gzIndex(c.gz);
+    return `<div class="col${c.zhu?" zhu":""}">
+      <div class="cl">${c.lab}</div>
+      <div class="cmark">${c.zhu?'<span class="cyuan">日主</span>':""}</div>
+      <div class="cg wx-${GAN_WX[g]}">${g}</div>
+      <div class="cz wx-${ZHI_WX[z]}">${z}</div>
+      ${idx>=0?`<div class="cn">${nayinOf(idx)}</div>`:""}
+      ${c.animal?`<div class="cs">生肖${c.animal}</div>`:""}
+    </div>`;
+  }).join("");
+  $("#mingBazi").innerHTML=`<div class="card"><div class="cardhd"><div class="gdate">客人命盤</div>
+    <div class="mini">由右至左 · 干上支下 · 已套用於「每日查詢」與「用事擇日」</div></div>
+    <div style="padding:14px 16px 4px;"><div class="chart">${colHTML}</div></div>
+    <div class="ss"><div class="row"><span class="tag g">貴人</span>${(GUIREN[CLIENT.dayGan]||[]).map(z=>`<span class="badge g">${z}(${ANIMAL[z]})</span>`).join("")}
+      <span class="tag g" style="margin-left:10px;">祿</span><span class="badge g">${LU[CLIENT.dayGan]}(${ANIMAL[LU[CLIENT.dayGan]]})</span></div>
+    <div class="mini" style="margin-top:6px;">擇日時，日支落在上列地支＝貴人／祿到位（吉）。</div></div>
+  </div>`;
+}
+$("#mingSet").addEventListener("click",()=>{const y=+mYsel.value,m=+mMsel.value,d=+mDsel.value;if(!y||!m||!d){$("#mingBazi").innerHTML='<div class="hint warn">請選擇客人的國曆生日。</div>';return;}setClient(y,m,d,$("#mingHour").value||null);renderBazi();if($("#dayDate").value)doDay();});
+$("#mingClear").addEventListener("click",()=>{CLIENT=null;$("#mingBazi").innerHTML="";$("#findMing").innerHTML="";if($("#dayDate").value)doDay();});
+
+// init
+(function(){const t=todayStr();$("#dayDate").value=t;$("#findStart").value=t;
+  const nd=new Date();nd.setMonth(nd.getMonth()+2);$("#findEnd").value=`${nd.getFullYear()}-${String(nd.getMonth()+1).padStart(2,"0")}-${String(nd.getDate()).padStart(2,"0")}`;
+  doDay();})();
+</script>
+</body>
+</html>
