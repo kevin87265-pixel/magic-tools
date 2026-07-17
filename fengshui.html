@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#16130e">
+<title>風水五派實戰排盤</title>
+<style>
+:root{
+  --bg:#16130e; --bg2:#1f1a12; --panel:#221c13; --line:#3a2f1e;
+  --ink:#ece3cf; --dim:#b6a884; --faint:#8a7c5e;
+  --brass:#c8a24a; --brass2:#e6c878; --jade:#5aa892; --zhu:#c8574a; --zhu2:#e07a5f;
+  --shadow:rgba(0,0,0,.5); --fs:18px;
+}
+html[data-theme="light"]{
+  --bg:#efe7d4; --bg2:#e6dcc4; --panel:#f6efdd; --line:#d3c39a;
+  --ink:#2a2013; --dim:#4a3d26; --faint:#6f5f3f;
+  --brass:#9a7420; --brass2:#7a5a10; --jade:#2f7a64; --zhu:#b23a2a; --zhu2:#8a2a1c;
+  --shadow:rgba(0,0,0,.15); color-scheme:light dark;
+}
+html{background:var(--bg);color-scheme:dark light;}
+html.big{--fs:18px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:radial-gradient(120% 80% at 50% -10%, var(--bg2), var(--bg));
+  color:var(--ink);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  font-size:var(--fs);line-height:1.65;min-height:100vh;padding:18px 16px 90px;}
+.wrap{max-width:1000px;margin:0 auto;}
+.head{text-align:center;margin-bottom:18px;}
+h1{font-family:"Noto Serif TC","Songti TC",serif;font-weight:700;font-size:1.6rem;
+  letter-spacing:.16em;color:var(--brass2);}
+.sub{color:var(--faint);font-size:.76rem;letter-spacing:.28em;margin-top:6px;}
+.themebar{position:absolute;top:14px;right:14px;display:flex;gap:6px;}
+.themebar button{background:transparent;border:1px solid var(--line);color:var(--dim);
+  border-radius:20px;padding:3px 11px;font-size:.72rem;cursor:pointer;font-family:inherit;}
+.themebar button:hover{border-color:var(--brass);color:var(--brass2);}
+#printBtn{margin-top:12px;background:transparent;border:1px solid var(--brass);color:var(--brass2);
+  border-radius:22px;padding:7px 18px;font-size:.85rem;cursor:pointer;font-family:"Noto Serif TC",serif;letter-spacing:.08em;}
+#printBtn:hover{background:var(--brass);color:#2a2013;}
+#leanBtn{margin-top:12px;margin-left:8px;background:transparent;border:1px solid var(--jade);color:var(--jade);
+  border-radius:22px;padding:7px 18px;font-size:.85rem;cursor:pointer;font-family:"Noto Serif TC",serif;letter-spacing:.08em;}
+#leanBtn:hover{background:var(--jade);color:#fff;}
+body.lean .talk{display:none;}
+body.lean .simple-hide{display:none;}
+.print-header{display:none;}
+
+/* 輸入區：羅盤 + 表單，responsive 不擠 */
+.top{display:grid;grid-template-columns:248px 1fr;gap:20px;align-items:start;
+  background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:20px;}
+@media(max-width:720px){.top{grid-template-columns:1fr;}}
+.luopan-box{display:flex;flex-direction:column;align-items:center;gap:10px;}
+#luopan{width:100%;max-width:232px;height:auto;filter:drop-shadow(0 6px 20px var(--shadow));}
+.seatdetail{font-size:.8rem;color:var(--dim);margin-top:6px;line-height:1.5;text-align:center;
+  background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:6px 8px;}
+.seatlegend{font-size:.66rem;color:var(--faint);margin-top:5px;text-align:center;line-height:1.5;}
+.seat{font-family:"Noto Serif TC",serif;font-size:.9rem;color:var(--dim);text-align:center;line-height:1.4;}
+.seat b{color:var(--brass2);font-size:1.1rem;}.seat .xiang{color:var(--jade);}
+.seat small{display:block;color:var(--faint);font-size:.68rem;letter-spacing:.05em;margin-top:2px;}
+
+.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 16px;}
+@media(max-width:560px){.formgrid{grid-template-columns:1fr;}}
+.grp{min-width:0;}
+.grp.full{grid-column:1/-1;}
+.grp>label{display:block;font-size:.82rem;color:var(--dim);letter-spacing:.06em;margin-bottom:6px;font-weight:600;}
+.row{display:flex;gap:6px;}
+select,input[type=number],input[type=text]{background:var(--bg2);border:1px solid var(--line);color:var(--ink);
+  border-radius:8px;padding:10px 11px;font-size:.98rem;font-family:inherit;width:100%;min-width:0;}
+select:focus,input:focus{outline:none;border-color:var(--brass);}
+.hint{font-size:.78rem;color:var(--faint);margin-top:4px;line-height:1.5;}
+.formhead{grid-column:1/-1;font-family:"Noto Serif TC",serif;font-size:.92rem;color:var(--brass2);
+  letter-spacing:.1em;border-bottom:1px solid var(--line);padding-bottom:5px;margin-bottom:2px;}
+.formhead.opt{color:var(--faint);margin-top:8px;}
+.chk{font-size:.9rem;color:var(--dim);display:flex;align-items:center;gap:7px;cursor:pointer;}
+.chk input{width:auto;}
+details.help .body h5{color:var(--brass2);margin:12px 0 4px;font-size:.9rem;border-top:1px solid var(--line);padding-top:8px;}
+details.help .body h5:first-child{border-top:none;padding-top:0;}
+.btn{grid-column:1/-1;background:linear-gradient(180deg,var(--brass2),var(--brass));
+  color:#2a2013;border:none;border-radius:10px;padding:12px;font-size:1.05rem;font-weight:700;
+  letter-spacing:.3em;cursor:pointer;font-family:"Noto Serif TC",serif;margin-top:4px;}
+.btn:active{transform:translateY(1px);}
+details.help{grid-column:1/-1;background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:2px 12px;}
+details.help summary{cursor:pointer;font-size:.8rem;color:var(--brass2);padding:8px 0;list-style:none;}
+details.help summary::-webkit-details-marker{display:none;}
+details.help summary::before{content:'▸ ';}
+details.help[open] summary::before{content:'▾ ';}
+details.help .body{font-size:.85rem;color:var(--dim);line-height:1.7;padding:4px 0 12px;}
+details.help .body b{color:var(--brass2);}
+details.help .body h5{color:var(--ink);margin:10px 0 3px;font-size:.9rem;}
+.jsgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px;margin-top:6px;}
+.jsgrid select{font-size:.78rem;padding:6px;}
+
+/* 分頁 */
+.tabs{display:flex;gap:3px;flex-wrap:wrap;border-bottom:1px solid var(--line);}
+.tab{background:transparent;border:none;color:var(--faint);padding:9px 13px;font-size:.85rem;
+  cursor:pointer;font-family:"Noto Serif TC",serif;letter-spacing:.06em;border-bottom:2px solid transparent;margin-bottom:-1px;}
+.tab:hover{color:var(--dim);}.tab.on{color:var(--brass2);border-bottom-color:var(--brass);}
+.tab.sum.on{color:var(--zhu2);border-bottom-color:var(--zhu);}
+.panel{display:none;background:var(--panel);border:1px solid var(--line);border-top:none;
+  border-radius:0 0 14px 14px;padding:22px;animation:fade .25s;}
+.panel.on{display:block;}
+@keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;}}
+
+h2{font-family:"Noto Serif TC",serif;font-size:1.18rem;color:var(--brass2);letter-spacing:.1em;margin-bottom:3px;}
+.tagline{color:var(--faint);font-size:.8rem;margin-bottom:16px;letter-spacing:.06em;}
+h3{font-size:.98rem;color:var(--dim);margin:22px 0 10px;letter-spacing:.05em;border-left:3px solid var(--brass);padding-left:9px;}
+.note{background:var(--bg2);border:1px dashed var(--line);border-radius:8px;padding:12px 14px;
+  font-size:.85rem;color:var(--dim);margin-top:14px;line-height:1.7;}
+.note b{color:var(--zhu2);}
+.talk{background:linear-gradient(180deg,rgba(200,162,74,.06),transparent);
+  border:1px solid var(--line);border-left:3px solid var(--brass2);border-radius:8px;
+  padding:14px 17px;margin:16px 0;font-size:.92rem;line-height:1.85;color:var(--ink);}
+.talk h4{color:var(--brass2);font-size:.92rem;letter-spacing:.08em;margin-bottom:8px;font-family:"Noto Serif TC",serif;}
+.talk p{margin:6px 0;}
+.talk .q{color:var(--faint);font-style:italic;}
+
+.grid9{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:330px;margin:6px auto 4px;}
+.cell{background:var(--bg2);border:1px solid var(--line);border-radius:9px;aspect-ratio:1;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;padding:4px;}
+.cell .dir{position:absolute;top:4px;left:6px;font-size:.58rem;color:var(--faint);}
+.cell.zuo{border-color:var(--zhu);box-shadow:inset 0 0 0 1px var(--zhu);}
+.cell.xiang{border-color:var(--jade);box-shadow:inset 0 0 0 1px var(--jade);}
+.cell.center{background:var(--panel);border-style:dashed;}
+.cell.warn{border-color:var(--zhu2);box-shadow:inset 0 0 0 1px var(--zhu2);}
+.stars{display:flex;gap:8px;align-items:baseline;}
+.s-shan{color:var(--zhu2);font-size:1.05rem;font-weight:700;}
+.s-xiang{color:var(--jade);font-size:1.05rem;font-weight:700;}
+.s-yun{color:var(--faint);font-size:.7rem;}
+.zi-year{color:var(--brass2);font-size:1.15rem;font-weight:700;}
+.zi-month{color:var(--dim);font-size:.85rem;}
+.legend{text-align:center;font-size:.66rem;color:var(--faint);margin-top:3px;}
+.ling{text-align:center;font-family:"Noto Serif TC",serif;font-size:1rem;color:var(--brass2);letter-spacing:.1em;margin:14px 0 4px;}
+
+.dirlist{display:grid;gap:7px;margin-top:4px;}
+.direntry{display:grid;grid-template-columns:66px 1fr;gap:10px;align-items:start;
+  background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:9px 11px;}
+.direntry.wide{grid-template-columns:1fr;}
+.direntry .d{font-family:"Noto Serif TC",serif;color:var(--brass2);font-size:.94rem;text-align:center;
+  border-right:1px solid var(--line);padding-right:8px;}
+.direntry .d small{display:block;color:var(--faint);font-size:.6rem;font-family:sans-serif;}
+.direntry .txt{font-size:.88rem;line-height:1.6;}
+.pill{display:inline-block;font-size:.66rem;padding:1px 8px;border-radius:20px;margin-right:6px;}
+.pill.ji{background:rgba(90,168,146,.18);color:var(--jade);border:1px solid var(--jade);}
+.pill.xiong{background:rgba(200,87,74,.16);color:var(--zhu2);border:1px solid var(--zhu);}
+.pill.ping{background:var(--bg);color:var(--faint);border:1px solid var(--line);}
+.kv{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:.85rem;margin:6px 0;}
+.kv span b{color:var(--brass2);}
+.verdict{background:var(--bg2);border:1px solid var(--brass);border-radius:10px;padding:14px 16px;margin-bottom:16px;}
+.verdict .big{font-family:"Noto Serif TC",serif;font-size:1.05rem;color:var(--brass2);letter-spacing:.06em;line-height:1.6;}
+.rankrow{display:grid;grid-template-columns:52px 1fr;gap:11px;align-items:center;
+  background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:9px 12px;margin-bottom:6px;}
+.rankrow .badge{font-family:"Noto Serif TC",serif;font-size:1rem;text-align:center;border-radius:6px;padding:4px 0;}
+.rankrow.good .badge{background:rgba(90,168,146,.15);color:var(--jade);border:1px solid var(--jade);}
+.rankrow.bad .badge{background:rgba(200,87,74,.15);color:var(--zhu2);border:1px solid var(--zhu);}
+.rankrow .info b{color:var(--ink);}
+.rankrow .info small{color:var(--faint);font-size:.78rem;}
+.rankrow .use{font-size:.86rem;color:var(--dim);margin-top:3px;line-height:1.55;}
+.checklist{list-style:none;}
+.checklist li{background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:10px 13px;margin-bottom:6px;font-size:.88rem;line-height:1.6;}
+.checklist li b{color:var(--brass2);}
+
+@media print{
+ html{--bg:#fff;--bg2:#fff;--panel:#fff;--line:#c8c8c8;--ink:#1a1a1a;--dim:#333;--faint:#666;--brass:#8a6d1a;--brass2:#5c4610;--jade:#1a7050;--zhu:#a83224;--zhu2:#7a2016;}
+ body{background:#fff!important;padding:0;font-size:12px;}
+ .themebar,.top,.tabs,#printBtn,.head .sub{display:none!important;}
+ .head h1{font-size:1.2rem;color:#5c4610;}
+ .print-header{display:block!important;text-align:center;border-bottom:2px solid #8a6d1a;padding-bottom:8px;margin-bottom:14px;}
+ .print-header .ph-title{font-family:"Noto Serif TC",serif;font-size:1.3rem;color:#5c4610;letter-spacing:.2em;}
+ .print-header .ph-meta{font-size:.8rem;color:#333;margin-top:4px;}
+ .panel{display:block!important;border:none!important;background:#fff!important;padding:0 0 10px;}
+ .panel+.panel{page-break-before:always;}
+ h2,h3,h4{page-break-after:avoid;}
+ .talk,.direntry,.rankrow,.checklist li,.verdict,.note,.grid9{page-break-inside:avoid;}
+ *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+}
+</style>
+</head>
+<body>
+<div class="themebar">
+  <button onclick="setTheme('dark')">深</button>
+  <button onclick="setTheme('light')">淺</button>
+  <button onclick="toggleBig()">大字</button>
+</div>
+<div class="wrap">
+  <div class="head">
+    <h1>風水五派實戰排盤</h1>
+    <div class="sub">綜合總結 · 八宅 · 玄空 · 三合 · 金鎖玉關 · 乾坤國寶 · 紫白</div>
+    <button id="printBtn" onclick="printAll()">🖨 列印／存 PDF 排盤單</button>
+    <button id="leanBtn" onclick="toggleLean()">📖 完整解說</button>
+  </div>
+  <div class="print-header" id="printHeader"></div>
+
+  <div class="top">
+    <div class="luopan-box">
+      <svg id="luopan" viewBox="0 0 220 220" aria-label="羅盤"></svg>
+      <div class="seat" id="seat">坐 <b>—</b> 向 <span class="xiang">—</span><small>先填坐山，再按排盤</small></div>
+    </div>
+
+    <div class="formgrid">
+      <div class="formhead">必填 · 這 4 樣填完就能排盤</div>
+
+      <div class="grp full"><label>① 房屋坐向（手機羅盤讀哪個填哪個 · 三選一）</label>
+        <div class="row" style="flex-wrap:wrap;gap:8px">
+          <div style="flex:1;min-width:140px"><input type="number" id="degXiang" placeholder="向 度數 0–360">
+            <div class="hint">面對方度數（手機羅盤讀這個最準）</div></div>
+          <div style="flex:1;min-width:140px"><input type="number" id="degZuo" placeholder="坐 度數 0–360">
+            <div class="hint">或背靠方度數</div></div>
+          <div style="flex:1;min-width:150px"><select id="zuo"></select>
+            <div class="hint">或直接選坐山</div></div>
+        </div>
+        <div class="hint" id="resolveHint" style="margin-top:6px"></div></div>
+
+      <div class="grp"><label>② 屋主生年</label>
+        <input type="number" id="year" placeholder="西元 例1985" value="1985">
+        <label class="hint" style="display:flex;align-items:center;gap:5px;margin-top:5px;cursor:pointer"><input type="checkbox" id="lichun" style="width:auto"> 國曆 2/4 立春前生→算前一年</label></div>
+      <div class="grp"><label>③ 屋主性別</label>
+        <select id="gender"><option value="男">男</option><option value="女">女</option></select></div>
+
+      <div class="grp full"><label>④ 分析流年 · 流月（紫白）</label>
+        <div class="row" style="max-width:320px"><input type="number" id="fyear" value="2026"><select id="fmonth" style="flex:1.3"></select></div>
+        <div class="hint">流月填了才排月紫白</div></div>
+
+      <div class="formhead opt">選填 · 需要才點開（不填也能完整排盤）</div>
+
+      <details class="help">
+        <summary>更多資料（案主・配偶・坐向依據・來去水）</summary>
+        <div class="body">
+          <h5>案主／客戶（印在排盤單上）</h5>
+          <input type="text" id="client" placeholder="例：王小姐 / 台中大墩路某宅">
+          <h5>配偶（排夫妻床位用）</h5>
+          <div class="row" style="gap:8px"><input type="number" id="year2" placeholder="配偶生年">
+            <select id="gender2" style="max-width:90px"><option value="女">女</option><option value="男">男</option></select></div>
+          <h5>坐向依據</h5>
+          <select id="basis"><option value="門">依大門（八宅慣用）</option><option value="屋">依屋向／大採光面（玄空慣用）</option><option value="陽台">依陽台（大樓自家戶）</option></select>
+          <h5>元運（玄空老屋用 · 預設當運九運）</h5>
+          <select id="yun"></select>
+          <div class="hint">玄空星盤依「房子建造／入伙的元運」定。新屋或不確定用九運即可；老屋知道建造運（如七運、八運）再改。</div>
+          <h5>來水口／去水口（不會看看下面教學，可留空）</h5>
+          <div class="row" style="flex-wrap:wrap;gap:8px">
+            <div style="flex:1;min-width:130px"><div class="row"><select id="laishui"></select><input type="number" id="laiDeg" placeholder="來°" style="max-width:66px"></div></div>
+            <div style="flex:1;min-width:130px"><div class="row"><select id="qushui"></select><input type="number" id="quDeg" placeholder="去°" style="max-width:66px"></div></div>
+          </div>
+        </div>
+      </details>
+
+      <details class="help">
+        <summary>現場勘查選填（砂水・擺設・全家・商業・外局・擇日）</summary>
+        <div class="body">
+          <h5>金鎖玉關 · 八方砂水</h5>
+          <div class="hint">砂＝高的實的（樓/牆/山/大樹）；水＝低的空的動的（路/河/空地）。沒明顯留「平」。</div>
+          <div class="jsgrid" id="jsgrid" style="margin-top:6px"></div>
+          <h5>陽宅擺設（對著格局圖填 · 做格局檢查）</h5>
+          <div class="jsgrid" id="fgrid"></div>
+          <div class="jsgrid" id="fgrid2" style="margin-top:6px"></div>
+          <div style="margin-top:10px;display:grid;gap:7px">
+            <label class="chk"><input type="checkbox" id="sofaBack"> 沙發／主位背後是實牆（有靠山）</label>
+            <label class="chk"><input type="checkbox" id="sofaDoor"> 沙發／主位背對大門</label>
+            <label class="chk"><input type="checkbox" id="deskBack"> 書桌／辦公椅背後是實牆</label>
+            <label class="chk"><input type="checkbox" id="deskDoor"> 書桌／辦公椅背對門或走道</label>
+            <label class="chk"><input type="checkbox" id="bedDoor"> 床腳正對房門（門沖床）</label>
+          </div>
+          <h5>全家成員（做全家合盤／分房）</h5>
+          <div id="famrows" style="display:grid;gap:6px"></div>
+          <h5>商業風水（店面／辦公 · 以屋主為負責人）</h5>
+          <div class="jsgrid" id="bizgrid"></div>
+          <h5>外環境巒頭（站屋前面向大門判）</h5>
+          <div class="jsgrid" id="envgrid"></div>
+          <h5>開運擇日（結果在紫白頁）</h5>
+          <select id="zeriMatter"><option value="入宅">入宅</option><option value="安床">安床</option><option value="動土">動土</option><option value="開市">開市</option></select>
+        </div>
+      </details>
+
+      <details class="help">
+        <summary>使用教學（坐向怎麼量・水口怎麼看・砂水怎麼看）</summary>
+        <div class="body">
+          <h5>坐向 · 手機羅盤 3 步</h5>
+          ① 開手機「指南針」App。② <b>背對房子、面向大門（或大採光面／陽台）站好</b>，手機平放、頂端指向你面對的方向。③ 讀<b>那個度數（＝向）</b>填進「向 度數」，自動算 24 山。讀背靠方就填「坐 度數」。<br>
+          透天：以房子中心立極，八宅論大門、玄空論屋向。大樓：用自家戶中心立極，玄空取陽台/大採光面、八宅取入戶門。磁干擾大退到門外量；壓兩山界線會跳空亡提示；手機給磁北，全程用磁北即可。
+          <h5>來水／去水口</h5>
+          「水」不一定是河：<b>低、動、氣通的都算水</b>（馬路、車流、大門、電梯、空地、河池）。站屋中央看，氣從哪來＝來水、往哪走／消失＝去水。看門前路：來車那頭＝來水、路盡頭下坡＝去水。不確定<b>整個留空</b>不影響其他派。
+          <h5>金鎖玉關 砂水</h5>
+          <b>砂＝高聳實體</b>（樓、牆、山、大樹）；<b>水＝低窪空曠或動水</b>（路、河、池、空地）。站屋中央看八方外面是砂是水，沒明顯留平。
+        </div>
+      </details>
+
+      <button class="btn" onclick="run()">排　盤　生　成</button>
+    </div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+  <div id="panels"></div>
+</div>
+
+<script>
+/* ============ 基礎資料 ============ */
+const SHAN=[
+ {n:'子',d:0,g:'坎',y:1,yy:'陰'},{n:'癸',d:15,g:'坎',y:2,yy:'陰'},
+ {n:'丑',d:30,g:'艮',y:0,yy:'陰'},{n:'艮',d:45,g:'艮',y:1,yy:'陽'},{n:'寅',d:60,g:'艮',y:2,yy:'陽'},
+ {n:'甲',d:75,g:'震',y:0,yy:'陽'},{n:'卯',d:90,g:'震',y:1,yy:'陰'},{n:'乙',d:105,g:'震',y:2,yy:'陰'},
+ {n:'辰',d:120,g:'巽',y:0,yy:'陰'},{n:'巽',d:135,g:'巽',y:1,yy:'陽'},{n:'巳',d:150,g:'巽',y:2,yy:'陽'},
+ {n:'丙',d:165,g:'離',y:0,yy:'陽'},{n:'午',d:180,g:'離',y:1,yy:'陰'},{n:'丁',d:195,g:'離',y:2,yy:'陰'},
+ {n:'未',d:210,g:'坤',y:0,yy:'陰'},{n:'坤',d:225,g:'坤',y:1,yy:'陽'},{n:'申',d:240,g:'坤',y:2,yy:'陽'},
+ {n:'庚',d:255,g:'兌',y:0,yy:'陽'},{n:'酉',d:270,g:'兌',y:1,yy:'陰'},{n:'辛',d:285,g:'兌',y:2,yy:'陰'},
+ {n:'戌',d:300,g:'乾',y:0,yy:'陰'},{n:'乾',d:315,g:'乾',y:1,yy:'陽'},{n:'亥',d:330,g:'乾',y:2,yy:'陽'},
+ {n:'壬',d:345,g:'坎',y:0,yy:'陽'}];
+const SHAN_YY={}; SHAN.forEach(s=>SHAN_YY[s.n]=s.yy);
+const GUA={
+ 坎:{lo:1,dir:'N',cn:'北',bits:2}, 坤:{lo:2,dir:'SW',cn:'西南',bits:0},
+ 震:{lo:3,dir:'E',cn:'東',bits:1}, 巽:{lo:4,dir:'SE',cn:'東南',bits:6},
+ 乾:{lo:6,dir:'NW',cn:'西北',bits:7}, 兌:{lo:7,dir:'W',cn:'西',bits:3},
+ 艮:{lo:8,dir:'NE',cn:'東北',bits:4}, 離:{lo:9,dir:'S',cn:'南',bits:5}};
+const BITS_GUA={}; for(const k in GUA) BITS_GUA[GUA[k].bits]=k;
+const NUM_GUA={1:'坎',2:'坤',3:'震',4:'巽',6:'乾',7:'兌',8:'艮',9:'離'};
+const GUA_SHAN={坎:['壬','子','癸'],坤:['未','坤','申'],震:['甲','卯','乙'],巽:['辰','巽','巳'],
+ 乾:['戌','乾','亥'],兌:['庚','酉','辛'],艮:['丑','艮','寅'],離:['丙','午','丁']};
+const DIR_CN={N:'北',NE:'東北',E:'東',SE:'東南',S:'南',SW:'西南',W:'西',NW:'西北'};
+const DIR_ANG={N:0,NE:45,E:90,SE:135,S:180,SW:225,W:270,NW:315};
+const ANG_DIR={0:'N',45:'NE',90:'E',135:'SE',180:'S',225:'SW',270:'W',315:'NW'};
+const ZHI=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+const GUA_DIRLIST=Object.keys(GUA);
+function guaByDir(d){return GUA_DIRLIST.find(k=>GUA[k].dir===d);}
+
+/* ============ 通用 ============ */
+function digitReduce(y){let s=String(Math.abs(y)).split('').reduce((a,b)=>a+ +b,0);
+ while(s>9){s=String(s).split('').reduce((a,b)=>a+ +b,0);} return s===0?9:s;}
+function oppIdx(i){return (i+12)%24;}
+function shanFromDeg(deg){const dv=((deg%360)+360)%360;return Math.round(dv/15)%24;}
+function degEdge(deg){const dv=((deg%360)+360)%360;const c=Math.round(dv/15)*15;let df=Math.abs(dv-c);df=Math.min(df,360-df);return df>=6.5;}
+const PATH=['中','乾','兌','艮','離','坎','坤','震','巽'];
+function fly(center,forward){let r={},n=center;
+ for(let i=0;i<9;i++){r[PATH[i]]=n; n+= forward?1:-1; if(n>9)n-=9; if(n<1)n+=9;} return r;}
+
+/* ============ 八宅 ============ */
+function mingGua(year,gender){let s=digitReduce(year),g;
+ if(gender==='男'){g=11-s; if(g===10)g=1; if(g>10)g-=9; if(g===5)g=2;}
+ else{g=s+4; if(g>9)g-=9; if(g===5)g=8;} return g;}
+const MG_NAME={1:'坎',2:'坤',3:'震',4:'巽',6:'乾',7:'兌',8:'艮',9:'離'};
+function youNian(base){let b=GUA[base].bits;const flips=[2,1,0,1,2,1,0,1];
+ const stars=['生氣','五鬼','延年','六煞','禍害','天醫','絕命','伏位'];
+ let cur=b,res={};res[base]='伏位';
+ for(let i=0;i<8;i++){cur^=(1<<flips[i]);res[BITS_GUA[cur]]=stars[i];} return res;}
+const JI4=['生氣','天醫','延年','伏位'];
+const STAR_INFO={生氣:['貪狼','大吉','旺丁旺事業、活力企圖'],天醫:['巨門','吉','健康財帛、貴人扶持'],
+ 延年:['武曲','吉','壽元、感情婚姻和諧'],伏位:['輔弼','小吉','平穩安定、心神安寧'],
+ 絕命:['破軍','大凶','絕嗣重病、大破財'],五鬼:['廉貞','凶','火災官非、失竊小人'],
+ 六煞:['文曲','凶','是非桃花、口舌爛桃花'],禍害:['祿存','凶','病痛爭執、慢性損耗']};
+const USE_BY_STAR={生氣:'大門、客廳、辦公桌、店面收銀（催動事業活力）',
+ 天醫:'主臥、久病者臥房、藥品存放（顧健康招貴人）',
+ 延年:'夫妻主臥、洽談談判位（穩感情延壽元）',
+ 伏位:'書房、神桌、靜養休息（求穩定安神）'};
+const EAST4=['坎','離','震','巽'],WEST4=['乾','坤','艮','兌'];
+const MING_WUXING={坎:['水','藍、黑、深灰'],離:['火','紅、紫、橘'],震:['木','青、綠'],巽:['木','青、綠'],
+ 乾:['金','白、金、銀'],兌:['金','白、金、銀'],坤:['土','黃、褐、米、咖啡'],艮:['土','黃、褐、米、咖啡']};
+// 納音五行
+const NAYIN_WX=['金','火','木','土','金','火','水','土','金','木','水','土','火','木','水','金','火','木','土','金','火','水','土','金','木','水','土','火','木','水'];
+const NAYIN_NM=['海中金','爐中火','大林木','路旁土','劍鋒金','山頭火','澗下水','城頭土','白蠟金','楊柳木','泉中水','屋上土','霹靂火','松柏木','長流水','沙中金','山下火','平地木','壁上土','金箔金','覆燈火','天河水','大驛土','釵釧金','桑柘木','大溪水','沙中土','天上火','石榴木','大海水'];
+const TG=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+function nayin(y){const idx=((y-4)%60+60)%60,p=Math.floor(idx/2);
+ return {gz:TG[((y-4)%10+10)%10]+ZHI[((y-4)%12+12)%12],name:NAYIN_NM[p],wx:NAYIN_WX[p]};}
+const WX_COLOR={金:'白、金、銀、米白',木:'青、綠',水:'藍、黑、深灰',火:'紅、紫、橘',土:'黃、褐、米、咖啡'};
+// 24山 → 雙山地支（三合水法用）
+const SHAN_ZHI={壬:'子',子:'子',癸:'丑',丑:'丑',艮:'寅',寅:'寅',甲:'卯',卯:'卯',乙:'辰',辰:'辰',
+ 巽:'巳',巳:'巳',丙:'午',午:'午',丁:'未',未:'未',坤:'申',申:'申',庚:'酉',酉:'酉',辛:'戌',戌:'戌',乾:'亥',亥:'亥'};
+// 年支桃花（咸池）
+const TAOHUA={申:'酉',子:'酉',辰:'酉',寅:'卯',午:'卯',戌:'卯',巳:'午',酉:'午',丑:'午',亥:'子',卯:'子',未:'子'};
+const ZHI_DIR={子:'N',丑:'NE',寅:'NE',卯:'E',辰:'SE',巳:'SE',午:'S',未:'SW',申:'SW',酉:'W',戌:'NW',亥:'NW'};
+function calcBazhai(zuoIdx,year,gender){
+ const zuoGua=SHAN[zuoIdx].g;const zhaiYN=youNian(zuoGua);
+ const mg=mingGua(year,gender),mgN=MG_NAME[mg];const mingYN=youNian(mgN);
+ const zGroup=EAST4.includes(zuoGua)?'東四宅':'西四宅';
+ const mGroup=EAST4.includes(mgN)?'東四命':'西四命';
+ return {zuoGua,zhaiYN,mgN,mingYN,zGroup,mGroup,match:zGroup.slice(0,2)===mGroup.slice(0,2)};}
+
+/* ============ 玄空 ============ */
+function calcXuankong(zuoIdx,yun){
+ const xiangIdx=oppIdx(zuoIdx),zuo=SHAN[zuoIdx],xiang=SHAN[xiangIdx];
+ const zuoGua=zuo.g,xiangGua=xiang.g,yunPan=fly(yun,true);
+ const M=yunPan[zuoGua];let shanYin;
+ if(M===5)shanYin=(zuo.yy==='陰');
+ else{const gn=NUM_GUA[M];shanYin=(SHAN_YY[GUA_SHAN[gn][zuo.y]]==='陰');}
+ const shanPan=fly(M,!shanYin);
+ const N=yunPan[xiangGua];let xiangYin;
+ if(N===5)xiangYin=(xiang.yy==='陰');
+ else{const gn=NUM_GUA[N];xiangYin=(SHAN_YY[GUA_SHAN[gn][xiang.y]]==='陰');}
+ const xiangPan=fly(N,!xiangYin);
+ const ling=yun;let ge='',geShort='';
+ const sZuo=shanPan[zuoGua]===ling,sXiang=shanPan[xiangGua]===ling;
+ const xZuo=xiangPan[zuoGua]===ling,xXiang=xiangPan[xiangGua]===ling;
+ if(sZuo&&xXiang){geShort='旺山旺向';ge='旺山旺向（到山到向）— 丁財兩旺，上格。前有水、後有山即完美應局。';}
+ else if(sXiang&&xZuo){geShort='上山下水';ge='上山下水 — 損丁破財格；除非後有水、前有山（顛倒巒頭）反成旺局，否則需化解。';}
+ else if(sXiang&&xXiang){geShort='雙星到向';ge='雙星到向 — 旺財格，向首宜見水（真水或明堂）；山星亦到向，人丁需靠外巒（向方有秀峰）補。';}
+ else if(sZuo&&xZuo){geShort='雙星到坐';ge='雙星到坐 — 旺丁格，坐後宜見水收山出煞；財星到坐，得靠坐後有水或低平處。';}
+ else{geShort='令星分佈他宮';ge='令星未到山向，須配合巒頭與流年細論。';}
+ return {zuoGua,xiangGua,yunPan,shanPan,xiangPan,ling,ge,geShort};}
+
+/* ============ 三合 ============ */
+const JU_GROUP={木:['乾','亥','甲','卯','丁','未'],火:['艮','寅','丙','午','辛','戌'],
+ 金:['巽','巳','庚','酉','癸','丑'],水:['坤','申','壬','子','乙','辰']};
+const JU_SHENG={木:11,火:2,金:5,水:8};
+const STAGES=['長生','沐浴','冠帶','臨官','帝旺','衰','病','死','墓','絕','胎','養'];
+function juOfXiang(x){for(const k in JU_GROUP)if(JU_GROUP[k].includes(x))return k;return null;}
+function stageOfZhi(zi,ju){return STAGES[((zi-JU_SHENG[ju])%12+12)%12];}
+const LAI_JUDGE={長生:['ji','來水朝生方，主旺丁旺壽、根基深厚'],帝旺:['ji','旺水到堂，發財快、財氣厚'],
+ 臨官:['ji','臨官水朝，主科甲功名、青壯得力'],冠帶:['ji','冠帶水來，出秀主貴、子女聰穎'],
+ 養:['ji','養水朝堂，主田產、後代綿延'],沐浴:['xiong','沐浴桃花水，主淫亂敗財、私情'],
+ 衰:['ping','衰方水來，平順不發，宜靜'],病:['xiong','病方水來，主疾病損人'],
+ 死:['xiong','死方水來，主損丁破敗'],墓:['ping','墓庫水朝，聚財但須配去水口論'],
+ 絕:['xiong','絕方水來，主敗絕退財'],胎:['ping','胎方水來，孕育反覆，力弱']};
+const QU_JUDGE={墓:['ji','水出墓庫，財歸庫聚而不散（正墓消水）'],絕:['ji','水出絕方，去死氣、合局'],
+ 衰:['ji','衰方消水，退氣出去，合法'],胎:['ji','胎方消水，可（借庫消水）'],
+ 死:['ping','死方去水，尚可但力弱'],病:['ping','病方去水，中平'],
+ 沐浴:['ping','沐浴消水，桃花去，須配向論'],長生:['xiong','生方去水，退財傷丁（生方流破主敗）'],
+ 臨官:['xiong','臨官流破，損少壯、傷科名'],帝旺:['xiong','旺方去水，大破財損丁（最忌）'],
+ 冠帶:['xiong','冠帶流破，傷幼退秀'],養:['xiong','養方去水，損後代田產']};
+function calcSanhe(zuoIdx,laiIdx,quIdx){
+ const xiang=SHAN[oppIdx(zuoIdx)];const ju=juOfXiang(xiang.n);
+ if(!ju)return {err:'此向未落四大局雙山，請確認坐向'};
+ const xz=ZHI.indexOf(xiang.n);let xiangGe;
+ if(xz>=0){const st=stageOfZhi(xz,ju);
+   const m={帝旺:'正旺向',長生:'正生向',墓:'正墓向',養:'自旺／養向',衰:'衰向'};
+   xiangGe=`向坐【${st}】位　${m[st]||''}`;}
+ else xiangGe=`向為天干／卦（${xiang.n}），非地支正向，格局從寬論`;
+ return {ju,xiangName:xiang.n,xiangGe,
+  lai:{zhi:ZHI[laiIdx],stage:stageOfZhi(laiIdx,ju),j:LAI_JUDGE[stageOfZhi(laiIdx,ju)]},
+  qu:{zhi:ZHI[quIdx],stage:stageOfZhi(quIdx,ju),j:QU_JUDGE[stageOfZhi(quIdx,ju)]}};}
+
+/* ============ 金鎖玉關 ============ */
+const JSYG={
+ 坎:{cn:'北',want:'水',sym:'中男·腎·耳',good:'中男聰俊、財丁興旺',bad:'傷中男、腎耳之疾、水厄'},
+ 坤:{cn:'西南',want:'水',sym:'老母·腹脾·田產',good:'老母壽康、田產富厚',bad:'傷老母、脾胃、婦人病'},
+ 震:{cn:'東',want:'水',sym:'長男·足肝',good:'長男顯達、貴氣',bad:'傷長男、手足肝膽之疾'},
+ 巽:{cn:'東南',want:'水',sym:'長女·股·文昌',good:'文昌旺、出秀女、名利雙收',bad:'傷長女、股疾、婦人不利'},
+ 乾:{cn:'西北',want:'砂',sym:'老父·首·官貴',good:'老父高壽、出官掌權',bad:'傷老父、頭疾、損丁'},
+ 兌:{cn:'西',want:'砂',sym:'少女·口·肺',good:'少女貌美、口才辯給',bad:'傷少女、肺疾、桃花口舌'},
+ 艮:{cn:'東北',want:'砂',sym:'少男·手·子孫',good:'子孫繁盛、少男顯貴',bad:'傷少男、手疾、恐絕嗣'},
+ 離:{cn:'南',want:'砂',sym:'中女·目·心',good:'中女貴顯、聲名遠揚',bad:'傷中女、心眼之疾、火災血光'}};
+function judgeJSYG(gua,state){const c=JSYG[gua];
+ if(state==='平'||!state)return {p:'ping',t:`宜${c.want}。目前平，未應吉凶。理想見${c.want}：「${c.good}」`};
+ if(state===c.want)return {p:'ji',t:`得${c.want}合局：${c.good}`};
+ return {p:'xiong',t:`見${state}逆局：${c.bad}`};}
+
+/* ============ 乾坤國寶 ============ */
+const XIANTIAN_POS={乾:'S',坤:'N',離:'E',坎:'W',震:'NE',巽:'SW',兌:'SE',艮:'NW'};
+function calcQiankun(zuoIdx){
+ const xiangDir=GUA[SHAN[oppIdx(zuoIdx)].g].dir,zuoGua=SHAN[zuoIdx].g;
+ const xa=DIR_ANG[xiangDir],dirOf=a=>ANG_DIR[((a%360)+360)%360];
+ return {anJie:xiangDir,tianJie:dirOf(xa-45),diXing:dirOf(xa+45),
+  keWei:dirOf(xa-90),binWei:dirOf(xa+90),xtWei:XIANTIAN_POS[zuoGua],zuoGua,xiangDir};}
+
+/* ============ 紫白 ============ */
+const STAR9={
+ 1:['一白','貪狼','吉','官星文昌、桃花人緣（九運未來旺氣，可用）'],
+ 2:['二黑','巨門','凶','病符——疾病、腹疾、寡母，最忌動土'],
+ 3:['三碧','祿存','凶','蚩尤——是非官訟、盜劫破財'],
+ 4:['四綠','文曲','吉','文昌科甲、亦主桃花'],
+ 5:['五黃','廉貞','大凶','正關煞——災病傷亡，動則凶，宜靜宜化'],
+ 6:['六白','武曲','吉','權貴武職、驛馬（退氣但仍吉）'],
+ 7:['七赤','破軍','凶','盜賊口舌、退氣破財'],
+ 8:['八白','左輔','吉','財星（剛退運仍主財，尤利山管人丁）'],
+ 9:['九紫','右弼','大吉','當運旺星——喜慶財丁、置產添丁']};
+function yearZi(Y){return ((2026-Y)%9+9)%9+1;}
+function yearZhi(Y){return ((Y-4)%12+12)%12;}
+function monthZiBase(z){if([0,6,3,9].includes(z))return 8;if([4,10,1,7].includes(z))return 5;return 2;}
+function monthZi(Y,m){return ((monthZiBase(yearZhi(Y))-(m-1)-1)%9+9)%9+1;}
+function calcZibai(Y,m){
+ const yPan=fly(yearZi(Y),true),mPan=fly(monthZi(Y,m),true),dirStar={};
+ for(const g in GUA){const d=GUA[g].dir;dirStar[d]={year:yPan[g],month:mPan[g],gua:g};}
+ dirStar['中']={year:yPan['中'],month:mPan['中'],gua:'中'};
+ const warn=[];
+ for(const g in GUA){const d=GUA[g].dir,ys=yPan[g],ms=mPan[g],set=[ys,ms];
+   if(set.includes(5)&&(set.includes(2)||set.filter(x=>x===5).length===2))
+     warn.push(`${DIR_CN[d]}方：年${STAR9[ys][0]}＋月${STAR9[ms][0]} → 二五交加，主重病災厄，切忌動土修造`);
+   else if(set.filter(x=>x===2).length===2)warn.push(`${DIR_CN[d]}方：雙二黑臨，病符加重`);
+   else if(set.includes(3)&&set.includes(7))warn.push(`${DIR_CN[d]}方：三七疊臨（鬥牛煞），主口舌官非破財`);}
+ return {yPan,mPan,dirStar,warn,yearZi:yearZi(Y),monthZi:monthZi(Y,m)};}
+
+/* ============ 綜合總結（跨派評分）============ */
+const CURE={五黃:'金屬洩土：銅鈴、六帝古錢、金屬風鈴；忌紅色（火生土）、忌此方動土開挖',
+ 二黑:'銅器化病符；體弱者移離此方睡；忌久坐久臥、忌廚灶',
+ 三碧:'紅紫色洩木化是非；忌與五黃七赤同方；防官訟',
+ 七赤:'見紅化火剋金；防口舌盜竊、注意門戶',
+ 絕命:'厚重櫃體壓制；床頭、爐口勿朝此方',
+ 五鬼:'安忍水或化火煞物；避免大門開此方',
+ 六煞:'白色金屬化桃花是非；未婚防爛桃花',
+ 禍害:'銅葫蘆化慢病；避主臥與久坐'};
+function calcSummary(zuoIdx,year,gender,yun,fyear,fmonth,jsStates){
+ const bz=calcBazhai(zuoIdx,year,gender),xk=calcXuankong(zuoIdx,yun),zb=calcZibai(fyear,fmonth);
+ const dirs=['N','NE','E','SE','S','SW','W','NW'],scores={};
+ dirs.forEach(d=>{
+  const gua=guaByDir(d);let sc=0,rs=[];
+  const star=bz.zhaiYN[gua];
+  sc+={生氣:3,天醫:2,延年:2,伏位:1,禍害:-1,六煞:-2,五鬼:-3,絕命:-3}[star];rs.push('八宅'+star);
+  const xstar=xk.xiangPan[gua],ling=xk.ling;
+  if(xstar===ling){sc+=3;rs.push('向星當旺');}
+  else if(xstar===1){sc+=2;rs.push('向星一白進氣');}
+  else if(xstar===8){sc+=1;rs.push('向星八白');}
+  else if(xstar===5){sc-=3;rs.push('向星五黃');}
+  else if(xstar===2){sc-=2;rs.push('向星二黑');}
+  else if(xstar===7){sc-=1;rs.push('向星七赤');}
+  const ys=zb.dirStar[d].year,ms=zb.dirStar[d].month;
+  if(ys===5){sc-=3;rs.push('流年五黃');}else if(ys===2){sc-=2;rs.push('流年二黑');}
+  else if([9,1,8].includes(ys)){sc+=1;}
+  if([2,5].includes(ys)&&[2,5].includes(ms)){sc-=3;rs.push('二五交加');}
+  const st=jsStates[d];
+  if(st&&st!=='平'){const j=judgeJSYG(gua,st);if(j.p==='ji'){sc+=1;rs.push('金鎖得局');}else if(j.p==='xiong'){sc-=1;rs.push('金鎖逆局');}}
+  scores[d]={score:sc,star,xstar,ys,ms,rs,gua};});
+ const ranked=dirs.slice().sort((a,b)=>scores[b].score-scores[a].score);
+ return {bz,xk,zb,scores,ranked};}
+
+/* ============ 羅盤 SVG ============ */
+function drawLuopan(zuoIdx){
+ const cx=110,cy=110,xi=oppIdx(zuoIdx);
+ const P=(r,deg)=>[cx+r*Math.cos((deg-90)*Math.PI/180),cy+r*Math.sin((deg-90)*Math.PI/180)];
+ let s='';
+ // 圈線
+ s+=`<circle cx="110" cy="110" r="106" fill="none" stroke="var(--brass)" stroke-width="1.4" opacity=".6"/>`;
+ [92,74,55,28].forEach(r=>s+=`<circle cx="110" cy="110" r="${r}" fill="none" stroke="var(--line)" stroke-width=".8"/>`);
+ // 坐/向 高亮扇形（24山圈）
+ [[zuoIdx,'var(--zhu)'],[xi,'var(--jade)']].forEach(([idx,c])=>{const d=SHAN[idx].d;
+   const [ax,ay]=P(92,d-7.5),[bx,by]=P(92,d+7.5),[c2x,c2y]=P(74,d+7.5),[dx,dy]=P(74,d-7.5);
+   s+=`<path d="M${ax.toFixed(1)},${ay.toFixed(1)} A92,92 0 0,1 ${bx.toFixed(1)},${by.toFixed(1)} L${c2x.toFixed(1)},${c2y.toFixed(1)} A74,74 0 0,0 ${dx.toFixed(1)},${dy.toFixed(1)} Z" fill="${c}" opacity=".18"/>`;});
+ // 度數刻度(山界) + 度數字(每30°)
+ for(let k=0;k<24;k++){const bd=15*k+7.5,[x1,y1]=P(99,bd),[x2,y2]=P(106,bd);
+   s+=`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="var(--faint)" stroke-width=".5"/>`;}
+ for(let d=0;d<360;d+=30){const [tx,ty]=P(99,d);
+   s+=`<text x="${tx.toFixed(1)}" y="${(ty+2).toFixed(1)}" font-size="5" fill="var(--faint)" text-anchor="middle">${d}</text>`;}
+ // 山界輻線
+ for(let k=0;k<24;k++){const bd=15*k+7.5,[x1,y1]=P(28,bd),[x2,y2]=P(92,bd);
+   s+=`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="var(--line)" stroke-width=".35"/>`;}
+ // 24山：陰陽紅黑
+ SHAN.forEach((sh,i)=>{const [tx,ty]=P(83,sh.d);
+   let col=sh.yy==='陽'?'#d1613f':'var(--dim)',fw='500';
+   if(i===zuoIdx){col='var(--zhu2)';fw='800';} if(i===xi){col='var(--jade)';fw='800';}
+   s+=`<text x="${tx.toFixed(1)}" y="${(ty+3).toFixed(1)}" font-size="8.4" fill="${col}" font-weight="${fw}" text-anchor="middle" font-family="Noto Serif TC,serif">${sh.n}</text>`;});
+ // 三元龍圈：地/天/人
+ SHAN.forEach((sh)=>{const [tx,ty]=P(65,sh.d),yl=['地','天','人'][sh.y];
+   s+=`<text x="${tx.toFixed(1)}" y="${(ty+1.8).toFixed(1)}" font-size="4.4" fill="var(--faint)" text-anchor="middle">${yl}</text>`;});
+ // 八卦 + 洛書數
+ for(const g in GUA){const dir=DIR_ANG[GUA[g].dir],[x,y]=P(43,dir),[nx,ny]=P(51,dir+5);
+   s+=`<text x="${x.toFixed(1)}" y="${(y+4).toFixed(1)}" font-size="10" fill="var(--brass2)" text-anchor="middle" font-family="Noto Serif TC,serif">${g}</text>`;
+   s+=`<text x="${nx.toFixed(1)}" y="${(ny+2).toFixed(1)}" font-size="5" fill="var(--faint)" text-anchor="middle">${GUA[g].lo}</text>`;}
+ // 天池 + 指針
+ s+=`<circle cx="110" cy="110" r="28" fill="var(--bg2)" stroke="var(--brass)" stroke-width=".6" opacity=".9"/>`;
+ const [zx,zy]=P(26,SHAN[zuoIdx].d),[xx,xy]=P(26,SHAN[xi].d);
+ s+=`<line x1="${zx.toFixed(1)}" y1="${zy.toFixed(1)}" x2="${xx.toFixed(1)}" y2="${xy.toFixed(1)}" stroke="var(--brass2)" stroke-width="1.5"/>`;
+ s+=`<circle cx="110" cy="110" r="3" fill="var(--brass2)"/>`;
+ const [zlx,zly]=P(15,SHAN[zuoIdx].d),[xlx,xly]=P(15,SHAN[xi].d);
+ s+=`<text x="${zlx.toFixed(1)}" y="${(zly+3).toFixed(1)}" font-size="7" fill="var(--zhu2)" text-anchor="middle" font-weight="700">坐</text>`;
+ s+=`<text x="${xlx.toFixed(1)}" y="${(xly+3).toFixed(1)}" font-size="7" fill="var(--jade)" text-anchor="middle" font-weight="700">向</text>`;
+ document.getElementById('luopan').innerHTML=s;}
+
+/* ============ 渲染輔助 ============ */
+function pill(p,l){return `<span class="pill ${p}">${l}</span>`;}
+function pClass(p){return p;}function pLabel(p){return p==='ji'?'吉':p==='xiong'?'凶':'平';}
+function grid9(fn){const order=['SE','S','SW','E','中','W','NE','N','NW'];
+ let h='<div class="grid9">';order.forEach(d=>h+=fn(d));return h+'</div>';}
+
+/* ============ 綜合總結 render ============ */
+function renderSummary(zuoIdx,year,gender,yun,fyear,fmonth,jsStates,spouse){
+ const r=calcSummary(zuoIdx,year,gender,yun,fyear,fmonth,jsStates);
+ const zuo=SHAN[zuoIdx],xiang=SHAN[oppIdx(zuoIdx)];
+ let h=`<h2>綜合總結 · 解盤主軸</h2><div class="tagline">五派合參 · 從大勢到方位建議到化解</div>`;
+ // 總評
+ const dz=r.bz.match?'屋主本命與此宅同組相配，氣場相合':'屋主本命與此宅不同組，人宅氣場相斥，須以命卦四吉方安門主床灶補救';
+ h+=`<div class="verdict"><div class="big">
+   此宅坐<b>${zuo.n}</b>向<b>${xiang.n}</b>，${r.bz.zuoGua}宅（${r.bz.zGroup}）。玄空<b>${r.xk.geShort}</b>——${r.xk.ge.split('—')[1]||''}<br>
+   屋主${r.bz.mgN}命（${r.bz.mGroup}），${dz}。</div></div>`;
+ h+=`<div class="talk"><h4>開場定調（可照著講）</h4>
+   <p>看風水先看兩件事：<b>房子本身的格局</b>（玄空的丁財大勢、八宅的宅氣），跟<b>住的人合不合</b>（命卦與宅卦）。這間屋子玄空排出來是「${r.xk.geShort}」，這決定它先天財丁的底子；${r.bz.match?'而屋主命卦跟宅卦同一組，是加分的——人住進來能接得住這間屋的氣。':'而屋主命卦跟宅卦不同組，這不是不能住，是要靠「門、主、灶」擺在屋主的四吉方來補，這正是等一下要調的重點。'}</p>
+   <p class="q">（接著逐派拆給客戶聽：八宅講方位吉凶怎麼用房間、玄空講飛星丁財、三合金鎖看外面山水、紫白看今年流年動哪裡不能動。）</p></div>`;
+ // 吉方 top3
+ h+=`<h3>三大吉方 · 建議這樣用</h3>`;
+ r.ranked.slice(0,3).forEach((d,i)=>{
+   const sc=r.scores[d],use=USE_BY_STAR[sc.star]||'一般起居、靜態使用';
+   h+=`<div class="rankrow good"><div class="badge">${DIR_CN[d]}</div>
+     <div class="info"><b>${['首選','次吉','再次'][i]}吉方</b> <small>${sc.rs.join('、')}（評分 ${sc.score>0?'+':''}${sc.score}）</small>
+     <div class="use">▸ 適合：${use}</div></div></div>`;});
+ // 凶方 bottom3
+ h+=`<h3>三大凶方 · 避用與化解</h3>`;
+ r.ranked.slice(-3).reverse().forEach((d,i)=>{
+   const sc=r.scores[d];
+   let cure=CURE[sc.star]||'';
+   if(sc.ys===5)cure=CURE['五黃'];else if(sc.ys===2&&!cure)cure=CURE['二黑'];
+   h+=`<div class="rankrow bad"><div class="badge">${DIR_CN[d]}</div>
+     <div class="info"><b>${['最凶','次凶','再凶'][i]}方</b> <small>${sc.rs.join('、')}（評分 ${sc.score}）</small>
+     <div class="use">▸ 化解：${cure||'避免床頭、爐口、大門朝此；重要活動勿設此方'}</div></div></div>`;});
+ // 流年
+ h+=`<h3>本流年重點（${fyear}）</h3>`;
+ if(r.zb.warn.length){h+=`<ul class="checklist">`;
+   r.zb.warn.forEach(w=>h+=`<li>${pill('xiong','凶')}${w}</li>`);
+   h+=`</ul>`;}
+ else h+=`<div class="note">本年月無二五交加等重煞疊臨，動土修造相對安全，仍避開流年五黃、二黑所到之方。</div>`;
+ // 化解清單
+ // 財位文昌桃花
+ const xiangWang=Object.keys(GUA).filter(g=>r.xk.xiangPan[g]===r.xk.ling).map(g=>GUA[g].cn);
+ const yearWen=Object.keys(GUA).filter(g=>r.zb.dirStar[GUA[g].dir].year===4).map(g=>GUA[g].cn);
+ const shengqi=Object.keys(GUA).filter(g=>r.bz.mingYN[g]==='生氣').map(g=>GUA[g].cn);
+ const yearCai=Object.keys(GUA).filter(g=>[8,9,1].includes(r.zb.dirStar[GUA[g].dir].year)).map(g=>`${GUA[g].cn}(${STAR9[r.zb.dirStar[GUA[g].dir].year][0]})`);
+ const yzhi=ZHI[yearZhi(year)],th=TAOHUA[yzhi],thDir=DIR_CN[ZHI_DIR[th]];
+ h+=`<h3>財位 · 文昌 · 桃花速查</h3><ul class="checklist">
+   <li><b>財位（理氣）</b>：玄空向星當旺到<b>${xiangWang.length?xiangWang.join('、'):'（令星未到山向，見玄空頁）'}</b>方，此為催財第一位，宜見水、明亮、聚氣。另<b>明財位</b>在進大門的斜對角靜角（需對格局圖定），可擺聚寶盆、招財物。</li>
+   <li><b>流年財位（${fyear}）</b>：財星飛到 <b>${yearCai.join('、')}</b>；求財在此方擺動態招財、常保潔亮。</li>
+   <li><b>文昌位</b>：流年四綠文昌到 <b>${yearWen.join('、')||'—'}</b>方（考試升學擺書桌）；個人讀書亦可用命卦生氣方 <b>${shengqi.join('、')}</b>。文昌方擺文竹、置書桌、用綠色。</li>
+   <li><b>桃花位</b>：屋主生年${yzhi}，咸池桃花在 <b>${thDir}</b>方；求姻緣在此擺鮮花、粉水晶催桃花，已婚者反而要淨此方防爛桃花。</li></ul>`;
+ // 房間五行配色
+ h+=`<h3>房間五行配色表</h3><ul class="checklist">
+   <li><b>木（東・東南）</b>：青、綠——主成長、健康、文昌；適書房、孩子房、辦公。</li>
+   <li><b>火（南）</b>：紅、紫、橘——主名聲、桃花；點綴即可，忌整片大紅（火過旺易躁）。</li>
+   <li><b>土（西南・東北・中宮）</b>：黃、褐、米、咖啡——主穩定、健康、田產；適長輩房、客廳。</li>
+   <li><b>金（西・西北）</b>：白、金、銀、灰——主貴人、事業、官運；適主臥、辦公、老闆位。</li>
+   <li><b>水（北）</b>：藍、黑、深灰——主事業、智慧、財；適書房、事業區；忌臥室過多黑藍（陰重）。</li>
+   <li><b>用途配色</b>：臥室柔和助眠（米、淺粉、淺藍、淺綠）；書房綠系旺文昌；客廳明亮溫暖聚氣；廚房忌大面紅（火上加火）；廁所淺色乾淨。整體色調仍以<b>屋主納音五行的補色</b>為主軸（見上方地墊建議）。</li></ul>`;
+ const ny=nayin(year);
+ h+=`<h3>化解與布局清單（帶走版）</h3><ul class="checklist">
+   <li><b>大門地墊／地毯</b>：屋主 ${year} 生 ${ny.gz}・${ny.name}（<b>納音${ny.wx}</b>），門口地墊宜用 <b>${WX_COLOR[ny.wx]}</b> 系補氣轉旺；門若開凶方，用此色地墊踩踏轉氣是最省成本的補法。</li>
+   <li><b>財位／旺方</b>：${DIR_CN[r.ranked[0]]}方為全宅最旺，宜淨、亮、聚氣，可置聚寶盆或保持整潔明亮，忌堆雜物、忌廁所壓。</li>
+   <li><b>神桌／文昌</b>：靜方安神最穩；讀書考試坐命卦文昌或紫白四綠到方，書桌鋪綠色系助文昌。</li>
+   <li><b>臥床</b>：床位落屋主命卦四吉方，床頭忌貼廁所、廚房、樑下；夫妻求和睦取延年方${spouse?'（本盤已比對配偶命卦，見八宅頁床位左右建議）':'（填配偶生年可算左右睡法）'}。</li>
+   <li><b>爐灶</b>：灶口（瓦斯進氣向）朝屋主吉方，灶身壓凶方以「火燒凶方」制煞；廚廁相鄰／爐灶對水槽為水火相剋，中間以綠色木物或隔板通關。</li>
+   <li><b>顏色補洩</b>：吉方用該方五行的旺色催、凶方（五黃二黑）用<b>白／金屬色洩土</b>並忌紅黃；缺角方用該方五行色的物件補。</li>
+   <li><b>流年動土</b>：${fyear}年五黃、二黑所到之方勿開挖、勿大動裝修；非動不可先擇日、掛金屬（銅鈴六帝錢）洩煞。</li>
+   <li><b>屋內形煞</b>：穿堂、水火夾、壁刀、壓樑等最影響應驗，見「形煞」頁逐項對照化解。</li></ul>`;
+ h+=`<div class="note">此總結為五派評分合參的<b>起點</b>，真正解盤仍須到現場看巒頭（實際山水、路沖、壁刀、樑柱、動線）。理氣定吉凶方位、巒頭定應驗輕重，兩者合看才是完整的兩小時解盤。</div>`;
+ return h;}
+
+/* ============ 各派 render ============ */
+function renderBazhai(r,spouse,gender,year){
+ const rows=Object.keys(GUA).map(g=>({g,cn:GUA[g].cn,star:r.zhaiYN[g],info:STAR_INFO[r.zhaiYN[g]],ji:JI4.includes(r.zhaiYN[g])}))
+   .sort((a,b)=>a.ji===b.ji?0:(a.ji?-1:1));
+ let h=`<h2>八宅明鏡</h2><div class="tagline">以坐山定宅卦，翻卦掌佈遊年八星</div>`;
+ h+=`<div class="kv"><span>宅卦：<b>${r.zuoGua}宅</b>（${r.zGroup}）</span>
+   <span>命卦：<b>${r.mgN}命</b>（${r.mGroup}）</span>
+   <span>命宅：${r.match?'<b style="color:var(--jade)">相配 ✓</b>':'<b style="color:var(--zhu2)">不配 ✗</b>'}</span></div>`;
+ h+=`<div class="talk"><h4>八宅怎麼跟客戶講</h4>
+   <p>八宅把一間房子分成八個方位，四個吉、四個凶。<b>吉方（生氣、天醫、延年、伏位）</b>放你要「催」的東西——大門、客廳、書桌、床；<b>凶方（絕命、五鬼、六煞、禍害）</b>放你要「壓」的東西——廁所、儲藏、樓梯，讓髒亂壓在壞方反而好。</p>
+   <p>八宅最重「<b>門、主、灶</b>」三要：大門納氣、主臥（睡最久）、爐灶（養命之源）。這三個落在吉方，宅運就穩一大半。${r.match?'':'這間屋子命宅不同組，所以更要靠這三要擺在屋主命卦的吉方來補。'}</p></div>`;
+ h+=`<h3>宅盤 · 八方吉凶</h3><div class="dirlist">`;
+ rows.forEach(x=>h+=`<div class="direntry"><div class="d">${x.cn}<small>${x.g}</small></div>
+   <div class="txt">${pill(x.ji?'ji':'xiong',x.star)}${x.info[0]}（${x.info[1]}）— ${x.info[2]}${x.ji?'<br><span style="color:var(--faint);font-size:.74rem">▸ 宜：'+(USE_BY_STAR[x.star]||'')+'</span>':''}</div></div>`);
+ h+=`</div>`;
+ const mji=Object.keys(GUA).filter(g=>JI4.includes(r.mingYN[g]));
+ const mxi=Object.keys(GUA).filter(g=>!JI4.includes(r.mingYN[g]));
+ h+=`<h3>屋主命卦（${r.mgN}命）宜忌方位</h3>
+   <div class="kv"><span>四吉方：<b style="color:var(--jade)">${mji.map(g=>GUA[g].cn+'('+r.mingYN[g]+')').join('、')}</b></span></div>
+   <div class="kv"><span>四凶方：<b style="color:var(--zhu2)">${mxi.map(g=>GUA[g].cn+'('+r.mingYN[g]+')').join('、')}</b></span></div>`;
+ // 大門入向
+ const ny=nayin(year);
+ h+=`<h3>大門入氣方向（八宅最重）</h3>
+   <div class="talk"><p>八宅裡<b>大門是納氣的口，最重要</b>。門「開在哪一方」跟門「開了之後人往哪個方向走進來（入向）」都要看。理想是<b>門開在屋主命卦的吉方、且入向朝吉</b>——這叫「納旺氣」。</p>
+   <p>門若開在凶方，最實用的補法是<b>用地墊、地毯的顏色補</b>：踩在門口那塊地墊，把氣「轉」一下再進屋。地墊顏色取<b>屋主納音五行</b>（不是命卦）：此屋主 ${year} 年生為 <b style="color:var(--brass2)">${ny.gz}・${ny.name}（納音${ny.wx}）</b>，門口地墊／玄關地毯宜用 <b style="color:var(--brass2)">${WX_COLOR[ny.wx]}</b> 系；凶方地毯則鋪厚重深色壓煞。</p></div>`;
+ // 床位夫妻
+ h+=`<h3>床位方向 · 夫妻左右</h3>`;
+ if(spouse){
+   const same=(r.mGroup.slice(0,2)===spouse.group.slice(0,2));
+   h+=`<div class="kv"><span>屋主：<b>${r.mgN}命（${r.mGroup}）</b></span><span>配偶：<b>${spouse.mgN}命（${spouse.group}）</b></span>
+     <span>${same?'<b style="color:var(--jade)">同組 ✓</b>':'<b style="color:var(--zhu2)">一東一西 ✗</b>'}</span></div>`;
+   if(same) h+=`<div class="talk"><p>夫妻<b>同屬${r.mGroup.slice(0,2)}四命</b>，好辦：床頭同朝兩人共同吉方即可（取延年方最利感情、生氣方最旺）。兩人吉方一致，睡哪一側都在吉氣裡，依傳統<b>男左女右</b>（躺著頭朝床頭時，男睡左、女睡右）即可。</p></div>`;
+   else h+=`<div class="talk"><p>夫妻<b>一東四命、一西四命</b>——這是最常見的難題，兩人的吉方剛好相反，床頭不可能同時朝兩人的吉方。實務三種處理：</p>
+     <p>① <b>以當家者（主要經濟、主事者）命卦定床頭向</b>，另一方睡「靠近自己吉方那一側」偏移補回。<br>
+     ② 床頭取<b>兩人命卦共通的「延年方」</b>（延年主夫妻和諧，多數命卦都有一個彼此不太衝的折衷）。<br>
+     ③ 睡的左右邊：讓各自睡在<b>自己吉方那一側</b>——例如屋主吉方偏西，就睡靠西那側；並用個人枕向、床頭櫃小物在自己這側補。</p>
+     <p class="q">（左右睡法各派略有出入，此為通用調法，你師承若有定則以你為準。）</p></div>`;
+ } else {
+   h+=`<div class="talk"><p>床頭朝向取屋主命卦吉方：<b>求感情和睦取延年方、求事業活力取生氣方、體弱求健康取天醫方</b>。床頭忌貼廁所牆、廚房牆、忌在樑下、忌正對房門（門沖床）。<br>夫妻睡左右：傳統<b>男左女右</b>（躺著頭朝床頭時）。想精算夫妻床位，上方填「配偶生年」我幫你比對兩人東西四命。</p></div>`;
+ }
+ h+=`<div class="note">宅盤看整間屋的體質、命盤看屋主個人。衝突時臥床、書桌、辦公位以<b>命卦</b>為準，大門、客廳格局以<b>宅卦</b>為準。</div>`;
+ return h;}
+
+function renderXuankong(r){
+ let h=`<h2>玄空飛星</h2><div class="tagline">${r.ling}運入中 · 基本山向星盤</div><div class="ling">${r.geShort}</div>`;
+ h+=grid9(d=>{
+   if(d==='中')return `<div class="cell center"><div class="stars"><span class="s-shan">${r.shanPan['中']}</span><span class="s-xiang">${r.xiangPan['中']}</span></div><span class="s-yun">${r.yunPan['中']}運</span></div>`;
+   const g=guaByDir(d);let cls='cell';if(g===r.zuoGua)cls+=' zuo';if(g===r.xiangGua)cls+=' xiang';
+   return `<div class="${cls}"><span class="dir">${DIR_CN[d]}</span><div class="stars"><span class="s-shan">${r.shanPan[g]}</span><span class="s-xiang">${r.xiangPan[g]}</span></div><span class="s-yun">${r.yunPan[g]}</span></div>`;});
+ h+=`<div class="legend"><span style="color:var(--zhu2)">■山星</span> <span style="color:var(--jade)">■向星</span> <span style="color:var(--faint)">■運星</span> 紅框坐·綠框向（南上）</div>`;
+ h+=`<div class="talk"><h4>玄空怎麼講</h4>
+   <p>每個方位有兩顆星：<b>山星（紅）管人丁、健康、貴人</b>，<b>向星（綠）管財祿、事業</b>。當運令星是 <b>${r.ling}</b>，星到哪個方位、那方就當旺。</p>
+   <p>這間屋整體格局是「<b>${r.geShort}</b>」：${r.ge}</p>
+   <p>用法：<b>向星旺的方位要見水</b>（真水、馬路、明堂、魚缸）來催財；<b>山星旺的方位要見山</b>（實牆、高樓、靠山、櫃體）來旺丁。反過來擺就洩了。這是理氣，還要配現場真實的山水（巒頭）才算數。</p>
+   <p class="q">（若客戶度數壓在兼向界線，這裡本應動替卦——目前先出基本盤，兼向屋另議。）</p></div>`;
+ h+=`<div class="note">本工具出基本山向盤，未含入囚、城門訣、七星打劫、替卦。這些進階局你要納入再跟我說。</div>`;
+ return h;}
+
+function renderSanhe(r){
+ let h=`<h2>三合 · 十二長生水法</h2><div class="tagline">楊公救貧水法 · 以向定四大局</div>`;
+ if(r.err)return h+`<div class="note"><b>${r.err}</b></div>`;
+ h+=`<div class="kv"><span>向：<b>${r.xiangName}</b></span><span>水局：<b>${r.ju}局</b></span><span>${r.xiangGe}</span></div>`;
+ h+=`<div class="talk"><h4>三合水法核心</h4>
+   <p>三合看的是<b>外面的水從哪來、往哪去</b>。口訣八個字：<b>來水要生旺、去水要墓絕</b>。水從「生方、旺方」流過來到堂前，是把財氣帶進來；水從「墓庫、絕方」流出去，是把濁氣送走、財歸庫。</p>
+   <p>最忌的是<b>旺方去水</b>——等於把最旺的財往外倒，主損丁破財。這是三合斷財最快的一刀。</p></div>`;
+ h+=`<h3>來水口（宜朝生旺）</h3><div class="dirlist"><div class="direntry">
+   <div class="d">${r.lai.zhi}<small>${r.lai.stage}</small></div>
+   <div class="txt">${pill(pClass(r.lai.j[0]),pLabel(r.lai.j[0]))}${r.lai.j[1]}</div></div></div>`;
+ h+=`<h3>去水口（宜出墓絕）</h3><div class="dirlist"><div class="direntry">
+   <div class="d">${r.qu.zhi}<small>${r.qu.stage}</small></div>
+   <div class="txt">${pill(pClass(r.qu.j[0]),pLabel(r.qu.j[0]))}${r.qu.j[1]}</div></div></div>`;
+ h+=`<div class="note">此為十二長生正版（來去水論十二地支）。若你慣用輔星（九星）水法、或四大局正生正旺救貧向細分，回我改。</div>`;
+ return h;}
+
+function renderJSYG(states){
+ let h=`<h2>金鎖玉關（過路陰陽）</h2><div class="tagline">一二三四宜水、六七八九宜砂</div>`;
+ h+=`<div class="talk"><h4>金鎖玉關怎麼用</h4>
+   <p>這派只看八個方位<b>該有砂還是該有水</b>。北、西南、東、東南（坎坤震巽）宜水；西北、西、東北、南（乾兌艮離）宜砂。擺對了應吉、擺反了應凶，而且<b>對應到具體的人和身體</b>——哪方壞就傷那房人、那個器官。</p>
+   <p>這是斷「應在誰身上」最直接的一派：老父看西北、老母看西南、長男看東、少男看東北……客戶問「為什麼是我兒子出事」，這裡給答案。</p></div>`;
+ h+=`<div class="dirlist">`;
+ ['乾','兌','艮','離','坎','坤','震','巽'].forEach(g=>{const j=judgeJSYG(g,states[GUA[g].dir]),c=JSYG[g];
+   h+=`<div class="direntry"><div class="d">${c.cn}<small>${g}·宜${c.want}</small></div>
+     <div class="txt">${pill(pClass(j.p),pLabel(j.p))}<span style="color:var(--faint);font-size:.72rem">${c.sym}</span><br>${j.t}</div></div>`;});
+ h+=`</div><div class="note">砂＝高聳實體，水＝低窪空曠或動水。此為基本八方盤；要細到二十四山逐山斷數字，回我加做。</div>`;
+ return h;}
+
+function renderQiankun(r){
+ const P={anJie:['案劫','向·明堂','宜開闊見案、忌逼壓沖射，為堂局主位','ping'],
+  tianJie:['天劫','向左前','全局最凶——絕對忌來水、忌高逼，犯之損丁血光','xiong'],
+  diXing:['地刑','向右前','忌沖射惡形，與天劫同凶，宜淨空平順','xiong'],
+  binWei:['賓位','向右','宜有水，主女婿外親、意外之財','ji'],
+  keWei:['客位','向左','外方配賓位論，水來應外姓客旺','ping'],
+  xtWei:['先天位','主人丁','宜來水到堂、端秀有情，旺丁添口；缺則丁稀','ji']};
+ let h=`<h2>乾坤國寶（龍門八局）</h2><div class="tagline">以坐向定訣位 · 三元水法</div>`;
+ h+=`<div class="kv"><span>坐：<b>${r.zuoGua}</b></span><span>向：<b>${DIR_CN[r.xiangDir]}</b></span></div>`;
+ h+=`<div class="talk"><h4>龍門八局要點</h4>
+   <p>乾坤國寶把堂局分成幾個關鍵位。<b>先天位管人丁、後天位管財</b>，這兩處宜有水到堂（先天水旺丁、後天水旺財）。<b>天劫位是全局最凶</b>，絕對不能有水沖來、也不能高壓，犯了損人口見血光——這是這派最要盯的一條。</p></div>`;
+ h+=`<div class="dirlist">`;
+ ['anJie','tianJie','diXing','binWei','keWei','xtWei'].forEach(k=>{
+   h+=`<div class="direntry"><div class="d">${DIR_CN[r[k]]}<small>${P[k][0]}</small></div>
+     <div class="txt">${pill(P[k][3],P[k][0])}<span style="color:var(--faint);font-size:.72rem">${P[k][1]}</span><br>${P[k][2]}</div></div>`;});
+ h+=`</div><div class="note"><b>已定位（跨派一致）：</b>案劫、天劫、地刑、賓、客（依向幾何定）＋先天位（主丁，坐卦先天方）。<b>後天位（財）／庫池／正竅（消水口）</b>各流派定法不一，工具不臆造方位，改給原則：後天位主財宜來水到堂、庫池宜靜水聚財、正竅是全局唯一宜去水的消水口。現場以你師承版本定這三位即可，其餘照本盤。</div>`;
+ return h;}
+
+function renderZibai(r){
+ let h=`<h2>紫白飛星</h2><div class="tagline">流年 ${r.yearZi} 入中 · 流月 ${r.monthZi} 入中（皆順飛）</div>`;
+ h+=grid9(d=>{
+   if(d==='中'){const c=r.dirStar['中'];return `<div class="cell center"><div class="stars"><span class="zi-year">${c.year}</span><span class="zi-month">${c.month}</span></div><span class="s-yun">中宮</span></div>`;}
+   const c=r.dirStar[d],bad=[2,5].includes(c.year)&&[2,5].includes(c.month);
+   return `<div class="cell${bad?' warn':''}"><span class="dir">${DIR_CN[d]}</span><div class="stars"><span class="zi-year">${c.year}</span><span class="zi-month">${c.month}</span></div><span class="s-yun">${STAR9[c.year][0]}</span></div>`;});
+ h+=`<div class="legend"><span style="color:var(--brass2)">■年星</span> <span style="color:var(--dim)">■月星</span>（南上）</div>`;
+ h+=`<div class="talk"><h4>紫白＝流年這一年的動態</h4>
+   <p>前面四派看的是房子的「不動格局」，紫白看的是<b>今年這一年、哪個方位有什麼星飛進來</b>。最要盯兩顆凶星：<b>五黃（大災病）</b>和<b>二黑（病符）</b>，這兩方今年不能動土、不能大裝修，要動先擇日、掛金屬洩。</p>
+   <p>年月疊在一起最怕「<b>二五交加</b>」（年五黃＋月二黑同方），主重病災厄，那個月那個方位碰都別碰。吉星則看<b>九紫（當運）、一白、八白</b>，可催喜事、財、添丁。</p></div>`;
+ if(r.warn.length){h+=`<h3>年月交加 · 重點凶方</h3><div class="dirlist">`;
+   r.warn.forEach(w=>h+=`<div class="direntry wide"><div class="txt">${pill('xiong','凶')}${w}</div></div>`);h+=`</div>`;}
+ else h+=`<h3>年月交加</h3><div class="note">本月無二五交加等重煞疊臨，各方相對平穩。</div>`;
+ h+=`<h3>九星速查</h3><div class="dirlist">`;
+ [9,1,8,6,4,2,3,7,5].forEach(n=>{const s=STAR9[n];
+   h+=`<div class="direntry"><div class="d">${s[0]}<small>${s[1]}</small></div><div class="txt">${pill(s[2].includes('凶')?'xiong':'ji',s[2])}${s[3]}</div></div>`;});
+ h+=`</div><div class="note">九運（2024–2043）當旺＝<b>九紫</b>，未來旺氣＝一白。年紫白以<b>立春</b>換年、月紫白以<b>節氣</b>換月，跨界日期以萬年曆為準。</div>`;
+ return h;}
+
+/* ============ 陽宅格局檢查 ============ */
+const FURN=[
+ {id:'door',name:'大門',rule:'開吉方納旺氣；凶方用納音色地墊補'},
+ {id:'bed',name:'主臥床',rule:'落命卦吉方、床頭朝吉方靠實牆；忌樑壓、忌門沖床腳'},
+ {id:'sofa',name:'客廳沙發',rule:'落吉方、背後靠實牆（有靠山）、面向大門或開闊處，忌背門'},
+ {id:'desk',name:'書桌／辦公',rule:'落吉方或文昌方、背後有靠、面門不背門（能看到來人）'},
+ {id:'stove',name:'爐灶',rule:'灶身壓凶方（火燒凶方）、灶口朝吉方；忌對水槽、對廁、對門'},
+ {id:'altar',name:'神位',rule:'落吉方或伏位、背靠實牆、面向開闊；忌對廁、對房門、樑壓'}];
+function renderGeju(zuoIdx,year,gender,furn,tog){
+ const mg=MG_NAME[mingGua(year,gender)],mingYN=youNian(mg),isJi=g=>JI4.includes(mingYN[g]);
+ let h=`<h2>陽宅格局檢查</h2><div class="tagline">對照格局圖 · 命卦吉凶 × 擺設原則</div>`;
+ h+=`<div class="kv"><span>屋主：<b>${mg}命（${EAST4.includes(mg)?'東四命':'西四命'}）</b></span></div>`;
+ h+=`<div class="talk"><h4>怎麼用這頁</h4><p>把客戶的格局圖攤開，以屋子中央立極，對照下面這張<b>命卦八方吉凶圖</b>：綠色方位可以放門、主臥、書桌、辦公（人常待、要旺的）；紅色方位放廁所、儲藏、樓梯（壓煞）。再把每件家具落在哪方填進表單，系統告訴你合不合、還有背靠與沖門對不對。</p></div>`;
+ h+=`<h3>屋主命卦 · 八方吉凶圖（疊在格局圖上看）</h3>`;
+ h+=grid9(d=>{if(d==='中')return `<div class="cell center"><span class="s-yun">中宮·立極</span></div>`;
+   const g=guaByDir(d),ji=isJi(g);
+   return `<div class="cell ${ji?'':'warn'}"><span class="dir">${DIR_CN[d]}</span><span style="color:${ji?'var(--jade)':'var(--zhu2)'};font-weight:700;font-size:1.05rem">${mingYN[g]}</span><span class="s-yun">${ji?'吉':'凶'}</span></div>`;});
+ h+=`<div class="legend">綠＝吉方（門主床桌辦公）· 紅＝凶方（廁所儲藏壓煞）· 南上</div>`;
+ h+=`<h3>家具落位判斷</h3><div class="dirlist">`;
+ FURN.forEach(f=>{const pos=furn[f.id];
+   if(pos){const g=guaByDir(pos),ji=isJi(g);
+     h+=`<div class="direntry"><div class="d">${f.name}<small>${DIR_CN[pos]}</small></div>
+       <div class="txt">${pill(ji?'ji':'xiong',ji?'落吉方 ✓':'落凶方 ✗')}${mingYN[g]}方。${f.rule}${ji?'':'<br><span style="color:var(--zhu2)">▸ 建議移吉方，或此處改作次要用途</span>'}</div></div>`;}
+   else h+=`<div class="direntry"><div class="d">${f.name}<small>未選</small></div><div class="txt">${f.rule}</div></div>`;});
+ h+=`</div>`;
+ h+=`<h3>背靠與沖門檢查</h3><div class="dirlist">`;
+ [['sofaBack','沙發／主位背後有靠實牆','ji','有靠山，主貴人得力、坐得穩','背後空／背窗＝無靠，主漂泊無助、決策搖擺，宜移到實牆前或加高背屏風'],
+  ['sofaDoor','沙發／主位背對大門','bad','','背門而坐看不到進門的人，主犯小人、易受驚、沒安全感——轉向面門或後方立屏風'],
+  ['deskBack','書桌／辦公椅背後有靠','ji','背有實牆，事業有靠、專注穩定','背後空或背門，主分心、犯小人，宜靠牆'],
+  ['deskDoor','書桌／辦公椅背對門或走道','bad','','背門辦公主犯小人、被算計、升遷受阻，宜面門或側門而坐'],
+  ['bedDoor','床腳正對房門','bad','','門沖床（開門見床腳）主睡不安、健康差、易受驚，宜移床或門內加簾']
+ ].forEach(c=>{const[id,label,type,g,b]=c,val=tog[id];let p,t;
+   if(type==='ji'){p=val?'ji':'xiong';t=val?g:b;}else{p=val?'xiong':'ji';t=val?b:'無此問題 ✓';}
+   h+=`<div class="direntry wide"><div class="txt">${pill(p,pLabel(p))}<b>${label}</b>：${t}</div></div>`;});
+ h+=`</div>`;
+ // 神位安座細則
+ h+=`<h3>神位安座細則</h3>
+   <div class="talk"><p>神桌是全宅氣場核心，安錯比不安更糟。要點：<b>坐吉向吉</b>（神桌背靠的牆＝坐，落屋主命卦吉方或伏位；面朝開闊或大門納氣）、<b>背後靠實牆</b>（不可背窗、背廁、背樓梯、背走道、背房門，背後即為「靠山」）、<b>龍邊為上</b>（進門左手龍邊為尊，神桌宜安龍邊或正廳中軸）。</p>
+   <p>禁忌：神桌<b>忌對廁所、對廚房爐灶、對房門、對樓梯、對電視（動亂）</b>；<b>上方忌樑壓、忌樓上是廁所或床</b>；神明爐與祖先爐分清（神明在龍邊、祖先在虎邊，祖先爐不高於神明爐）；後方不可是夫妻房床頭。高度以「魯班尺」紅字吉位為佳。</p></div>`;
+ // 廚房廁所專段
+ h+=`<h3>廚房・廁所專段</h3>`;
+ h+=`<div class="talk"><h4>爐灶（財庫與健康之源，坐凶向吉）</h4>
+   <p>灶有兩個方向：<b>灶身壓哪方</b>、<b>灶口（開關／進氣面，人站的對面）朝哪方</b>。口訣「<b>坐凶向吉</b>」——灶身壓凶方（火燒凶方制煞）、灶口朝屋主吉方（納吉氣入食）。</p></div>`;
+ h+=`<div class="dirlist">`;
+ if(furn.stove){const g=guaByDir(furn.stove),ji=isJi(g);
+   h+=`<div class="direntry"><div class="d">灶身<small>${DIR_CN[furn.stove]}</small></div><div class="txt">${pill(ji?'xiong':'ji',ji?'壓吉方 ✗':'壓凶方 ✓')}${ji?'灶壓吉方會把好方位燒掉，宜移位或至少灶口補朝吉方':'灶身壓凶方＝火燒凶方制煞，正確'}</div></div>`;}
+ if(tog.stoveMouth){const g=guaByDir(tog.stoveMouth),ji=isJi(g);
+   h+=`<div class="direntry"><div class="d">灶口<small>朝${DIR_CN[tog.stoveMouth]}</small></div><div class="txt">${pill(ji?'ji':'xiong',ji?'朝吉方 ✓':'朝凶方 ✗')}${ji?'灶口納吉氣，正確':'灶口朝凶方，宜轉朝屋主吉方'}</div></div>`;}
+ if(!furn.stove&&!tog.stoveMouth) h+=`<div class="direntry wide"><div class="txt">（未填灶位／灶口，填了可判吉凶）</div></div>`;
+ h+=`</div><div class="note">爐灶禁忌：忌灶口對水槽／冰箱（水火相剋，傷腸胃財氣）、忌對廁所門、忌對大門（開門見灶漏財）、忌背後無靠（灶後為窗）、忌樑壓、忌廁所在灶的上／後方。</div>`;
+ h+=`<div class="talk"><h4>廁所（藏污之處，要壓壞方）</h4>
+   <p>廁所跟門主床相反——<b>要落在凶方</b>，用穢氣壓制凶方最好。最忌落在<b>中宮（房子正中）、財位、文昌位</b>，或正對大門／廚房／床。</p></div>`;
+ h+=`<div class="dirlist">`;
+ if(furn.toilet){const g=guaByDir(furn.toilet),ji=isJi(g);
+   h+=`<div class="direntry"><div class="d">廁所<small>${DIR_CN[furn.toilet]}</small></div><div class="txt">${pill(ji?'xiong':'ji',ji?'落吉方 ✗':'落凶方 ✓')}${ji?'廁所占了吉方、把好方位污掉，宜化解（粗鹽／綠植／常關門）或改用途':'廁所壓凶方，正確——以穢制煞'}</div></div>`;}
+ else h+=`<div class="direntry wide"><div class="txt">（未填廁所方位）</div></div>`;
+ h+=`</div><div class="note">廁所化解：常關門、放粗鹽／綠植／除濕、保持乾燥明亮；<b>廁居中宮</b>最凶務必通風淨化；廁門對床／對灶／對大門者加長門簾。</div>`;
+ h+=`<div class="note">擺設三原則：<b>坐吉向吉</b>（人與家具落命卦吉方）、<b>背後有靠</b>（實牆為靠山，忌背門背窗背走道）、<b>不沖不壓</b>（不被門沖、不被樑壓、不被壁刀切）。夫妻不同命時此圖以屋主為準，配偶重要位另用配偶命卦吉方，衝突取當家者。</div>`;
+ return h;}
+
+/* ============ 屋內形煞 ============ */
+const XINGSHA=[
+ {n:'穿堂煞（漏財煞）',pheno:'大門正對後門或後窗、落地窗，一條線可以看穿。或大門直對陽台外。',
+  bad:'「前通後通、人財兩空」。氣從前門直穿後門不停留，聚不了財、留不住人，主漏財、家人待不住、留不住錢。',
+  cure:'大門內做玄關、屏風、櫃體擋一擋，讓氣轉個彎；或長布簾（過膝）、高身鞋櫃、屏風盆栽阻斷直線。'},
+ {n:'穿心煞 / 壓樑（樑壓）',pheno:'橫樑壓在床頭、沙發、書桌、爐灶、神桌、大門動線正上方。或走道／樑貫穿全屋中線。',
+  bad:'樑壓何處傷何處：壓床頭主頭痛失眠、精神壓力；壓灶傷腸胃財氣；壓神桌對神明不敬；壓辦公位事業受壓。長期主「無形壓力、抬不起頭」。',
+  cure:'首選移開（床、桌、沙發避開樑正下方）。不能移就<b>包樑做平天花板</b>把樑藏起來，或樑下掛葫蘆、麒麟、兩側貼金化解。'},
+ {n:'水火夾 / 水火相剋',pheno:'廚房（火）與廁所（水）緊鄰、或門對門；爐灶緊貼水槽、冰箱、洗碗機；廁所門對廚房門。',
+  bad:'水火不容，主家人腸胃、泌尿、婦科毛病，夫妻口角、財來財去。開門見灶亦漏財、脾氣暴。',
+  cure:'廚廁門對門掛門簾各一、中間擺綠色植物（木通關，水生木、木生火）；爐灶與水槽間隔至少一個檯面或立隔板；廁所常關門、放粗鹽／綠植。'},
+ {n:'壁刀煞 / 邊角煞（柱角）',pheno:'室內牆角、柱子的尖角，正對床、沙發、餐桌、辦公位、大門。或屋外他棟牆面像刀一樣切過來。',
+  bad:'尖角沖射主血光、開刀、意外、身體對應部位病痛（切到頭部主頭疾、切到腰主腰疾）；情緒易怒、坐不安穩。',
+  cure:'室內柱角<b>做圓弧包角</b>或擺高櫃、大型盆栽把尖角遮住化圓；沖床就移床。屋外壁刀用山海鎮、凸面鏡（八卦鏡慎用）反制，或窗簾遮擋。'},
+ {n:'門對門（鬥口煞）',pheno:'兩房門正對、房門對大門、房門對廁所門、廁所對廚房。門對門且大小不一更凶（大口吃小口）。',
+  bad:'主口舌是非、家人不和、易吵架；房門對廁所主住此房者健康差；房門對大門主此房人待不住、隱私外洩。',
+  cure:'兩門各掛長門簾、擺屏風或改門動線；門楣貼五帝錢；對到廁所的門常關、放綠植淨化。'},
+ {n:'開門見灶 / 見廁 / 見鏡',pheno:'一進大門就直接看到爐灶、看到馬桶／廁所門、或正對一面大鏡子。',
+  bad:'見灶漏財、脾氣火爆；見廁一進門先納穢氣、財氣受污、健康差；見鏡把財氣、貴人反射出去，也易受驚（尤其晚上）。',
+  cure:'玄關屏風／櫃體遮擋；廁所常關門加門簾；鏡子移位或加簾遮，避免正對大門與床。'},
+ {n:'缺角',pheno:'房子平面不方正，某個方位凹進去缺一塊（常見L型、缺角超過該邊 1/3 較嚴重）。',
+  bad:'缺哪方傷哪方對應的人與事：缺西北傷老父／事業、缺西南傷老母／腸胃、缺正東傷長男、缺正南傷中女名聲…（配八宅、金鎖玉關的方位人事看）。',
+  cure:'室內該方擺對應五行的物件補（缺角方位五行色的水晶、擺件、燈）；長期常亮燈、擺重物「填實」該角；嚴重者以泰山石敢當、該卦象徵物鎮補。'},
+ {n:'樓梯沖門 / 廁所居中 / 中宮受污',pheno:'開門正對向下樓梯（牽牛煞，氣往下洩）；廁所、廚房、雜物間落在房子正中央（中宮）。',
+  bad:'樓梯下沖主財氣往下流、退運；中宮是全屋的心臟，廁廚壓中宮主全家健康、運勢受污，尤其腸胃、心臟。',
+  cure:'門對下樓梯放門檻、門簾、綠植擋洩；中宮廁所常關門通風、放粗鹽綠植；中宮盡量保持乾淨明亮、不堆雜物。'},
+ {n:'（屋外參考）路沖 / 天斬 / 反弓',pheno:'大馬路、巷子直沖大門或窗（路沖）；兩棟大樓夾縫正對（天斬煞）；彎路的外側弧形對著家（反弓水）。',
+  bad:'路沖主意外血光、退財、住不安穩；天斬如刀劈主血光破財；反弓主破財、是非、留不住人。',
+  cure:'屬外形煞，室內化解有限：山海鎮、凸鏡、屏風擋，窗簾遮擋，或門前設玄關轉氣；嚴重者以擺設與植栽緩衝，並配合擇日安鎮。'}
+];
+function renderXingsha(){
+ let h=`<h2>屋內形煞 · 巒頭速查</h2><div class="tagline">理氣定方位、形煞定應驗輕重 — 現場一定要走一遍</div>`;
+ h+=`<div class="talk"><h4>為什麼形煞最要看</h4>
+   <p>前面五派算的是「理氣」（看不見的方位吉凶）。但客戶最有感的、應驗最快最重的，其實是<b>看得見的形煞</b>——一根壓在床頭的樑、一條穿堂而過的門窗、一個切過沙發的柱角。理氣說這方不好是「機率」，形煞擺在那就是「一定會應」。</p>
+   <p>解盤走現場，這張表逐項對，每對到一個都能講：這是什麼煞、會應在什麼事、怎麼化。光這一段就夠講很久，而且客戶當場看得到、最信服。</p></div>`;
+ XINGSHA.forEach((x,i)=>{
+   h+=`<div class="direntry wide" style="margin-bottom:10px"><div class="txt">
+     <b style="color:var(--brass2);font-size:1rem">${i+1}. ${x.n}</b><br>
+     <span style="color:var(--faint)">現象：</span>${x.pheno}<br>
+     ${pill('xiong','應驗')}${x.bad}<br>
+     ${pill('ji','化解')}${x.cure}</div></div>`;});
+ h+=`<div class="note">形煞化解「先避（移位）＞再擋（屏風櫃體）＞後化（吉祥物）」，能移位就別只靠掛件。八卦鏡、山海鎮這類反制物對外可用、對內慎用（易傷自家或鄰里關係），室內優先用遮擋、綠植、圓化。</div>`;
+ return h;}
+
+/* ============ 外環境巒頭 ============ */
+function renderWailuan(env){
+ let h=`<h3 style="margin-top:28px;border-color:var(--zhu)">外環境巒頭（屋外四靈＋路形）</h3>`;
+ h+=`<div class="talk"><h4>屋外比屋內更重要</h4><p>陽宅先看外、再看內。「四靈」：<b>後玄武要有靠（靠山）、前朱雀要開闊（明堂）、左青龍宜高有情、右白虎宜低伏</b>。青龍高於白虎為正；白虎高壓、尖射（白虎抬頭）主血光官非、傷女主人。路形則看「玉帶環腰」（吉）還是「反弓／路沖」（凶）。</p></div>`;
+ const J={'有靠':['ji','後有靠山／實樓，主貴人、根基穩、有後盾'],'空曠':['xiong','後方空曠無靠（背後是空地/矮房/水），主漂泊無依、事業無後盾'],'低陷':['xiong','後方低陷下傾，退氣不聚，宜牆體/高櫃補靠'],
+  '開闊':['ji','明堂開闊（前有空地/廣場/水），納氣旺、前程遠大、財氣進'],'逼壓':['xiong','前方逼壓（大樓/牆逼近），前途受阻、壓迫沉悶'],'見水':['ji','前有水（河/池/馬路環抱），主財；須配合水形非反弓'],
+  '高有情':['ji','青龍方高聳有情，主男丁、貴氣、事業助力'],'低陷_l':['xiong','青龍低陷，男丁事業助力弱'],
+  '低伏':['ji','白虎低伏，正局（虎伏龍昂）'],'高壓':['xiong','白虎高過青龍且逼壓，白虎抬頭——主血光、官非、傷女眷，宜化'],'尖射':['xiong','白虎方尖角/壁刀射來，主意外血光，山海鎮/擋煞化'],
+  '玉帶':['ji','路水如玉帶環抱屋前，主聚財旺丁，上吉'],'反弓':['xiong','反弓煞（路水外弧對屋），主破財、是非、留不住人'],'路沖':['xiong','路直沖大門/窗，主意外血光退財，玄關/山海鎮擋'],'直去':['xiong','門前路直去無攔，氣不留、漏財'],'平順':['ping','路平順無沖無抱，中平']};
+ const rows=[['後·玄武（靠山）',env.back],['前·朱雀（明堂）',env.front],['左·青龍',env.left],['右·白虎',env.right],['門前路形',env.road]];
+ h+=`<div class="dirlist">`;
+ rows.forEach(([nm,v])=>{if(!v){h+=`<div class="direntry"><div class="d">${nm}<small>未填</small></div><div class="txt">（填了可判）</div></div>`;return;}
+   const j=J[v]||['ping',v];h+=`<div class="direntry"><div class="d">${nm}<small>${v.replace('_l','')}</small></div><div class="txt">${pill(j[0],pLabel(j[0]))}${j[1]}</div></div>`;});
+ h+=`</div><div class="note">其他外煞速記：<b>天斬煞</b>（兩樓夾縫對門窗，如刀劈，主血光）；<b>壁刀煞</b>（他棟牆角切來）；<b>孤峰煞</b>（四周空曠獨高，孤立無援）；<b>藥罐煞</b>（對醫院）；<b>官帽煞／蜈蚣煞</b>（對變電/招牌鐵架）。外煞化解優先：玄關轉氣＞窗簾遮擋＞山海鎮/凸鏡反制（對外可用、對內慎用）。</div>`;
+ return h;}
+
+/* ============ 全家合盤 ============ */
+function renderFamily(members){
+ let h=`<h2>全家合盤 · 房間分配</h2><div class="tagline">各人命卦 × 東西四命 → 誰住哪個方位的房最合</div>`;
+ if(!members.length) return h+`<div class="note">在上方「全家成員」填生年即可比對。用途：把每個房間（依方位）分給命卦最合的人——小孩房求文昌、長輩房求健康、夫妻房求和睦。</div>`;
+ h+=`<div class="talk"><h4>怎麼分房</h4><p>每個人有自己的四吉方。<b>房間落在某方位，就適合分給「該方位是其吉方」的家人</b>。例如某房在正東，正東是孩子的生氣方，這房給孩子當臥室/書房最旺。全家東西四命混雜很正常，以「各就各的吉方」分配即可。</p></div>`;
+ h+=`<h3>各成員命卦</h3><div class="dirlist">`;
+ members.forEach(m=>{const yn=youNian(m.mgN);const ji=Object.keys(GUA).filter(g=>JI4.includes(yn[g])).map(g=>GUA[g].cn);
+   h+=`<div class="direntry"><div class="d">${m.label}<small>${m.year}</small></div>
+     <div class="txt"><b>${m.mgN}命（${EAST4.includes(m.mgN)?'東四命':'西四命'}）</b><br>
+     宜住／書桌吉方：<span style="color:var(--jade)">${ji.join('、')}</span></div></div>`;});
+ h+=`</div>`;
+ // 各方位適合誰
+ h+=`<h3>八方位 → 適合分配給誰</h3><div class="dirlist">`;
+ Object.keys(GUA).forEach(g=>{const cn=GUA[g].cn;
+   const fit=members.filter(m=>JI4.includes(youNian(m.mgN)[g])).map(m=>m.label);
+   h+=`<div class="direntry"><div class="d">${cn}<small>${g}</small></div>
+     <div class="txt">${fit.length?pill('ji','宜')+'適合：<b>'+fit.join('、')+'</b>':pill('xiong','—')+'此方為全員或多數的凶方，宜作衛浴／儲藏／不常用空間'}</div></div>`;});
+ h+=`</div><div class="note">夫妻主臥若兩人一東一西，取當家者命卦定床頭、對方睡靠己方吉側（見八宅頁）。孩子房優先給「文昌／生氣」落此方者；長輩房優先「天醫（健康）」方。</div>`;
+ return h;}
+
+/* ============ 商業風水 ============ */
+function renderBiz(biz,zuoIdx,yun,mingYear,gender){
+ const mg=MG_NAME[mingGua(mingYear,gender)],yn=youNian(mg),isJi=g=>JI4.includes(yn[g]);
+ const xk=calcXuankong(zuoIdx,yun);
+ const caiFang=Object.keys(GUA).filter(g=>xk.xiangPan[g]===xk.ling).map(g=>GUA[g].cn);
+ let h=`<h2>商業風水 · 店面／辦公</h2><div class="tagline">收銀・老闆桌・店門 × 老闆命卦＋財位</div>`;
+ h+=`<div class="kv"><span>負責人：<b>${mg}命</b></span><span>玄空財位（向星當旺）：<b>${caiFang.join('、')||'見玄空頁'}</b></span></div>`;
+ h+=`<div class="talk"><h4>開店三大件</h4><p><b>店門</b>：開在納氣旺方（向星旺方）或龍邊（面店外、左手邊），迎客納財。<b>收銀台／金庫</b>：要「藏」不要「露」——背後靠實牆（有靠山守財）、位在店內財位或暗方、忌對大門（財外露易破）、忌走道沖。<b>老闆桌</b>：坐老闆命卦吉方、背實牆、面向店門（看得到進出、掌控全局），忌背門背窗。</p></div>`;
+ h+=`<h3>落位判斷</h3><div class="dirlist">`;
+ const items=[['cashier','收銀台／金庫','背靠實牆、落財位或暗方、忌對門露白'],['boss','老闆桌','坐命卦吉方、背牆面門、忌背門窗'],['door','店門','開向星旺方或龍邊納客']];
+ items.forEach(([id,nm,rule])=>{const pos=biz[id];
+   if(pos){const ji=isJi(pos),isCai=caiFang.includes(GUA[guaByDir(pos)].cn);
+     let p=(id==='door')?(isCai?'ji':'ping'):(ji?'ji':'xiong');
+     let t=(id==='door')?(isCai?'開在財星旺方，納財氣，佳':'非向星旺方，配合龍邊/明堂再評'):(ji?'落老闆命卦吉方 ✓':'落凶方，宜移到吉方');
+     if(id==='cashier'&&isCai)t+='（且為財位，加分）';
+     h+=`<div class="direntry"><div class="d">${nm}<small>${DIR_CN[pos]}</small></div><div class="txt">${pill(p,pLabel(p))}${t}。${rule}</div></div>`;}
+   else h+=`<div class="direntry"><div class="d">${nm}<small>未填</small></div><div class="txt">${rule}</div></div>`;});
+ h+=`</div><div class="note">催財小物：收銀台招財貓/聚寶盆/五帝錢壓；財位擺流水（動水生財）常保明亮；店門風鈴迎客。忌：收銀背門、財位堆雜物或設廁、大門直通後門（穿堂漏財）。</div>`;
+ return h;}
+
+/* ============ 開運擇日助手 ============ */
+const SHENGXIAO=['鼠','牛','虎','兔','龍','蛇','馬','羊','猴','雞','狗','豬'];
+function renderZeri(matter,tmonth,fyear,mingYear,zb){
+ const zhiIdx=((mingYear-4)%12+12)%12,sx=SHENGXIAO[zhiIdx],chongIdx=(zhiIdx+6)%12,chongSx=SHENGXIAO[chongIdx],chongZhi=ZHI[chongIdx];
+ let h=`<h3 style="margin-top:28px">開運擇日助手（${matter}）</h3>`;
+ h+=`<div class="talk"><h4>擇方＋擇時一起看</h4><p>紫白管「哪個方位能不能動」，擇日管「哪一天動」。兩個要合：<b>先避開流年五黃、二黑所到的方位別動工</b>，再<b>挑日子避開沖屋主生肖的日子</b>。屋主屬<b>${sx}</b>，逢<b>${chongSx}日（地支${chongZhi}日）＝正沖，動工/入宅/安床一律避開</b>。</p></div>`;
+ // 該年凶方
+ const wuHuang=Object.keys(GUA).filter(g=>zb.dirStar[GUA[g].dir].year===5).map(g=>GUA[g].cn);
+ const erHei=Object.keys(GUA).filter(g=>zb.dirStar[GUA[g].dir].year===2).map(g=>GUA[g].cn);
+ h+=`<div class="dirlist">
+   <div class="direntry wide"><div class="txt">${pill('xiong','避方')}<b>${fyear}年五黃到 ${wuHuang.join('、')||'—'}、二黑到 ${erHei.join('、')||'—'}</b>：這些方位今年忌動土、破土、大裝修；${matter}若動到這些方位，先擇日並掛金屬洩煞。</div></div>
+   <div class="direntry wide"><div class="txt">${pill('xiong','避日')}逢<b>${chongZhi}日</b>（沖${sx}）不用；家中主事者、及該事項當事人生肖被沖之日亦避。</div></div>`;
+ const tips={入宅:'宜晴日、上午（陽氣旺）；帶舊灶火/米/鹽入新居；避空亡日、楊公忌。',安床:'先安床後入住；孕婦迴避搬床（胎神）；床安後當晚宜有人睡。',動土:'先看流年三煞、五黃方；動土祭拜后土；避太歲方（今年太歲方勿輕動）。',開市:'宜開日、滿日、成日；上午開張；生肖沖日避開；紅包/招財布置到位。'};
+ h+=`<div class="direntry wide"><div class="txt">${pill('ji','宜')}${tips[matter]||''}</div></div></div>`;
+ h+=`<div class="note">此為<b>擇日原則版</b>（避沖生肖＋避流年凶方＋事項通則），非通書排日。要精準到「某月某日某時＋建除十二神＋二十八宿＋真太陽時」須查通書或專門擇日，屬另一套工具，要做我再開。</div>`;
+ return h;}
+
+/* ============ 分頁 ============ */
+const TABS=[{id:'sum',name:'綜合總結',sum:1},{id:'bz',name:'八宅'},{id:'gj',name:'格局檢查'},{id:'xk',name:'玄空'},
+ {id:'sh',name:'三合'},{id:'js',name:'金鎖玉關'},{id:'qk',name:'乾坤國寶'},{id:'zb',name:'紫白·擇日'},
+ {id:'xs',name:'形煞·外局'},{id:'jt',name:'全家合盤'},{id:'biz',name:'商業風水'}];
+function buildTabs(){let t='',p='';
+ TABS.forEach((x,i)=>{t+=`<button class="tab${x.sum?' sum':''}${i===0?' on':''}" data-t="${x.id}" onclick="switchTab('${x.id}')">${x.name}</button>`;
+  p+=`<div class="panel${i===0?' on':''}" id="p-${x.id}"></div>`;});
+ document.getElementById('tabs').innerHTML=t;document.getElementById('panels').innerHTML=p;}
+function switchTab(id){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.t===id));
+ document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.id==='p-'+id));}
+
+/* ============ 主流程 ============ */
+function run(){
+ const zuoIdx=+document.getElementById('zuo').value;
+ const yearRaw=+document.getElementById('year').value||1985;
+ const gender=document.getElementById('gender').value;
+ const lichun=document.getElementById('lichun').checked;
+ const year=lichun?yearRaw-1:yearRaw; // 命卦/納音/桃花 用立春修正後的年
+ const year2=+document.getElementById('year2').value||0;
+ const gender2=document.getElementById('gender2').value;
+ const spouse=year2? {mgN:MG_NAME[mingGua(year2,gender2)],group:'',gender:gender2}:null;
+ if(spouse) spouse.group=EAST4.includes(spouse.mgN)?'東四命':'西四命';
+ const yun=+document.getElementById('yun').value;
+ function waterZhi(selId,degId){const dv=document.getElementById(degId).value;
+   let shanIdx = dv!=='' ? shanFromDeg(+dv) : +document.getElementById(selId).value;
+   return ZHI.indexOf(SHAN_ZHI[SHAN[shanIdx].n]);}
+ const laiIdx=waterZhi('laishui','laiDeg');
+ const quIdx=waterZhi('qushui','quDeg');
+ const fyear=+document.getElementById('fyear').value||2026;
+ const fmonth=+document.getElementById('fmonth').value;
+ const degZuo=document.getElementById('degZuo').value;
+ const xi=oppIdx(zuoIdx);
+ const zs=SHAN[zuoIdx],xs=SHAN[xi],yl=['地元','天元','人元'];
+ // 空亡提示（用坐度數）
+ let seatExtra='';
+ if(degZuo!==''){const dv=((+degZuo)%360+360)%360;
+   if(degEdge(dv))seatExtra=`<small style="color:var(--zhu2)">⚠ ${dv}° 接近兩山界線，恐兼向／空亡</small>`;
+   else seatExtra=`<small>坐 ${dv}° · 依${document.getElementById('basis').value}向</small>`;}
+ else seatExtra=`<small>${zs.d}° · 依${document.getElementById('basis').value}向</small>`;
+ document.getElementById('seat').innerHTML=
+   `坐 <b>${zs.n}</b> 向 <span class="xiang">${xs.n}</span>${seatExtra}`+
+   `<div class="seatdetail">坐 ${zs.n}（${zs.g}·${GUA[zs.g].cn}·${yl[zs.y]}·${zs.yy}）<br>`+
+   `向 ${xs.n}（${xs.g}·${GUA[xs.g].cn}·${yl[xs.y]}·${xs.yy}）</div>`+
+   `<div class="seatlegend"><span style="color:#d1613f">■</span>陽龍 <span style="color:var(--dim)">■</span>陰龍　外圈度數・內圈八卦洛書數・三元龍地天人</div>`;
+ drawLuopan(zuoIdx);
+ const jsStates={};for(const d in DIR_CN){const el=document.getElementById('js-'+d);jsStates[d]=el?el.value:'平';}
+
+ document.getElementById('p-sum').innerHTML=renderSummary(zuoIdx,year,gender,yun,fyear,fmonth,jsStates,spouse);
+ document.getElementById('p-bz').innerHTML=renderBazhai(calcBazhai(zuoIdx,year,gender),spouse,gender,year);
+ const furn={};['door','bed','sofa','desk','stove','altar','toilet'].forEach(id=>{const el=document.getElementById('f-'+id);furn[id]=el?el.value:'';});
+ const tog={};['sofaBack','sofaDoor','deskBack','deskDoor','bedDoor'].forEach(id=>{const el=document.getElementById(id);tog[id]=el?el.checked:false;});
+ tog.stoveMouth=document.getElementById('stoveMouth').value;
+ document.getElementById('p-gj').innerHTML=renderGeju(zuoIdx,year,gender,furn,tog);
+ // 列印表頭
+ const client=document.getElementById('client').value.trim();
+ const dstr=new Date().toLocaleDateString('zh-TW');
+ document.getElementById('printHeader').innerHTML=
+   `<div class="ph-title">風水排盤單</div><div class="ph-meta">${client?'案主：'+client+'　│　':''}坐 ${SHAN[zuoIdx].n} 向 ${SHAN[xi].n}　│　${yun}運　│　排盤日 ${dstr}</div>`;
+ document.getElementById('p-xk').innerHTML=renderXuankong(calcXuankong(zuoIdx,yun));
+ document.getElementById('p-sh').innerHTML=renderSanhe(calcSanhe(zuoIdx,laiIdx,quIdx));
+ document.getElementById('p-js').innerHTML=renderJSYG(jsStates);
+ document.getElementById('p-qk').innerHTML=renderQiankun(calcQiankun(zuoIdx));
+ // 紫白 + 擇日
+ const zb=calcZibai(fyear,fmonth);
+ const matter=document.getElementById('zeriMatter').value;
+ document.getElementById('p-zb').innerHTML=renderZibai(zb)+renderZeri(matter,fmonth,fyear,year,zb);
+ // 形煞 + 外局
+ const env={};['back','front','left','right','road'].forEach(k=>{env[k]=document.getElementById('env-'+k).value;});
+ document.getElementById('p-xs').innerHTML=renderXingsha()+renderWailuan(env);
+ // 全家合盤
+ const members=[];
+ for(let i=0;i<4;i++){const y=+document.getElementById('fam-year-'+i).value;
+   if(y){members.push({label:document.getElementById('fam-label-'+i).value||('成員'+(i+1)),year:y,gender:document.getElementById('fam-gender-'+i).value,mgN:MG_NAME[mingGua(y,document.getElementById('fam-gender-'+i).value)]});}}
+ document.getElementById('p-jt').innerHTML=renderFamily(members);
+ // 商業風水
+ const biz={};['cashier','boss','door'].forEach(id=>{biz[id]=document.getElementById('biz-'+id).value;});
+ document.getElementById('p-biz').innerHTML=renderBiz(biz,zuoIdx,yun,year,gender);
+}
+
+/* ============ 初始化 ============ */
+function initSelects(){
+ const zuo=document.getElementById('zuo');
+ SHAN.forEach((s,i)=>{const lo=((s.d-7.5)%360+360)%360,hi=(s.d+7.5)%360;
+   zuo.appendChild(new Option(`${s.n}山（${s.g}${GUA[s.g].cn}）${lo}–${hi}°`,i));});
+ zuo.value=0;
+ const yun=document.getElementById('yun');
+ [['一運 1864-1883',1],['二運 1884-1903',2],['三運 1904-1923',3],['四運 1924-1943',4],
+  ['五運 1944-1963',5],['六運 1964-1983',6],['七運 1984-2003',7],['八運 2004-2023',8],
+  ['九運 2024-2043',9]].forEach(([t,v])=>yun.appendChild(new Option(t,v)));
+ yun.value=9;
+ const lai=document.getElementById('laishui'),qu=document.getElementById('qushui');
+ SHAN.forEach((s,i)=>{lai.appendChild(new Option(s.n+'（'+SHAN_ZHI[s.n]+'）',i));qu.appendChild(new Option(s.n+'（'+SHAN_ZHI[s.n]+'）',i));});
+ lai.value=4;qu.value=16; // 寅 / 申 起始
+ const fm=document.getElementById('fmonth');
+ ['正月(寅)','二月(卯)','三月(辰)','四月(巳)','五月(午)','六月(未)','七月(申)','八月(酉)','九月(戌)','十月(亥)','十一月(子)','十二月(丑)']
+  .forEach((t,i)=>fm.appendChild(new Option(t,i+1)));fm.value=1;
+ // 金鎖玉關砂水
+ const jg=document.getElementById('jsgrid');
+ ['坎','艮','震','巽','離','坤','兌','乾'].forEach(g=>{const d=GUA[g].dir;
+   const sel=document.createElement('select');sel.id='js-'+d;
+   sel.innerHTML=`<option value="平">${GUA[g].cn}${g}·平</option><option value="水">${GUA[g].cn}·水</option><option value="砂">${GUA[g].cn}·砂</option>`;
+   jg.appendChild(sel);});
+ // 陽宅擺設 8方
+ const fg=document.getElementById('fgrid');
+ [['door','大門'],['bed','主臥床'],['sofa','客廳沙發'],['desk','書桌／辦公'],['stove','爐灶'],['altar','神位']].forEach(([id,nm])=>{
+   const sel=document.createElement('select');sel.id='f-'+id;
+   sel.innerHTML='<option value="">'+nm+'：未定</option>'+['N','NE','E','SE','S','SW','W','NW'].map(d=>`<option value="${d}">${nm}：${DIR_CN[d]}</option>`).join('');
+   fg.appendChild(sel);});
+ const fg2=document.getElementById('fgrid2');
+ [['toilet','廁所'],['stoveMouth','灶口朝']].forEach(([id,nm])=>{
+   const sel=document.createElement('select');sel.id=id==='toilet'?'f-toilet':'stoveMouth';
+   sel.innerHTML='<option value="">'+nm+'：未定</option>'+['N','NE','E','SE','S','SW','W','NW'].map(d=>`<option value="${d}">${nm}：${DIR_CN[d]}</option>`).join('');
+   fg2.appendChild(sel);});
+ // 全家成員 4 列
+ const fr=document.getElementById('famrows');
+ const presets=['爸爸','媽媽','長子/女','次子/女'];
+ for(let i=0;i<4;i++){const row=document.createElement('div');row.className='row';row.style.gap='6px';
+   row.innerHTML=`<input type="text" id="fam-label-${i}" placeholder="稱謂" value="${presets[i]}" style="flex:1.2">
+     <input type="number" id="fam-year-${i}" placeholder="生年" style="flex:1.3">
+     <select id="fam-gender-${i}" style="flex:.9"><option value="男">男</option><option value="女">女</option></select>`;
+   fr.appendChild(row);}
+ // 商業 3 選
+ const bg=document.getElementById('bizgrid');
+ [['cashier','收銀台'],['boss','老闆桌'],['door','店門']].forEach(([id,nm])=>{
+   const sel=document.createElement('select');sel.id='biz-'+id;
+   sel.innerHTML='<option value="">'+nm+'：未定</option>'+['N','NE','E','SE','S','SW','W','NW'].map(d=>`<option value="${d}">${nm}：${DIR_CN[d]}</option>`).join('');
+   bg.appendChild(sel);});
+ // 外局 5 選
+ const eg=document.getElementById('envgrid');
+ const envOpts={back:[['','後·玄武：未填'],['有靠','後：有靠山/實樓'],['空曠','後：空曠無靠'],['低陷','後：低陷下傾']],
+  front:[['','前·朱雀：未填'],['開闊','前：明堂開闊'],['見水','前：有水環抱'],['逼壓','前：大樓逼壓']],
+  left:[['','左·青龍：未填'],['高有情','左：青龍高有情'],['低陷_l','左：青龍低陷']],
+  right:[['','右·白虎：未填'],['低伏','右：白虎低伏(正)'],['高壓','右：白虎高壓(抬頭)'],['尖射','右：白虎尖射']],
+  road:[['','門前路形：未填'],['平順','路：平順'],['玉帶','路：玉帶環抱(吉)'],['反弓','路：反弓(凶)'],['路沖','路：路沖(凶)'],['直去','路：直去漏財']]};
+ ['back','front','left','right','road'].forEach(k=>{const sel=document.createElement('select');sel.id='env-'+k;
+   sel.innerHTML=envOpts[k].map(([v,t])=>`<option value="${v}">${t}</option>`).join('');eg.appendChild(sel);});
+ // 度數 ↔ 坐山 同步
+ const zuoSel=document.getElementById('zuo'),dz=document.getElementById('degZuo'),dx=document.getElementById('degXiang'),rh=document.getElementById('resolveHint');
+ function showResolve(idx,deg,src){const xi=oppIdx(idx);
+   let edge=(deg!==null&&degEdge(deg))?' <span style="color:var(--zhu2)">⚠接近界線</span>':'';
+   rh.innerHTML=`→ 坐 <b style="color:var(--zhu2)">${SHAN[idx].n}山</b>（${SHAN[idx].g}·${GUA[SHAN[idx].g].cn}）　向 <b style="color:var(--jade)">${SHAN[xi].n}</b>（${GUA[SHAN[xi].g].cn}）${edge}`;}
+ dx.addEventListener('input',()=>{if(dx.value==='')return;const idx=shanFromDeg(+dx.value+180);zuoSel.value=idx;dz.value=((+dx.value+180)%360+360)%360;drawLuopan(idx);showResolve(idx,+dx.value+180,'x');});
+ dz.addEventListener('input',()=>{if(dz.value==='')return;const idx=shanFromDeg(+dz.value);zuoSel.value=idx;dx.value=((+dz.value+180)%360+360)%360;drawLuopan(idx);showResolve(idx,+dz.value,'z');});
+ zuoSel.addEventListener('change',()=>{const idx=+zuoSel.value;dz.value=SHAN[idx].d;dx.value=SHAN[oppIdx(idx)].d;drawLuopan(idx);showResolve(idx,SHAN[idx].d,'s');});
+ showResolve(0,0,'s');
+}
+function setTheme(t){document.documentElement.dataset.theme=t;
+ document.documentElement.style.colorScheme=(t==='light')?'light dark':'dark light';
+ document.querySelector('meta[name=theme-color]').content=(t==='light')?'#efe7d4':'#16130e';}
+function toggleBig(){document.documentElement.classList.toggle('big');}
+function printAll(){window.print();}
+function toggleLean(){const b=document.body,btn=document.getElementById('leanBtn');
+ b.classList.toggle('lean');
+ if(b.classList.contains('lean')){btn.textContent='📖 完整解說';btn.style.borderColor='var(--jade)';btn.style.color='var(--jade)';}
+ else{btn.textContent='🔎 簡潔模式';btn.style.background='var(--jade)';btn.style.color='#fff';}}
+
+initSelects();buildTabs();drawLuopan(0);document.body.classList.add('lean');run();
+</script>
+</body>
+</html>
