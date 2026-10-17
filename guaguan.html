@@ -298,7 +298,7 @@ button{cursor:pointer}
 .cell.bk,.grid .h.bk{border-left:2px solid var(--line-2)}
 .cell .v{display:flex;flex-direction:column;align-items:center;font-family:var(--serif);font-weight:700}
 .cell small{font-size:14px;font-weight:700;margin-top:4px;white-space:nowrap}
-.cell small .s{color:var(--gold)} .cell small .y{color:var(--shui)} .cell small .b{color:var(--muted)}
+.cell small .s{color:var(--gold)} .cell small .y{color:var(--shui)} .cell small .b{color:var(--muted)} .cell small .a{color:var(--bad)}
 .cell.yong{background:var(--hi)}
 .cell .kg{position:absolute;right:1px;bottom:5px;background:#F5DE45;color:#6E5300;font-size:12px;font-weight:700;line-height:1.3;padding:0 2px;border-radius:3px}
 .cell .mv{font-size:26px;font-weight:900;color:var(--huo);line-height:1}
@@ -606,6 +606,8 @@ const WEEK='日一二三四五六', pad=n=>String(n).padStart(2,'0');
 const fmtDT=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 
 // ── 排盤 ──
+const CS_START={木:'亥',火:'寅',金:'巳',水:'申',土:'申'}, CS_NAME=['長生','沐浴','冠帶','臨官','帝旺','衰','病','死','墓','絕','胎','養'];
+function csOf(w,z){ return CS_NAME[(ZHI.indexOf(z)-ZHI.indexOf(CS_START[w])+12)%12]; } // 五行 w 在地支 z 的十二長生
 function wangshuai(mz,w){ const m=ZW[mz]; if(m===w) return '旺'; if(SHENG[m]===w) return '相'; if(SHENG[w]===m) return '休'; if(KE[w]===m) return '囚'; return '死'; }
 function dayRel(dz,z){
   if(chong(dz,z)) return '日沖'; if(HE[dz]===z) return '日合';
@@ -623,15 +625,17 @@ const YIMA={申:'寅',子:'寅',辰:'寅',寅:'申',午:'申',戌:'申',巳:'亥
 const TAOHUA={申:'酉',子:'酉',辰:'酉',寅:'卯',午:'卯',戌:'卯',巳:'午',酉:'午',丑:'午',亥:'子',卯:'子',未:'子'};
 const GUIREN={甲:'丑未',戊:'丑未',庚:'丑未',乙:'子申',己:'子申',丙:'亥酉',丁:'亥酉',壬:'卯巳',癸:'卯巳',辛:'寅午'};
 const WENCHANG={甲:'巳',乙:'午',丙:'申',丁:'酉',戊:'申',己:'酉',庚:'亥',辛:'子',壬:'寅',癸:'卯'};
-const YANGREN={甲:'卯',乙:'寅',丙:'午',丁:'巳',戊:'午',己:'巳',庚:'酉',辛:'申',壬:'子',癸:'亥'};
+const YANGREN={甲:'卯',乙:'寅',丙:'午',丁:'巳',戊:'子',己:'巳',庚:'酉',辛:'申',壬:'子',癸:'亥'}; // 土水共長生：戊同壬，羊刃在子
 function analyze(lines,now){
   const cal=calendar(now), bits=lines.map(l=>l.yang?1:0), moving=lines.some(l=>l.moving), vbits=lines.map(l=>(l.yang!==l.moving)?1:0);
   const ben=hexOf(bits), bian=moving?hexOf(vbits):null, hu=hexOf([bits[1],bits[2],bits[3],bits[2],bits[3],bits[4]]);
   const gwx=ben.pal.gwx, shi=ben.pal.shi, ying=(shi+2)%6+1, s0=SHEN_START[cal.dg];
   const rows=lines.map((l,i)=>{
     const z=ben.zhi[i], r={i,z,w:ZW[z],qin:qinOf(gwx,ZW[z]),shen:SHEN[(s0+i)%6],yang:l.yang,moving:l.moving,shi:shi===i+1,ying:ying===i+1,
-      ws:wangshuai(cal.mz,ZW[z]),dr:dayRel(cal.dz,z),kong:cal.kong.includes(z),po:chong(cal.mz,z),lin:cal.mz===z,lind:cal.dz===z};
-    if(l.moving){ const bz=bian.zhi[i]; Object.assign(r,{bz,bw:ZW[bz],bqin:qinOf(gwx,ZW[bz]),hua:huaRel(z,bz),bkong:cal.kong.includes(bz)}); }
+      ws:wangshuai(cal.mz,ZW[z]),dr:dayRel(cal.dz,z),cs:csOf(ZW[z],cal.dz),kong:cal.kong.includes(z),po:chong(cal.mz,z),lin:cal.mz===z,lind:cal.dz===z};
+    if(l.moving){ const bz=bian.zhi[i]; Object.assign(r,{bz,bw:ZW[bz],bqin:qinOf(gwx,ZW[bz]),hua:huaRel(z,bz),bkong:cal.kong.includes(bz),bcs:csOf(ZW[z],bz)}); }
+    // 靜爻逢日沖：旺相為暗動，休囚為日破（K 確認的用法）
+    if(!l.moving&&r.dr==='日沖') r.an='旺相'.includes(r.ws)?'暗動':'日破';
     return r;
   });
   const have=new Set(rows.map(r=>r.qin)), pure=TRI.find(t=>t.n===ben.pal.gong), pz=(NA_IN[pure.n]+NA_OUT[pure.n]).split(''), fu=[];
@@ -991,7 +995,7 @@ function renderPan(A,now){
   let rowsH='';
   [5,4,3,2,1,0].forEach(i=>{
     const r=A.rows[i], fu=A.fu.find(f=>f.i===i);
-    const marks=[r.shi?'<span class="s">世</span>':'',r.ying?'<span class="y">應</span>':'',A.shenyao===i?'<span class="b">身</span>':''].filter(Boolean).join(' ');
+    const marks=[r.shi?'<span class="s">世</span>':'',r.ying?'<span class="y">應</span>':'',A.shenyao===i?'<span class="b">身</span>':'',r.an?`<span class="a">${r.an==='暗動'?'暗':'破'}</span>`:''].filter(Boolean).join(' ');
     const ben=r.moving?`<span class="mv">${r.yang?'○':'×'}</span>`:yaoSVG(r.yang,false,38);
     rowsH+=`<div class="prow ${selRow===i?'sel':''}" data-i="${i}" role="button" tabindex="0" aria-label="${POS[i]}">
       <div class="cell">${fu?zw(fu.z,ZW[fu.z]):''}</div>
@@ -1030,11 +1034,12 @@ function showDetail(A){
   const r=A.rows[selRow], c=A.cal, t=[];
   t.push(`<span class="tg ${'旺相'.includes(r.ws)?'g':'b'}">月建${c.mz}：${r.ws}${r.lin?'，臨月建':''}</span>`);
   if(r.po) t.push('<span class="tg b">月破</span>');
-  t.push(`<span class="tg ${['日沖','日剋'].includes(r.dr)?'b':(['日生','日合','日比'].includes(r.dr)?'g':'')}">日辰${c.dz}：${r.dr}${r.dr==='日沖'&&!r.moving?'，靜爻逢沖為暗動':''}</span>`);
+  t.push(`<span class="tg ${['日沖','日剋'].includes(r.dr)?'b':(['日生','日合','日比'].includes(r.dr)?'g':'')}">日辰${c.dz}：${r.dr}${r.an?'，'+r.an:''}</span>`);
+  t.push(`<span class="tg ${['長生','帝旺','臨官'].includes(r.cs)?'g':(['墓','絕'].includes(r.cs)?'b':'n')}">十二長生（對日）：${r.cs}</span>`);
   if(r.lind) t.push('<span class="tg g">臨日辰</span>');
   if(r.kong) t.push('<span class="tg n">旬空</span>');
   let h=`<b>${POS[r.i]}　${r.shen}　${r.qin}${r.z}${r.w}</b>${r.shi?'　世':''}${r.ying?'　應':''}<br>${t.join('')}`;
-  if(r.moving) h+=`<br>動化 <b>${r.bqin}${r.bz}${r.bw}</b>　${r.hua.map(x=>`<span class="tg ${['回頭生','化進神'].includes(x)?'g':(['回頭剋','化退神','化沖'].includes(x)?'b':'')}">${x}</span>`).join('')}${r.bkong?'<span class="tg n">變爻旬空</span>':''}`;
+  if(r.moving) h+=`<br>動化 <b>${r.bqin}${r.bz}${r.bw}</b>　${['長生','帝旺','墓','絕'].includes(r.bcs)?`<span class="tg ${['墓','絕'].includes(r.bcs)?'b':'g'}">化${r.bcs}</span>`:''}${r.hua.map(x=>`<span class="tg ${['回頭生','化進神'].includes(x)?'g':(['回頭剋','化退神','化沖'].includes(x)?'b':'')}">${x}</span>`).join('')}${r.bkong?'<span class="tg n">變爻旬空</span>':''}`;
   A.fu.filter(f=>f.i===r.i).forEach(f=>{ h+=`<br>伏神 <b>${f.q}${f.z}${ZW[f.z]}</b>，伏在${r.qin}${r.z}${r.w}之下`; });
   $('panDetail').innerHTML=h; $('panDetail').hidden=false; $('panTip').hidden=true;
 }
@@ -1217,8 +1222,8 @@ function chartText(A,now){
   L.push(`卦身：${A.guashen}　身爻：${POS[A.shenyao]}`);
   L.push('爻位（由上爻到初爻）：');
   [5,4,3,2,1,0].forEach(i=>{ const r=A.rows[i], fu=A.fu.filter(f=>f.i===i);
-    const tags=[r.shi?'世':'',r.ying?'應':'',r.moving?(r.yang?'老陽動○':'老陰動×'):'',r.kong?'旬空':'',r.po?'月破':'',r.lin?'臨月建':'',r.lind?'臨日辰':''].filter(Boolean).join('、');
-    L.push(`${POS[i]}　${r.shen}　${r.qin}${r.z}${r.w}　${r.yang?'陽':'陰'}　月令${r.ws}　${r.dr}${tags?'　'+tags:''}${r.moving?`　→ 變出 ${r.bqin}${r.bz}${r.bw}（${r.hua.join('、')}${r.bkong?'、化空':''}）`:''}${fu.length?'　伏神：'+fu.map(f=>f.q+f.z+ZW[f.z]).join('、'):''}`); });
+    const tags=[r.shi?'世':'',r.ying?'應':'',r.moving?(r.yang?'老陽動○':'老陰動×'):'',r.an||'',r.kong?'旬空':'',r.po?'月破':'',r.lin?'臨月建':'',r.lind?'臨日辰':''].filter(Boolean).join('、');
+    L.push(`${POS[i]}　${r.shen}　${r.qin}${r.z}${r.w}　${r.yang?'陽':'陰'}　月令${r.ws}　${r.dr}　於日${r.cs}${tags?'　'+tags:''}${r.moving?`　→ 變出 ${r.bqin}${r.bz}${r.bw}（${r.hua.join('、')}${['長生','帝旺','墓','絕'].includes(r.bcs)?'、化'+r.bcs:''}${r.bkong?'、化空':''}）`:''}${fu.length?'　伏神：'+fu.map(f=>f.q+f.z+ZW[f.z]).join('、'):''}`); });
   L.push(`梅花易數：體${M.ti.n}${M.ti.wx}、用${M.yong.n}${M.yong.wx}，${M.r.k}${M.note?'（'+M.note+'）':''}`);
   return L.join('\n');
 }
