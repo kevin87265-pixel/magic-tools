@@ -12,7 +12,7 @@ header{background:var(--accent);color:#fff;padding:12px 16px;display:flex;justif
 header h1{margin:0;font-family:var(--serif);font-size:22px;letter-spacing:.08em}
 header button{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:99px;padding:5px 14px;font:inherit;font-size:14px}
 .wrap{max-width:640px;margin:0 auto;padding:14px 16px 40px;display:flex;flex-direction:column;gap:12px}
-.tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;position:sticky;top:0;background:var(--bg);padding:6px 0;z-index:2}
+.tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;position:sticky;top:0;background:var(--bg);padding:6px 0;z-index:2}
 .tabs button{border:2px solid var(--line);background:#fff;border-radius:12px;padding:8px 2px;font:inherit;font-size:15px;font-weight:700;color:var(--muted);white-space:nowrap}
 .tabs button[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
 .tabs .n{background:var(--bad);color:#fff;border-radius:99px;padding:0 6px;font-size:12px;margin-left:4px}
@@ -28,6 +28,30 @@ label{font-size:14px;font-weight:700;color:var(--muted);display:flex;flex-direct
 .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .tag{display:inline-block;border-radius:99px;padding:0 10px;font-size:13px;font-weight:700;background:var(--accent-soft);color:var(--accent)}
 .tag.off{background:var(--bad-soft);color:var(--bad)}
+.lsn{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line)}
+.lsn:first-of-type{border-top:0}
+.lsn .t{flex:1;min-width:0;font-size:15px;line-height:1.45}
+.lsn .t b{color:var(--accent);margin-right:4px}
+.lsn button{flex:none;border:2px solid var(--accent-soft);background:#fff;color:var(--accent);border-radius:9px;padding:4px 9px;font:inherit;font-size:14px;font-weight:700}
+.hit{display:block;width:100%;text-align:left;border:0;border-top:1px solid var(--line);background:none;padding:9px 0;font:inherit;color:var(--ink);cursor:pointer}
+.hit small{display:block;color:var(--accent);font-weight:700;font-size:13px}
+.hit span{font-size:15px;line-height:1.55}
+mark{background:var(--gold-soft);color:inherit;border-radius:3px;padding:0 1px}
+.rbar{position:sticky;top:52px;z-index:1;background:var(--bg);display:flex;gap:6px;align-items:center;padding:4px 0 8px;flex-wrap:wrap}
+.rbar .sp{flex:1}
+.rbar .sb{flex:none;padding:6px 10px;font-size:14px;background:#fff;color:var(--accent);border:2px solid var(--accent-soft)}
+.rbar{flex-wrap:nowrap}
+.doc{background:#fff;border:1px solid var(--line);border-radius:14px;padding:6px 16px 18px;font-size:17px;line-height:1.8;overflow-wrap:anywhere}
+.doc h1{font-family:var(--serif);font-size:22px;line-height:1.4;margin:14px 0 6px}
+.doc h2{font-family:var(--serif);font-size:19px;color:var(--accent);margin:22px 0 6px;padding-top:12px;border-top:1px solid var(--line)}
+.doc h3{font-size:17px;color:var(--gold);margin:16px 0 4px}
+.doc h4{font-size:16px;margin:12px 0 4px}
+.doc p{margin:8px 0} .doc ul,.doc ol{padding-left:22px;margin:6px 0} .doc li{margin:3px 0}
+.doc blockquote{margin:8px 0;padding:6px 12px;border-left:4px solid var(--accent-soft);color:var(--muted);font-size:15px}
+.doc strong{color:var(--accent)} .doc code{background:var(--accent-soft);border-radius:4px;padding:0 4px;font-size:.92em}
+.doc hr{border:0;border-top:1px dashed var(--line);margin:14px 0}
+.tw{overflow-x:auto;margin:8px 0} .doc table{border-collapse:collapse;font-size:14px;line-height:1.5;min-width:100%}
+.doc th,.doc td{border:1px solid var(--line);padding:5px 7px;text-align:left;vertical-align:top} .doc th{background:var(--accent-soft)}
 .msg{font-size:14px;font-weight:700;color:var(--good)} .err{color:var(--bad);font-weight:700}
 .big{display:block;width:100%;border:0;border-radius:12px;background:var(--accent);color:#fff;font:inherit;font-size:18px;font-weight:700;padding:12px}
 </style></head><body>
@@ -61,9 +85,9 @@ $('outBtn').onclick=async()=>{ await sb.auth.signOut(); route(); };
 
 async function render(){
   const pend=(await sb.from('payments').select('id',{count:'exact',head:true}).eq('status','pending')).count||0;
-  app.innerHTML=`<div class="tabs">${[['pay','轉帳確認'],['mem','會員'],['plan','方案'],['set','設定']].map(([k,n])=>`<button data-t="${k}" aria-selected="${tab===k}">${n}${k==='pay'&&pend?`<span class="n">${pend}</span>`:''}</button>`).join('')}</div><div id="pane"></div>`;
+  app.innerHTML=`<div class="tabs">${[['pay','收款'],['mem','會員'],['plan','方案'],['set','設定'],['learn','學習']].map(([k,n])=>`<button data-t="${k}" aria-selected="${tab===k}">${n}${k==='pay'&&pend?`<span class="n">${pend}</span>`:''}</button>`).join('')}</div><div id="pane"></div>`;
   app.querySelector('.tabs').onclick=e=>{ const b=e.target.closest('button'); if(b){ tab=b.dataset.t; render(); } };
-  ({pay:renderPay,mem:renderMem,plan:renderPlan,set:renderSet})[tab]();
+  ({pay:renderPay,mem:renderMem,plan:renderPlan,set:renderSet,learn:renderLearn})[tab]();
 }
 const pname=id=>(plans.find(p=>p.id===id)||{}).name||id||'無';
 
@@ -131,5 +155,81 @@ async function renderSet(){
     const {error}=await sb.rpc('admin_set_setting',{k:b.dataset.s,v:$(b.dataset.src).value,is_private:b.dataset.pv==='1'});
     msg($('m_'+b.dataset.s),error?error.message:'已儲存',!!error); };
 }
+// ── 學習：課程與規則書（資料在資料庫 course_docs，只有管理員讀得到）──
+let LM=null, LB={}, LV=null; // LM：目錄；LB：內文快取；LV：目前閱讀 {id,q}
+function mdInline(t){ return esc(t).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/`([^`]+)`/g,'<code>$1</code>'); }
+function md2html(src){
+  const L=src.replace(/\r/g,'').split('\n'), out=[]; let i=0;
+  const isList=l=>/^\s*([-*]|\d+[.、])\s+/.test(l), isTbl=l=>/^\s*\|.*\|\s*$/.test(l);
+  while(i<L.length){ const l=L[i];
+    if(!l.trim()){ i++; continue; }
+    let m=l.match(/^(#{1,4})\s+(.*)$/); if(m){ out.push(`<h${m[1].length}>${mdInline(m[2])}</h${m[1].length}>`); i++; continue; }
+    if(/^\s*(-{3,}|\*{3,})\s*$/.test(l)){ out.push('<hr>'); i++; continue; }
+    if(/^\s*>/.test(l)){ const b=[]; while(i<L.length&&/^\s*>/.test(L[i])) b.push(L[i++].replace(/^\s*>\s?/,'')); out.push(`<blockquote>${b.map(mdInline).join('<br>')}</blockquote>`); continue; }
+    if(isTbl(l)){ const rows=[]; while(i<L.length&&isTbl(L[i])) rows.push(L[i++]); const cells=r=>r.trim().replace(/^\||\|$/g,'').split('|').map(c=>c.trim());
+      const body=rows.filter(r=>!/^\s*\|?\s*:?-{2,}/.test(r)); const [h,...rest]=body;
+      out.push(`<div class="tw"><table><thead><tr>${cells(h).map(c=>`<th>${mdInline(c)}</th>`).join('')}</tr></thead><tbody>${rest.map(r=>`<tr>${cells(r).map(c=>`<td>${mdInline(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`); continue; }
+    if(isList(l)){ const ol=/^\s*\d+[.、]/.test(l), items=[];
+      while(i<L.length&&(isList(L[i])||(/^\s{2,}\S/.test(L[i])&&items.length))){ const x=L[i++]; if(isList(x)) items.push({d:(x.match(/^\s*/)[0].length>=2),t:x.replace(/^\s*([-*]|\d+[.、])\s+/,'')}); else items[items.length-1].t+=' '+x.trim(); }
+      out.push(`<${ol?'ol':'ul'}>${items.map(it=>`<li${it.d?' style="margin-left:18px"':''}>${mdInline(it.t)}</li>`).join('')}</${ol?'ol':'ul'}>`); continue; }
+    const p=[]; while(i<L.length&&L[i].trim()&&!/^(#{1,4}\s|\s*>|\s*\|)/.test(L[i])&&!isList(L[i])) p.push(L[i++]); out.push(`<p>${p.map(mdInline).join('<br>')}</p>`);
+  }
+  return out.join('');
+}
+const lsnTopic=n=>{ const d=(LM||[]).find(x=>x.lesson===n&&x.kind==='逐字稿'); return d?d.title.replace(/^第\s*\d+\s*堂[\s　：:]*/,''):''; };
+const docLabel=d=>d.lesson?`第 ${d.lesson} 堂・${d.kind}`:d.kind;
+async function loadMeta(force){ if(LM&&!force) return LM; const {data,error}=await sb.from('course_docs').select('id,kind,lesson,title,updated_at').order('id'); if(error) throw error; LM=data||[]; return LM; }
+async function loadBody(id){ if(LB[id]!=null) return LB[id]; const {data}=await sb.from('course_docs').select('body').eq('id',id).maybeSingle(); LB[id]=data?data.body:''; return LB[id]; }
+async function loadAll(){ const miss=(LM||[]).filter(d=>LB[d.id]==null).map(d=>d.id); if(!miss.length) return;
+  const {data}=await sb.from('course_docs').select('id,body'); (data||[]).forEach(r=>LB[r.id]=r.body); }
+
+async function renderLearn(){
+  if(LV) return renderReader();
+  $('pane').innerHTML='<div class="card muted">讀取課程中…</div>';
+  try{ await loadMeta(); }catch(e){ $('pane').innerHTML=`<div class="card err">讀不到課程資料：${esc(e.message)}<div class="muted">資料庫可能還沒加上課程資料表，請重新執行一次設定檔。</div></div>`; return; }
+  const has=id=>LM.some(d=>d.id===id), lessons=[...new Set(LM.filter(d=>d.lesson).map(d=>d.lesson))].sort((a,b)=>a-b);
+  const imp=`<div class="card"><h2>${LM.length?'更新課程資料':'匯入課程資料'}</h2><div class="muted">選 Claude 給你的「course_docs.json」檔，會新增或覆蓋同名的內容。課程內容只存在資料庫，只有管理員看得到。</div>
+    <input type="file" id="impF" accept=".json,application/json"><div id="impM"></div></div>`;
+  if(!LM.length){ $('pane').innerHTML=`<div class="card"><h2>還沒有課程資料</h2><div class="muted">先匯入一次，之後就能在這裡讀課程、查規則。</div></div>`+imp; bindImport(); return; }
+  $('pane').innerHTML=`<div class="card"><h2>查詢</h2><div class="row" style="flex-wrap:nowrap"><input id="lq" placeholder="例如：空亡、回頭剋、復合、應期" value="${esc(sessionQ)}"><button class="btn" id="lqGo" style="flex:none">搜尋</button></div><div id="lres"></div></div>
+  <div class="card"><h2>規則書</h2><div class="muted">卦師解卦用的規則，已整理 20 堂課並套用你確認過的規則。</div>
+    <div class="row" style="justify-content:flex-start">${has('rules')?'<button class="btn" data-open="rules">讀規則書</button>':''}${has('pending')?'<button class="btn no" style="color:var(--accent);border-color:var(--accent-soft)" data-open="pending">待確認清單</button>':''}</div>
+    ${has('rules')?'<button class="btn gold" id="applyRules">把這版規則書套用到卦師</button><div id="applyM" class="muted">套用後，網站上的卦師立刻照這版解卦（等於覆蓋「設定」裡的規則書）。</div>':''}</div>
+  <div class="card"><h2>課程 ${lessons.length} 堂</h2>${lessons.map(n=>`<div class="lsn"><div class="t"><b>第 ${n} 堂</b>${esc(lsnTopic(n))}</div>${has(`L${String(n).padStart(2,'0')}-重點`)?`<button data-open="L${String(n).padStart(2,'0')}-重點">重點</button>`:''}${has(`L${String(n).padStart(2,'0')}-逐字稿`)?`<button data-open="L${String(n).padStart(2,'0')}-逐字稿">全文</button>`:''}</div>`).join('')}</div>`+imp;
+  bindImport();
+  const doSearch=async()=>{ const q=$('lq').value.trim(); sessionQ=q; const box=$('lres'); if(!q){ box.innerHTML=''; return; }
+    box.innerHTML='<div class="muted">搜尋中…（第一次要下載全部課程，約幾秒）</div>'; await loadAll();
+    const terms=q.split(/\s+/).filter(Boolean), hits=[];
+    for(const d of LM){ const body=LB[d.id]||''; for(const para of body.split(/\n\s*\n/)){ const plain=para.replace(/[#>*|`]/g,' ').replace(/\s+/g,' ').trim(); if(terms.every(t=>plain.includes(t))){ hits.push({d,plain}); if(hits.length>=80) break; } } if(hits.length>=80) break; }
+    const order={'規則書':0,'重點':1,'待確認':2,'逐字稿':3}; hits.sort((a,b)=>order[a.d.kind]-order[b.d.kind]||(a.d.lesson||0)-(b.d.lesson||0));
+    const hl=t=>{ let h=esc(t); terms.forEach(x=>{ h=h.split(esc(x)).join(`<mark>${esc(x)}</mark>`); }); return h; };
+    const snip=t=>{ const k=t.indexOf(terms[0]); const s=Math.max(0,k-40); return (s?'…':'')+t.slice(s,s+120)+(t.length>s+120?'…':''); };
+    box.innerHTML=hits.length?`<div class="muted">找到 ${hits.length>=80?'80 筆以上，先列前 80 筆':hits.length+' 筆'}</div>`+hits.map(h=>`<button class="hit" data-open="${h.d.id}"><small>${esc(docLabel(h.d))}</small><span>${hl(snip(h.plain))}</span></button>`).join(''):'<div class="muted">找不到。換個字試試，例如只打兩個字。</div>'; };
+  $('lqGo').onclick=doSearch; $('lq').onkeydown=e=>{ if(e.key==='Enter') doSearch(); };
+  if(sessionQ) doSearch();
+  $('pane').onclick=async e=>{ const o=e.target.closest('[data-open]'); if(o){ LV={id:o.dataset.open,q:o.classList.contains('hit')?sessionQ:''}; renderReader(); window.scrollTo(0,0); return; }
+    if(e.target.id==='applyRules'){ e.target.disabled=true; const body=await loadBody('rules'); const {error}=await sb.rpc('admin_set_setting',{k:'rules',v:body,is_private:true}); e.target.disabled=false; msg($('applyM'),error?error.message:'已套用，卦師現在照這版規則書解卦',!!error); } };
+}
+let sessionQ='';
+function bindImport(){ const f=$('impF'); if(!f) return; f.onchange=async()=>{ const file=f.files[0]; if(!file) return; const m=$('impM');
+  let rows; try{ rows=JSON.parse(await file.text()); if(!Array.isArray(rows)||!rows.every(r=>r.id&&r.kind&&r.title&&typeof r.body==='string')) throw new Error('格式不對'); }catch(e){ msg(m,'這個檔案不能用：'+e.message,true); return; }
+  let done=0, batch=[], size=0; const send=async()=>{ if(!batch.length) return; const {error}=await sb.from('course_docs').upsert(batch.map(r=>({id:r.id,kind:r.kind,lesson:r.lesson??null,title:r.title,body:r.body,updated_at:new Date().toISOString()}))); if(error) throw error; done+=batch.length; batch=[]; size=0; msg(m,`匯入中… ${done} / ${rows.length}`); };
+  try{ for(const r of rows){ batch.push(r); size+=r.body.length; if(size>150000) await send(); } await send(); LM=null; LB={}; msg(m,`完成，共 ${done} 份`); setTimeout(()=>{ if(tab==='learn') renderLearn(); },800); }
+  catch(e){ msg(m,'匯入失敗：'+e.message,true); } }; }
+
+async function renderReader(){
+  const d=(LM||[]).find(x=>x.id===LV.id); if(!d){ LV=null; return renderLearn(); }
+  $('pane').innerHTML=`<div class="rbar"><button class="btn sb" id="rBack" style="background:var(--accent);color:#fff;border-color:var(--accent)">← 返回</button><span class="sp"></span>${d.lesson?`${d.lesson>1?`<button class="btn sb" id="rPrev">上一堂</button>`:''}<button class="btn sb" id="rSwap">${d.kind==='重點'?'看全文':'看重點'}</button>${LM.some(x=>x.lesson===d.lesson+1)?`<button class="btn sb" id="rNext">下一堂</button>`:''}`:''}</div><div class="doc" id="rDoc"><p class="muted">載入中…</p></div>`;
+  const go=id=>{ if(LM.some(x=>x.id===id)){ LV={id,q:''}; renderReader(); window.scrollTo(0,0); } }, pad=n=>String(n).padStart(2,'0');
+  $('rBack').onclick=()=>{ LV=null; renderLearn(); };
+  if(d.lesson){ $('rSwap').onclick=()=>go(`L${pad(d.lesson)}-${d.kind==='重點'?'逐字稿':'重點'}`); if($('rPrev')) $('rPrev').onclick=()=>go(`L${pad(d.lesson-1)}-${d.kind}`); if($('rNext')) $('rNext').onclick=()=>go(`L${pad(d.lesson+1)}-${d.kind}`); }
+  const body=await loadBody(d.id); const doc=$('rDoc'); if(!doc) return; doc.innerHTML=md2html(body);
+  const terms=(LV.q||'').split(/\s+/).filter(Boolean); if(!terms.length) return;
+  const w=document.createTreeWalker(doc,NodeFilter.SHOW_TEXT), nodes=[]; while(w.nextNode()) nodes.push(w.currentNode);
+  const re=new RegExp('('+terms.map(t=>t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')','g');
+  nodes.forEach(n=>{ if(!re.test(n.nodeValue)) return; re.lastIndex=0; const s=document.createElement('span'); s.innerHTML=esc(n.nodeValue).replace(re,'<mark>$1</mark>'); n.replaceWith(s); });
+  const first=doc.querySelector('mark'); if(first) first.scrollIntoView({block:'center'});
+}
+
 boot();
 </script></body></html>

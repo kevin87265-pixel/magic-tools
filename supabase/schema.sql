@@ -287,3 +287,17 @@ drop policy if exists casts_own_insert on public.casts;
 create policy casts_own_insert on public.casts for insert with check (user_id = auth.uid());
 drop policy if exists casts_own_delete on public.casts;
 create policy casts_own_delete on public.casts for delete using (user_id = auth.uid());
+
+-- ── 課程與規則書（只有管理員能看、能改；內容不放在公開網頁裡）──
+create table if not exists public.course_docs (
+  id text primary key,
+  kind text not null check (kind in ('規則書','待確認','重點','逐字稿')),
+  lesson int,
+  title text not null,
+  body text not null,
+  updated_at timestamptz not null default now()
+);
+alter table public.course_docs enable row level security;
+drop policy if exists course_docs_admin on public.course_docs;
+create policy course_docs_admin on public.course_docs for all
+  using (public.is_admin(auth.uid())) with check (public.is_admin(auth.uid()));
