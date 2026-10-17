@@ -152,19 +152,19 @@ button{cursor:pointer}
 #motionMsg{font-size:14px;color:var(--muted);text-align:center}
 
 /* 自訂卦象 */
-.diysec{display:flex;flex-direction:column;gap:6px}
+.diysec{display:flex;flex-direction:column;gap:5px}
 .diyh{font-family:var(--serif);font-weight:900;font-size:18px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
 .diyh small{font-family:var(--sans);font-weight:500;font-size:13px;color:var(--muted)}
 .trow{display:grid;grid-template-columns:2.6em minmax(0,1fr);align-items:center;gap:6px}
 .trow>span{font-size:14px;font-weight:700;color:var(--muted)}
 .tris{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px}
-.tris button{border:2px solid var(--line);background:#fff;border-radius:10px;padding:3px 0;line-height:1.15;display:flex;flex-direction:column;align-items:center;font-size:16px;font-weight:700;color:var(--ink)}
+.tris button{border:2px solid var(--line);background:#fff;border-radius:10px;padding:2px 0;line-height:1.1;display:flex;flex-direction:column;align-items:center;font-size:16px;font-weight:700;color:var(--ink)}
 .tris button small{font-size:11px;color:var(--muted);font-weight:500}
 .tris button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent);color:#fff}
 .tris button[aria-pressed="true"] small{color:#C9D0EA}
 .tris button:disabled{opacity:.35}
 .dlines{display:flex;flex-direction:column;border:2px solid var(--line);border-radius:14px;overflow:hidden}
-.dl{display:grid;grid-template-columns:2.4em minmax(0,1fr) 5.2em;align-items:center;gap:10px;padding:8px 12px;border:0;border-top:1px solid var(--line);background:#fff;text-align:left;min-height:46px}
+.dl{display:grid;grid-template-columns:2.4em minmax(0,1fr) 5.2em;align-items:center;gap:10px;padding:5px 12px;border:0;border-top:1px solid var(--line);background:#fff;text-align:left;min-height:40px}
 .dl:first-child{border-top:0}
 .dl .pos{font-family:var(--serif);font-weight:900;color:var(--muted)}
 .dl .kd{justify-self:end;font-size:15px;font-weight:700;padding:1px 10px;border-radius:99px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
@@ -189,6 +189,20 @@ button{cursor:pointer}
 .suggest b{font-family:var(--serif);font-size:17px;color:var(--accent)}
 .suggest .why{color:var(--muted);font-size:13px;width:100%}
 .suggest button{margin-left:auto;border:0;border-radius:99px;background:var(--accent);color:#fff;font-weight:700;font-size:15px;padding:5px 14px;white-space:nowrap}
+
+/* 紀錄 */
+.histbtn{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:99px;padding:6px 14px;font-size:15px;font-weight:700;white-space:nowrap}
+.histbtn span{margin-left:6px;background:#F2D38E;color:#3A2A08;border-radius:99px;padding:0 7px;font-size:13px}
+.histbtn span:empty{display:none}
+.hi{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;padding:10px 2px;border-top:1px dashed var(--line);align-items:center}
+.hi:first-child{border-top:0}
+.hi .t{font-size:13px;color:var(--muted)}
+.hi .q{font-size:16px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hi .g{font-family:var(--serif);font-size:16px;color:var(--accent)}
+.hi .acts{grid-row:1/4;grid-column:2;display:flex;flex-direction:column;gap:6px}
+.hi .acts button{border:2px solid var(--accent);background:#fff;color:var(--accent);border-radius:10px;padding:4px 12px;font-size:15px;font-weight:700}
+.hi .acts button.del{border-color:var(--line);color:var(--muted)}
+.histempty{color:var(--muted);font-size:15px;text-align:center;padding:10px}
 
 /* 已得之爻 */
 .rec{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center}
@@ -328,7 +342,7 @@ button{cursor:pointer}
 </style>
 
 </head><body><header class="hud"><div class="hud-in">
-  <div class="hrow"><div><h1>六爻卦館</h1><div class="date" id="todayDate"></div></div></div>
+  <div class="hrow"><div><h1>六爻卦館</h1><div class="date" id="todayDate"></div></div><button class="histbtn" id="histBtn">紀錄<span id="histN"></span></button></div>
   <div class="gz" id="today"></div>
 </div></header>
 <div class="wrap">
@@ -450,6 +464,11 @@ button{cursor:pointer}
   </section>
 
   <button class="big gold" id="resetBtn" hidden>重新起卦</button>
+
+  <section class="panel" id="histPanel" hidden>
+    <h2 class="ph">起卦紀錄<small>只存在這支手機</small></h2>
+    <div id="histList"></div>
+  </section>
 
   <div class="foot">銅錢：字為陽、背為陰。兩背一字為少陽，兩字一背為少陰，三字為老陽 ○，三背為老陰 ×。<br>年以立春、月以節氣交接時刻換；晚上 11 點後算隔日。僅供參考。</div>
 </div>
@@ -806,7 +825,9 @@ if(window.DeviceMotionEvent&&typeof DeviceMotionEvent.requestPermission==='funct
 } else if('DeviceMotionEvent' in window) window.addEventListener('devicemotion',onMotion);
 
 // ── 數字起卦 ──
-function setMethod(m){ [['coin','tabCoin','coinPane'],['rice','tabRice','ricePane'],['num','tabNum','numPane'],['diy','tabDiy','diyPane']].forEach(([k,t,p])=>{ $(t).setAttribute('aria-selected',m===k); $(p).hidden=m!==k; }); }
+function setMethod(m){ [['coin','tabCoin','coinPane'],['rice','tabRice','ricePane'],['num','tabNum','numPane'],['diy','tabDiy','diyPane']].forEach(([k,t,p])=>{ $(t).setAttribute('aria-selected',m===k); $(p).hidden=m!==k; });
+  // 切換起卦方式時，把起卦方式這排捲到最上面，下面的欄位整個露出來
+  requestAnimationFrame(()=>{ const seg=document.querySelector('.seg'); window.scrollTo({top:Math.max(0,seg.getBoundingClientRect().top+scrollY-8),behavior:RM?'auto':'smooth'}); }); }
 $('tabDiy').addEventListener('click',()=>{ if(!busy) setMethod('diy'); });
 $('tabRice').addEventListener('click',()=>{ if(!busy) setMethod('rice'); });
 $('tabCoin').addEventListener('click',()=>{ if(!busy) setMethod('coin'); });
@@ -1003,13 +1024,43 @@ function renderMei(A){
 }
 function setTab(t){ document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t)); $('tPan').hidden=t!=='pan'; $('tXiang').hidden=t!=='xiang'; $('tMei').hidden=t!=='mei'; }
 document.querySelector('.tabs').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b) setTab(b.dataset.t); });
-function finish(){
-  const now=new Date(); lastNow=now; selRow=-1;
+function finish(at){
+  const now=at||new Date(); lastNow=now; selRow=-1;
+  if(!at) saveHist(now);
   const A=analyze(lines,now); lastA=A;
   renderPan(A,now); renderXiang(A); renderMei(A); setTab('pan');
   $('result').hidden=false; $('resetBtn').hidden=false;
   $('result').scrollIntoView({behavior:RM?'auto':'smooth',block:'start'});
 }
+
+// ── 起卦紀錄（存在這支手機的瀏覽器，最多 100 筆）──
+const HK='ly-hist-v1';
+function loadHist(){ try{ return JSON.parse(localStorage.getItem(HK)||'[]'); }catch(e){ return []; } }
+function storeHist(h){ try{ localStorage.setItem(HK,JSON.stringify(h.slice(0,100))); }catch(e){} }
+function saveHist(now){
+  const h=loadHist(), A=analyze(lines,now);
+  h.unshift({id:Date.now(),t:now.getTime(),q:$('q').value.trim(),cat:catVal,grp:grpVal,ys:ysVal,how:lines.how||(lines.numbers?'數字':'龜殼'),nums:lines.numbers||null,
+    L:lines.map(l=>(l.yang?1:0)+(l.moving?2:0)),ben:A.ben.m.name,bian:A.bian?A.bian.m.name:''});
+  storeHist(h); renderHist();
+}
+function renderHist(){
+  const h=loadHist(); $('histN').textContent=h.length||'';
+  $('histList').innerHTML=h.length?h.map(r=>{ const d=new Date(r.t);
+    return `<div class="hi"><span class="t">${fmtDT(d)}　${r.cat?esc(r.cat):''}${r.ys?'　用神 '+esc(r.ys):''}</span><span class="q">${r.q?esc(r.q):'（未填所問）'}</span><span class="g">${esc(r.ben)}${r.bian?' → '+esc(r.bian):''}</span>
+      <span class="acts"><button data-open="${r.id}">打開</button><button class="del" data-del="${r.id}">刪除</button></span></div>`; }).join('')
+    :'<div class="histempty">還沒有紀錄。每次排盤完成會自動存一筆。</div>';
+}
+$('histBtn').addEventListener('click',()=>{ const p=$('histPanel'); p.hidden=false; renderHist(); p.scrollIntoView({behavior:RM?'auto':'smooth',block:'start'}); });
+$('histList').addEventListener('click',e=>{
+  const o=e.target.closest('[data-open]'), d=e.target.closest('[data-del]');
+  if(d){ storeHist(loadHist().filter(r=>String(r.id)!==d.dataset.del)); renderHist(); return; }
+  if(!o||busy) return; const r=loadHist().find(x=>String(x.id)===o.dataset.open); if(!r) return;
+  $('q').value=r.q||''; grpVal=r.grp||''; catVal=r.cat||''; ysVal=r.ys||''; catOpen=!(catVal&&ysVal); renderYs(); $('suggest').hidden=true;
+  lines=r.L.map(v=>({yang:!!(v&1),moving:!!(v&2),zi:(v&2)?((v&1)?3:0):((v&1)?1:2),coins:null}));
+  if(r.how==='數字'||r.how==='米卦'){ lines.numbers=r.nums; lines.how=r.how; } else if(r.how==='自訂') lines.how='自訂';
+  renderRecord(); finish(new Date(r.t));
+});
+renderHist();
 
 // ── 卦師解卦 ──
 // 解卦引擎：目前走 Claude（卡片內建），之後換成自己的伺服器（訂閱＋金流＋訓練好的卦師規則）只要改這裡。
