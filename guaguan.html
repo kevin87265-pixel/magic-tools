@@ -184,6 +184,12 @@ button{cursor:pointer}
 .fx[aria-pressed="true"] .sw{background:var(--accent)}
 .fx[aria-pressed="true"] .sw::after{left:16px}
 
+/* 依問題推薦占類 */
+.suggest{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--gold-soft);border-radius:12px;padding:8px 10px 8px 12px;font-size:15px;color:var(--ink)}
+.suggest b{font-family:var(--serif);font-size:17px;color:var(--accent)}
+.suggest .why{color:var(--muted);font-size:13px;width:100%}
+.suggest button{margin-left:auto;border:0;border-radius:99px;background:var(--accent);color:#fff;font-weight:700;font-size:15px;padding:5px 14px;white-space:nowrap}
+
 /* 已得之爻 */
 .rec{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center}
 .bighex{padding:6px 4px}
@@ -209,6 +215,8 @@ button{cursor:pointer}
 .rulebox summary::after{content:" ▾";font-size:12px}
 .rulebox[open] summary::after{content:" ▴"}
 .rulebox .rule{margin-top:6px}
+.btns3{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:8px}
+.btns3 .big{font-size:clamp(16px,5vw,19px);padding:13px 4px;white-space:nowrap}
 .btns{display:grid;grid-template-columns:1fr 1.4fr;gap:10px}
 .btns .big{font-size:clamp(16px,5vw,19px);padding:13px 6px;white-space:nowrap}
 .err{color:var(--bad);font-size:15px;font-weight:700}
@@ -326,6 +334,7 @@ button{cursor:pointer}
 <div class="wrap">
   <section class="panel">
     <textarea id="q" rows="1" aria-label="所問之事" placeholder="寫下所問之事"></textarea>
+    <div class="suggest" id="suggest" hidden></div>
     <div class="cathead"><span class="lbl2" id="catLbl">占類</span><span class="catr"><button class="lnk" id="catEdit" hidden>更改</button><span class="ysbadge" id="ysBadge" aria-live="polite"><small>用神</small><b id="ysName">—</b></span></span></div>
     <div class="grp" id="catWrap" role="group" aria-label="占類大方向"></div>
     <div class="chips sub" id="subChips" role="group" aria-label="占類細項" hidden></div>
@@ -404,7 +413,7 @@ button{cursor:pointer}
     <div class="diyh">逐爻自訂<small>點爻位切換：少陽 → 少陰 → 老陽 → 老陰</small></div>
     <div class="dlines" id="dLines"></div>
     <div class="dname" id="dName"></div>
-    <div class="btns"><button class="big ghost" id="diyClear">清除</button><button class="big" id="diyBtn">排盤</button></div>
+    <div class="btns3"><button class="big ghost" id="diyClear">清除</button><button class="big ghost" id="diyRand">隨機</button><button class="big" id="diyBtn">排盤</button></div>
     <div class="err" id="diyErr" hidden></div>
   </section>
 
@@ -891,6 +900,8 @@ document.querySelectorAll('.tris').forEach(el=>el.addEventListener('click',e=>{
 }));
 $('dLines').addEventListener('click',e=>{ const b=e.target.closest('.dl'); if(!b) return; const i=+b.dataset.i, k=dIdx(DY[i]); DY[i]={...DK[(k+1)%4]}; delete DY[i].n; renderDiy(); });
 $('diyClear').addEventListener('click',()=>{ DY=[null,null,null,null,null,null]; renderDiy(); });
+// 隨機：每爻照三枚銅錢的真實機率（少陽、少陰各 3/8，老陽、老陰各 1/8）
+$('diyRand').addEventListener('click',()=>{ DY=DY.map(()=>{ const z=rndBit()+rndBit()+rndBit(); return {yang:z===1||z===3,moving:z===0||z===3}; }); renderDiy(); });
 $('diyBtn').addEventListener('click',()=>{
   if(needYs()) return;
   if(!DY.every(Boolean)){ $('diyErr').textContent='六個爻都要設定好才能排盤。'; $('diyErr').hidden=false; return; }
@@ -1082,7 +1093,49 @@ function reset(){
   renderRecord(); renderToday(); window.scrollTo({top:0,behavior:RM?'auto':'smooth'});
 }
 $('resetBtn').addEventListener('click',reset);
-$('q').addEventListener('input',e=>{e.target.style.height='auto';e.target.style.height=e.target.scrollHeight+2+'px';});
+$('q').addEventListener('input',e=>{e.target.style.height='auto';e.target.style.height=e.target.scrollHeight+2+'px'; clearTimeout(sugT); sugT=setTimeout(renderSuggest,250);});
+// ── 依所問之事的關鍵字推薦占類（只是建議，按「套用」才會選）──
+// 由上往下比對，先中的先用；感情類沒講男女時只推薦大方向
+const SUGGEST_RULES=[
+  ['感情·女問',/男友|男朋友|老公|丈夫|先生|前男友|男生|男方|他.{0,3}(愛|喜歡|想念|在乎)/],
+  ['感情·男問',/女友|女朋友|老婆|太太|妻子|前女友|女生|女方|她.{0,3}(愛|喜歡|想念|在乎)/],
+  ['其他·官司',/官司|訴訟|告他|被告|提告|法院|開庭|糾紛|和解|調解/],
+  ['財運·失物',/遺失|掉了|弄丟|不見|找不到|失物|被偷/],
+  ['財運·借貸',/借錢|借款|借給|借我|欠錢|欠款|欠我|債|還錢|還我|討債|討錢|討得回|討回|要回來|貸款/],
+  ['家庭·房屋',/房子|買房|賣房|租屋|租房|租金|搬家|房東|房客|裝潢|家宅|住宅|店面/],
+  ['財運·投資',/股票|股市|投資|基金|虛擬幣|加密貨幣|比特幣|期貨|ETF|買進|賣出|漲|跌/i],
+  ['事業·考試',/考試|考上|證照|升學|學測|指考|國考|高考|分數|錄取率|面試考/],
+  ['事業·升遷',/升遷|升職|加薪|調職|調動|考績|主管位|晉升/],
+  ['事業·合約',/合約|簽約|契約|合同|文件|申請|手續|簽證|批准|核准/],
+  ['財運·求財',/業績|生意|營收|營業額|銷量|銷售|訂單|客戶|開店|賺|收入|財運|錢|獲利|上架/],
+  ['事業·求職',/工作|面試|求職|應徵|錄取|轉職|換工作|離職|上班|公司|老闆|主管|事業|職場/],
+  ['家庭·子女',/孩子|小孩|兒子|女兒|懷孕|生子|備孕|生小孩|胎/],
+  ['家庭·長輩',/爸|媽|父親|母親|父母|長輩|阿公|阿嬤|爺爺|奶奶|外公|外婆|老師/],
+  ['家庭·車輛',/買車|賣車|車子|汽車|機車|車/],
+  ['家庭·寵物',/貓|狗|寵物|毛孩/],
+  ['家庭·手足',/兄弟|姊妹|姐妹|哥哥|弟弟|姐姐|妹妹|朋友|同事|合夥人/],
+  ['其他·醫藥',/醫生|醫院|藥|手術|療效|治療|療程|看診/],
+  ['自身·疾病',/生病|病|身體|健康|開刀|檢查報告/],
+  ['自身·出行',/出國|旅遊|旅行|出差|出行|搭機|飛機|遠行/],
+  ['感情·',/感情|戀愛|愛情|桃花|復合|前任|交往|曖昧|喜歡|告白|結婚|婚姻|離婚|分手|對象|姻緣|愛我/],
+  ['自身·運勢',/運勢|運氣|今年|明年|流年|最近|近況|本月|這個月/],
+];
+let sugT=0, sugVal='';
+function suggestFor(q){ for(const [k,re] of SUGGEST_RULES){ const m=q.match(re); if(m) return {k,hit:m[0]}; } return null; }
+function renderSuggest(){
+  const q=$('q').value.trim(), r=q?suggestFor(q):null, box=$('suggest');
+  if(!r){ box.hidden=true; sugVal=''; return; }
+  const [g,k]=r.k.split('·'), C=k?CAT_MAP[r.k]:null;
+  if(C&&catVal===r.k){ box.hidden=true; return; }
+  if(!C&&grpVal===g&&catVal) { box.hidden=true; return; }
+  sugVal=r.k;
+  box.innerHTML=C?`建議占類 <b>${g}·${k}</b>　用神 <b>${C.ys}</b><button type="button">套用</button><span class="why">因為提到「${esc(r.hit)}」</span>`
+                 :`建議占類 <b>${g}</b>　請再選男問或女問<button type="button">套用</button><span class="why">因為提到「${esc(r.hit)}」</span>`;
+  box.hidden=false;
+}
+$('suggest').addEventListener('click',e=>{ if(!e.target.closest('button')||!sugVal) return; const [g,k]=sugVal.split('·');
+  grpVal=g; if(k){ catVal=sugVal; ysVal=CAT_MAP[sugVal].ys; catOpen=false; } else { catVal=''; ysVal=''; catOpen=true; }
+  renderYs(); $('suggest').hidden=true; if(lastA) renderPan(lastA,lastNow); if(k) bringCast(); });
 renderToday(); renderRecord(); setInterval(renderToday,60000);
 function restCoins(){ const G=geom(); [1,0,1].forEach((v,i)=>{ const R=G.rest[i], rz=Math.round(Math.random()*40-20), ry=v?0:180; coinState[i]={x:R.x,y:R.y,rz,ry,shown:true}; coinEls[i].firstElementChild.style.transform=`rotateY(${ry}deg)`; place(i,R.x,R.y,rz,1,1); }); }
 requestAnimationFrame(restCoins);
