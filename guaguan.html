@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#22305E"><title>六爻卦館</title>
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"><meta name="theme-color" content="#22305E"><title>六爻卦館</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,8 +16,8 @@
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-html{-webkit-text-size-adjust:100%;overflow-x:hidden}
-body{overflow-x:hidden}
+html{-webkit-text-size-adjust:100%;overflow-x:hidden;overscroll-behavior-x:none;touch-action:pan-y}
+body{overflow-x:hidden;overscroll-behavior-x:none;touch-action:pan-y;width:100%;position:relative}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.6;text-wrap:pretty;padding:0}
 .wrap{max-width:600px;margin:0 auto;display:flex;flex-direction:column;gap:14px;
   padding-left:max(14px,env(safe-area-inset-left,0px));padding-right:max(14px,env(safe-area-inset-right,0px));padding-block:12px 40px}
@@ -175,6 +175,15 @@ button{cursor:pointer}
 .dname{text-align:center;font-size:16px;color:var(--muted);min-height:1.6em}
 .dname b{font-family:var(--serif);color:var(--ink);font-size:19px}
 
+/* 聲音／震動開關 */
+.fxrow{display:flex;justify-content:center;gap:12px}
+.fx{display:inline-flex;align-items:center;gap:8px;border:2px solid var(--line);background:#fff;border-radius:99px;padding:5px 14px 5px 6px;font-size:16px;font-weight:700;color:var(--muted)}
+.fx .sw{width:34px;height:20px;border-radius:99px;background:var(--line);position:relative;transition:background .2s}
+.fx .sw::after{content:"";position:absolute;left:2px;top:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:left .2s}
+.fx[aria-pressed="true"]{color:var(--accent);border-color:var(--accent)}
+.fx[aria-pressed="true"] .sw{background:var(--accent)}
+.fx[aria-pressed="true"] .sw::after{left:16px}
+
 /* 已得之爻 */
 .rec{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center}
 .bighex{padding:6px 4px}
@@ -311,7 +320,7 @@ button{cursor:pointer}
 </style>
 
 </head><body><header class="hud"><div class="hud-in">
-  <div class="hrow"><div><h1>六爻卦館</h1><div class="date" id="todayDate"></div></div><button class="sound" id="soundBtn" aria-pressed="true">聲音 開</button></div>
+  <div class="hrow"><div><h1>六爻卦館</h1><div class="date" id="todayDate"></div></div></div>
   <div class="gz" id="today"></div>
 </div></header>
 <div class="wrap">
@@ -342,6 +351,7 @@ button{cursor:pointer}
       <div class="mat-tags" id="matTags" aria-live="polite"></div>
     </div>
     <button class="big" id="throwBtn">搖初爻</button>
+    <div class="fxrow"><button class="fx" id="soundBtn" aria-pressed="false"><span class="sw"></span>聲音</button><button class="fx" id="vibBtn" aria-pressed="true"><span class="sw"></span>震動</button></div>
     <div class="panel">
       <h2 class="ph">已得之爻<small id="recCount">0 / 6</small></h2>
       <div class="rec"><div class="bighex" id="bigHex"></div><div class="rrows" id="recRows"></div></div>
@@ -593,7 +603,7 @@ function hexSVG(ls,w=56,mark=true){
 const KIND=zi=>({3:['老陽','○'],2:['少陰',''],1:['少陽',''],0:['老陰','×']})[zi];
 
 // ── 狀態 ──
-let lines=[], busy=false, soundOn=true, lastA=null, lastNow=null, selRow=-1;
+let lines=[], busy=false, soundOn=false, vibOn=true, lastA=null, lastNow=null, selRow=-1;
 const $=id=>document.getElementById(id);
 let ysVal='', catVal='';
 // 占類 → 用神（依《增刪卜易》《卜筮正宗》取用）
@@ -682,7 +692,14 @@ function coinHit(vol=0.25,muffled=false){
   ng.gain.setValueAtTime(muffled?0.25:0.35,t); ng.gain.exponentialRampToValueAtTime(0.0001,t+0.012);
   n.connect(hp); hp.connect(ng); ng.connect(out); n.start(t); n.stop(t+0.02);
 }
-function buzz(p){ try{ if(navigator.vibrate) navigator.vibrate(p); }catch(e){} }
+// 震動：Android 用 vibrate；iPhone（iOS 18 起）沒有 vibrate，改用系統開關元件觸發觸覺回饋
+let hapLabel=null;
+function buzz(p){
+  if(!vibOn) return;
+  try{ if(navigator.vibrate&&navigator.vibrate(p)) return; }catch(e){}
+  try{ if(!hapLabel){ hapLabel=document.createElement('label'); hapLabel.setAttribute('aria-hidden','true'); hapLabel.style.cssText='position:fixed;left:-200px;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none'; hapLabel.innerHTML='<input type="checkbox" switch tabindex="-1">'; document.body.appendChild(hapLabel); }
+    const n=Array.isArray(p)?Math.ceil(p.length/2):1; for(let i=0;i<n;i++) setTimeout(()=>hapLabel.click(),i*70); }catch(e){}
+}
 function coinLand(){ buzz(28); coinHit(0.32); setTimeout(()=>coinHit(0.12),70); setTimeout(()=>coinHit(0.06),130); }
 function shellKnock(vol=0.2){
   if(!soundOn) return; const a=ac(); if(!a) return;
@@ -691,8 +708,12 @@ function shellKnock(vol=0.2){
   g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(0.0001,t+0.07);
   n.connect(bp); bp.connect(g); g.connect(MASTER); n.start(t); n.stop(t+0.08);
 }
-$('soundBtn').addEventListener('click',()=>{ soundOn=!soundOn; $('soundBtn').setAttribute('aria-pressed',soundOn); $('soundBtn').textContent=soundOn?'聲音 開':'聲音 關'; try{localStorage.setItem('ly-sound',soundOn?'1':'0')}catch(e){} });
-try{ if(localStorage.getItem('ly-sound')==='0'){ soundOn=false; $('soundBtn').setAttribute('aria-pressed','false'); $('soundBtn').textContent='聲音 關'; } }catch(e){}
+// 聲音預設關、震動預設開；選擇記在這台手機
+try{ soundOn=localStorage.getItem('ly-sound2')==='1'; const v=localStorage.getItem('ly-vib'); if(v==='0') vibOn=false; }catch(e){}
+function paintFx(){ $('soundBtn').setAttribute('aria-pressed',soundOn); $('vibBtn').setAttribute('aria-pressed',vibOn); }
+$('soundBtn').addEventListener('click',()=>{ soundOn=!soundOn; paintFx(); if(soundOn){ ac(); coinHit(0.25); } try{localStorage.setItem('ly-sound2',soundOn?'1':'0')}catch(e){} });
+$('vibBtn').addEventListener('click',()=>{ vibOn=!vibOn; paintFx(); if(vibOn) buzz(30); try{localStorage.setItem('ly-vib',vibOn?'1':'0')}catch(e){} });
+paintFx();
 
 // ── 動畫 ──
 const RM=matchMedia('(prefers-reduced-motion: reduce)').matches, D=ms=>RM?Math.round(ms*0.2):ms, sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -748,6 +769,7 @@ function rndBit(){ const a=new Uint8Array(1); crypto.getRandomValues(a); return 
 async function throwOnce(){
   if(busy||lines.length>=6) return;
   if(lines.length===0&&needYs()) return;
+  buzz(15);
   busy=true; $('shell').disabled=true; $('throwBtn').disabled=true; ac();
   const pos=POS[lines.length]; $('matTags').innerHTML='';
   const G=geom();
