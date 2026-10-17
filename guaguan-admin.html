@@ -1,0 +1,125 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><meta name="robots" content="noindex">
+<title>卦館管理</title>
+<script>window.GG_CFG={"url": "", "anon": ""};</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;--bg:#ECEEF5;--panel:#fff;--ink:#1B2033;--muted:#5D6278;--line:#D7DAE6;--accent:#22305E;--accent-soft:#E3E7F4;--gold:#A8741A;--gold-soft:#F6EBD5;--good:#1B7556;--good-soft:#DDF1E8;--bad:#B0263C;--bad-soft:#F8E0E4;--serif:"Noto Serif TC",serif;--sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html,body{overflow-x:hidden}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6}
+header{background:var(--accent);color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+header h1{margin:0;font-family:var(--serif);font-size:22px;letter-spacing:.08em}
+header button{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:99px;padding:5px 14px;font:inherit;font-size:14px}
+.wrap{max-width:640px;margin:0 auto;padding:14px 16px 40px;display:flex;flex-direction:column;gap:12px}
+.tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;position:sticky;top:0;background:var(--bg);padding:6px 0;z-index:2}
+.tabs button{border:2px solid var(--line);background:#fff;border-radius:12px;padding:8px 2px;font:inherit;font-size:15px;font-weight:700;color:var(--muted);white-space:nowrap}
+.tabs button[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.tabs .n{background:var(--bad);color:#fff;border-radius:99px;padding:0 6px;font-size:12px;margin-left:4px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.card h2{margin:0;font-family:var(--serif);font-size:18px}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.muted{color:var(--muted);font-size:14px}
+.btn{border:0;border-radius:10px;background:var(--accent);color:#fff;font:inherit;font-weight:700;padding:8px 14px}
+.btn.ok{background:var(--good)} .btn.no{background:#fff;color:var(--bad);border:2px solid var(--bad-soft)} .btn.gold{background:var(--gold)}
+input,select,textarea{font:inherit;font-size:16px;border:2px solid var(--line);border-radius:10px;padding:8px 10px;background:#fff;width:100%}
+textarea{min-height:120px;resize:vertical}
+label{font-size:14px;font-weight:700;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.tag{display:inline-block;border-radius:99px;padding:0 10px;font-size:13px;font-weight:700;background:var(--accent-soft);color:var(--accent)}
+.tag.off{background:var(--bad-soft);color:var(--bad)}
+.msg{font-size:14px;font-weight:700;color:var(--good)} .err{color:var(--bad);font-weight:700}
+.big{display:block;width:100%;border:0;border-radius:12px;background:var(--accent);color:#fff;font:inherit;font-size:18px;font-weight:700;padding:12px}
+</style></head><body>
+<header><h1>卦館管理</h1><button id="outBtn" hidden>登出</button></header>
+<div class="wrap" id="app"><div class="card">載入中…</div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+const CFG=window.GG_CFG||{}, $=id=>document.getElementById(id), app=$('app');
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const d8=d=>{ if(!d) return '—'; const x=new Date(d); return `${x.getFullYear()}/${x.getMonth()+1}/${x.getDate()} ${String(x.getHours()).padStart(2,'0')}:${String(x.getMinutes()).padStart(2,'0')}`; };
+let sb=null, me=null, tab='pay', plans=[];
+function msg(el,t,bad){ el.innerHTML=`<span class="${bad?'err':'msg'}">${esc(t)}</span>`; }
+
+async function boot(){
+  if(!CFG.url||!CFG.anon||!window.supabase){ app.innerHTML='<div class="card">還沒設定資料庫連線（網址與公開金鑰）。</div>'; return; }
+  sb=window.supabase.createClient(CFG.url,CFG.anon);
+  sb.auth.onAuthStateChange(()=>route());
+  route();
+}
+async function route(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){ $('outBtn').hidden=true; app.innerHTML=`<div class="card"><h2>管理員登入</h2><input id="em" type="email" placeholder="管理員 Email"><button class="big" id="go">寄登入連結</button><div id="lm" class="muted"></div></div>`;
+    $('go').onclick=async()=>{ const {error}=await sb.auth.signInWithOtp({email:$('em').value.trim(),options:{emailRedirectTo:location.href.split('#')[0]}}); msg($('lm'),error?'寄送失敗：'+error.message:'已寄出，請到信箱點連結。',!!error); }; return; }
+  $('outBtn').hidden=false;
+  const {data:p}=await sb.from('profiles').select('*').eq('id',session.user.id).maybeSingle(); me=p;
+  if(!me||!me.is_admin){ app.innerHTML=`<div class="card"><h2>沒有管理權限</h2><div class="muted">${esc(session.user.email)} 不是管理員。第一次使用請在資料庫執行設定步驟裡的「設成管理員」那一行。</div></div>`; return; }
+  plans=(await sb.from('plans').select('*').order('sort')).data||[];
+  render();
+}
+$('outBtn').onclick=async()=>{ await sb.auth.signOut(); route(); };
+
+async function render(){
+  const pend=(await sb.from('payments').select('id',{count:'exact',head:true}).eq('status','pending')).count||0;
+  app.innerHTML=`<div class="tabs">${[['pay','轉帳確認'],['mem','會員'],['plan','方案'],['set','設定']].map(([k,n])=>`<button data-t="${k}" aria-selected="${tab===k}">${n}${k==='pay'&&pend?`<span class="n">${pend}</span>`:''}</button>`).join('')}</div><div id="pane"></div>`;
+  app.querySelector('.tabs').onclick=e=>{ const b=e.target.closest('button'); if(b){ tab=b.dataset.t; render(); } };
+  ({pay:renderPay,mem:renderMem,plan:renderPlan,set:renderSet})[tab]();
+}
+const pname=id=>(plans.find(p=>p.id===id)||{}).name||id||'無';
+
+async function renderPay(){
+  const {data}=await sb.from('payments').select('*,profiles(email)').order('created_at',{ascending:false}).limit(60);
+  const rows=data||[], pend=rows.filter(r=>r.status==='pending'), done=rows.filter(r=>r.status!=='pending').slice(0,20);
+  $('pane').innerHTML=(pend.length?pend.map(r=>`<div class="card"><div class="row"><b>${esc(r.profiles?.email)}</b><span class="tag">${pname(r.plan)} ${r.amount} 元</span></div>
+    <div class="muted">${d8(r.created_at)}　${r.method==='bank'?'銀行轉帳 後五碼':'LINE 轉帳'}：<b style="color:var(--ink)">${esc(r.ref)}</b></div>
+    <div class="row"><button class="btn ok" data-ok="${r.id}">確認收到，開通 30 天</button><button class="btn no" data-no="${r.id}">沒收到</button></div></div>`).join(''):'<div class="card muted">目前沒有待確認的轉帳。</div>')
+   +`<div class="card"><h2>最近處理</h2>${done.map(r=>`<div class="muted">${d8(r.decided_at)}　${esc(r.profiles?.email)}　${pname(r.plan)} ${r.amount} 元　<span class="tag ${r.status==='rejected'?'off':''}">${r.status==='approved'?'已開通':'已退回'}</span></div>`).join('')||'<div class="muted">尚無</div>'}</div>`;
+  $('pane').onclick=async e=>{ const ok=e.target.closest('[data-ok]'), no=e.target.closest('[data-no]');
+    if(ok){ ok.disabled=true; const {error}=await sb.rpc('approve_payment',{pid:+ok.dataset.ok}); if(error) alertBox(error.message); render(); }
+    if(no){ no.disabled=true; const {error}=await sb.rpc('reject_payment',{pid:+no.dataset.no}); if(error) alertBox(error.message); render(); } };
+}
+function alertBox(t){ const d=document.createElement('div'); d.className='card err'; d.textContent='錯誤：'+t; $('pane').prepend(d); }
+
+async function renderMem(){
+  const {data}=await sb.from('profiles').select('*').order('created_at',{ascending:false}).limit(300);
+  const now=new Date();
+  $('pane').innerHTML=`<div class="card"><input id="flt" placeholder="搜尋 Email"></div><div id="ml"></div>`;
+  const draw=()=>{ const f=$('flt').value.trim().toLowerCase();
+    $('ml').innerHTML=(data||[]).filter(p=>!f||(p.email||'').toLowerCase().includes(f)).map(p=>{ const on=p.plan&&p.period_end&&new Date(p.period_end)>now, pl=plans.find(x=>x.id===p.plan);
+      return `<div class="card"><div class="row"><b>${esc(p.email)}</b>${p.is_admin?'<span class="tag">管理員</span>':''}<span class="tag ${on?'':'off'}">${on?pname(p.plan):'未開通'}</span></div>
+      <div class="muted">到期 ${d8(p.period_end)}　本期已用 ${p.used}${pl&&pl.readings!=null?' / '+pl.readings:''} 卦</div>
+      <div class="grid3"><select data-plan="${p.id}"><option value="">取消方案</option>${plans.map(x=>`<option value="${x.id}" ${x.id===p.plan?'selected':''}>${x.name}</option>`).join('')}</select>
+      <input type="number" min="1" value="30" data-days="${p.id}" aria-label="天數"><button class="btn" data-set="${p.id}">手動設定</button></div>
+      <div class="muted" data-m="${p.id}">手動設定＝從今天起算天數、次數歸零（贈送、補償用）</div></div>`; }).join('')||'<div class="card muted">沒有會員</div>'; };
+  $('flt').oninput=draw; draw();
+  $('ml').onclick=async e=>{ const b=e.target.closest('[data-set]'); if(!b) return; const id=b.dataset.set;
+    const plan=document.querySelector(`[data-plan="${id}"]`).value||null, days=+document.querySelector(`[data-days="${id}"]`).value||30;
+    const {error}=await sb.rpc('admin_set_member',{uid:id,new_plan:plan,days,reset_used:true});
+    msg(document.querySelector(`[data-m="${id}"]`),error?error.message:'已更新',!!error); if(!error) setTimeout(()=>{ if(tab==='mem') renderMem(); },600); };
+}
+
+async function renderPlan(){
+  $('pane').innerHTML=plans.map(p=>`<div class="card"><h2>${esc(p.name)}方案</h2><div class="grid3">
+    <label>每月價格<input type="number" data-k="price" data-p="${p.id}" value="${p.price}"></label>
+    <label>每月卦數（空白＝不限）<input type="number" data-k="readings" data-p="${p.id}" value="${p.readings??''}"></label>
+    <label>每日上限（空白＝不限）<input type="number" data-k="daily" data-p="${p.id}" value="${p.daily_cap??''}"></label></div>
+    <button class="btn" data-save="${p.id}">儲存</button><div data-pm="${p.id}"></div></div>`).join('')+'<div class="card muted">「無限」方案建議保留每日上限，避免被濫用；一般人用不到。</div>';
+  $('pane').onclick=async e=>{ const b=e.target.closest('[data-save]'); if(!b) return; const id=b.dataset.save, v=k=>document.querySelector(`[data-p="${id}"][data-k="${k}"]`).value;
+    const num=x=>x===''?null:parseInt(x,10);
+    const {error}=await sb.rpc('admin_set_plan',{pid:id,p_price:num(v('price'))||0,p_readings:num(v('readings')),p_daily:num(v('daily'))});
+    msg(document.querySelector(`[data-pm="${id}"]`),error?error.message:'已儲存',!!error); plans=(await sb.from('plans').select('*').order('sort')).data||[]; };
+}
+
+async function renderSet(){
+  const pub=Object.fromEntries(((await sb.from('public_settings').select('*')).data||[]).map(r=>[r.key,r.value]));
+  const pr=await sb.rpc('admin_get_private'); const priv=Object.fromEntries((pr.data||[]).map(r=>[r.key,r.value]));
+  $('pane').innerHTML=`<div class="card"><h2>收款資訊（會員付款時看到）</h2><textarea id="s_pay">${esc(pub.payment_info)}</textarea><button class="btn" data-s="payment_info" data-src="s_pay" data-pv="0">儲存</button><div id="m_payment_info"></div></div>
+  <div class="card"><h2>每卦可追問次數</h2><input id="s_fu" type="number" min="0" value="${esc(pub.followup_limit||'3')}"><button class="btn" data-s="followup_limit" data-src="s_fu" data-pv="0">儲存</button><div id="m_followup_limit"></div></div>
+  <div class="card"><h2>卦師模型</h2><select id="s_model">${[['claude-sonnet-5-5','Sonnet 5.5（建議，約 Opus 一半價錢）'],['claude-opus-5-5','Opus 5.5（最強、最貴）'],['claude-haiku-5-5','Haiku 5.5（最便宜）']].map(([v,n])=>`<option value="${v}" ${priv.model===v?'selected':''}>${n}</option>`).join('')}</select><button class="btn" data-s="model" data-src="s_model" data-pv="1">儲存</button><div id="m_model"></div></div>
+  <div class="card"><h2>卦師規則書</h2><div class="muted">訓練好的斷卦規則貼在這裡，存了立刻生效。</div><textarea id="s_rules" style="min-height:260px">${esc(priv.rules)}</textarea><button class="btn gold" data-s="rules" data-src="s_rules" data-pv="1">儲存規則書</button><div id="m_rules"></div></div>`;
+  $('pane').onclick=async e=>{ const b=e.target.closest('[data-s]'); if(!b) return;
+    const {error}=await sb.rpc('admin_set_setting',{k:b.dataset.s,v:$(b.dataset.src).value,is_private:b.dataset.pv==='1'});
+    msg($('m_'+b.dataset.s),error?error.message:'已儲存',!!error); };
+}
+boot();
+</script></body></html>

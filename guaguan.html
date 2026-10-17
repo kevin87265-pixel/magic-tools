@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"><meta name="theme-color" content="#22305E"><title>六爻卦館</title>
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"><meta name="theme-color" content="#22305E"><script>window.GG_SITE=true;window.GG_CFG={"url": "", "anon": ""};</script><title>六爻卦館</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -132,6 +132,8 @@ button{cursor:pointer}
 .plan{border:2px solid var(--line);border-radius:14px;padding:10px;text-align:center;display:flex;flex-direction:column;line-height:1.35;background:#fff}
 .plan b{font-size:15px;color:var(--muted)} .plan span{font-family:var(--serif);font-size:24px;font-weight:900;color:var(--ink)} .plan small{font-size:13px;color:var(--gold);font-weight:700}
 .plan.best{border-color:var(--gold)}
+.plans.p3{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.plans.p3 .plan span{font-size:21px}
 .gsnote{font-size:15px;color:var(--muted);line-height:1.6}
 .btns2{display:grid;grid-template-columns:1fr auto;gap:10px}
 .btns2 #gsStop{padding-inline:22px}
@@ -212,6 +214,31 @@ button{cursor:pointer}
 .hi .acts button{border:2px solid var(--accent);background:#fff;color:var(--accent);border-radius:10px;padding:4px 12px;font-size:15px;font-weight:700}
 .hi .acts button.del{border-color:var(--line);color:var(--muted)}
 .histempty{color:var(--muted);font-size:15px;text-align:center;padding:10px}
+
+/* 會員 */
+.hbtns{display:flex;gap:8px;flex:none}
+.sheet-bg{position:fixed;inset:0;background:rgba(20,24,40,.45);z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.sheetbox{background:var(--bg);width:100%;max-width:600px;max-height:88vh;overflow:auto;border-radius:20px 20px 0 0;padding:16px max(16px,env(safe-area-inset-left,0px)) calc(20px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px}
+.sheethead{display:flex;justify-content:space-between;align-items:center}
+.sheethead h2{margin:0;font-family:var(--serif);font-size:22px}
+.mcard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.mcard h3{margin:0;font-family:var(--serif);font-size:18px}
+.mrow{display:flex;justify-content:space-between;gap:10px;font-size:16px}
+.mrow b{font-family:var(--serif)}
+.minput{width:100%;border:2px solid var(--line);border-radius:12px;padding:11px 12px;font-size:17px;background:#fff}
+.minput:focus{outline:none;border-color:var(--accent)}
+.planpick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.planpick button{border:2px solid var(--line);background:#fff;border-radius:14px;padding:10px 4px;display:flex;flex-direction:column;align-items:center;line-height:1.3}
+.planpick button b{font-family:var(--serif);font-size:17px}
+.planpick button span{font-family:var(--serif);font-size:21px;font-weight:900;color:var(--ink)}
+.planpick button small{font-size:13px;color:var(--muted)}
+.planpick button[aria-pressed="true"]{border-color:var(--gold);background:var(--gold-soft)}
+.methods{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.methods button{border:2px solid var(--line);background:#fff;border-radius:12px;padding:9px;font-size:16px;font-weight:700}
+.methods button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent);color:#fff}
+.payinfo{white-space:pre-wrap;font-size:15px;line-height:1.7;background:var(--bg);border-radius:10px;padding:10px 12px}
+.pst{font-size:14px;color:var(--muted)} .pst b{color:var(--ink)}
+.okmsg{color:var(--good);font-weight:700;font-size:15px} .errmsg{color:var(--bad);font-weight:700;font-size:15px}
 
 /* 已得之爻 */
 .rec{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center}
@@ -351,7 +378,7 @@ button{cursor:pointer}
 </style>
 
 </head><body><header class="hud"><div class="hud-in">
-  <div class="hrow"><div><h1>六爻卦館</h1><div class="date" id="todayDate"></div></div><button class="histbtn" id="histBtn">紀錄<span id="histN"></span></button></div>
+  <div class="hrow"><div><h1>六爻卦館</h1><div class="date" id="todayDate"></div></div><div class="hbtns"><button class="histbtn" id="memBtn" hidden>登入</button><button class="histbtn" id="histBtn">紀錄<span id="histN"></span></button></div></div>
   <div class="gz" id="today"></div>
 </div></header>
 <div class="wrap">
@@ -475,6 +502,13 @@ button{cursor:pointer}
   </section>
 
   <button class="big gold" id="resetBtn" hidden>重新起卦</button>
+
+  <div class="sheet-bg" id="memSheet" hidden>
+    <section class="sheetbox" role="dialog" aria-modal="true" aria-labelledby="memTitle">
+      <div class="sheethead"><h2 id="memTitle">會員</h2><button class="lnk" id="memClose">關閉</button></div>
+      <div id="memBody"></div>
+    </section>
+  </div>
 
   <section class="panel" id="histPanel" hidden>
     <h2 class="ph">起卦紀錄<small>只存在這支手機</small></h2>
@@ -1073,9 +1107,77 @@ $('histList').addEventListener('click',e=>{
 });
 renderHist();
 
+// ── 會員（只有網站版）：登入、方案、轉帳回報、次數 ──
+const CFG=window.GG_CFG||{}; let sb=null, sess=null, prof=null, plans=[], pubSet={}, myPays=[], payPick={plan:'basic',method:'bank'};
+function memState(){ if(!sb) return 'off'; if(!sess) return 'guest'; if(!prof||!prof.plan||!prof.period_end||new Date(prof.period_end)<new Date()) return 'noplan'; const pl=plans.find(p=>p.id===prof.plan); if(pl&&pl.readings!=null&&prof.used>=pl.readings) return 'quota'; return 'active'; }
+function memCanUse(){ return memState()==='active'; }
+function memLeftText(){ const pl=plans.find(p=>p.id===(prof&&prof.plan)); if(!pl) return ''; return pl.readings==null?`${pl.name}方案　不限卦數`:`${pl.name}方案　本期還剩 ${Math.max(0,pl.readings-prof.used)} 卦`; }
+const d8=d=>{ const x=new Date(d); return `${x.getFullYear()}/${x.getMonth()+1}/${x.getDate()}`; };
+async function memRefresh(){
+  if(!sb) return; const {data:{session}}=await sb.auth.getSession(); sess=session;
+  if(sess){ const r=await sb.from('profiles').select('*').eq('id',sess.user.id).maybeSingle(); prof=r.data;
+    const pr=await sb.from('payments').select('*').order('created_at',{ascending:false}).limit(5); myPays=pr.data||[]; } else { prof=null; myPays=[]; }
+  const st=memState(); $('memBtn').textContent=st==='guest'?'登入':st==='active'?(plans.find(p=>p.id===prof.plan)||{}).name||'會員':'會員';
+  renderGsGate(); if(!$('memSheet').hidden) renderMem();
+}
+async function siteCall(body,signal){
+  const {data:{session}}=await sb.auth.getSession(); if(!session) throw {message:'請先登入。'};
+  const r=await fetch(CFG.url+'/functions/v1/guashi',{method:'POST',signal,headers:{'Content-Type':'application/json',Authorization:'Bearer '+session.access_token,apikey:CFG.anon},body:JSON.stringify(body)});
+  let j={}; try{ j=await r.json(); }catch(e){}
+  if(!r.ok) throw {message:j.message||'卦師暫時沒有回應，請稍後再試。',code:j.error};
+  return j;
+}
+function openMem(){ $('memSheet').hidden=false; renderMem(); }
+function renderMem(){
+  const st=memState(), B=$('memBody');
+  if(st==='off'){ B.innerHTML='<div class="mcard">會員系統設定中，即將開放。</div>'; return; }
+  if(st==='guest'){ B.innerHTML=`<div class="mcard"><h3>用 Email 登入</h3><input class="minput" id="memEmail" type="email" autocomplete="email" placeholder="你的 Email"><button class="big" id="memSend">寄登入連結</button><div id="memMsg" class="pst">會寄一封信到你的信箱，點信裡的連結就登入了，不用密碼。</div></div>`; return; }
+  const pl=plans.find(p=>p.id===(prof&&prof.plan));
+  const info=`<div class="mcard"><div class="mrow"><span>${esc(prof.email||'')}</span><button class="lnk" id="memOut">登出</button></div>
+    ${pl&&st!=='noplan'?`<div class="mrow"><span>目前方案</span><b>${pl.name}（每月 ${pl.price} 元）</b></div><div class="mrow"><span>本期剩餘</span><b>${pl.readings==null?'不限':Math.max(0,pl.readings-prof.used)+' 卦'}</b></div><div class="mrow"><span>到期日</span><b>${d8(prof.period_end)}</b></div>`:'<div class="pst">目前沒有有效方案。</div>'}
+    <div class="pst">每一卦可以追問 ${esc(pubSet.followup_limit||'3')} 次。用完可以直接升級，從開通那天重新算 30 天。</div></div>`;
+  const pend=myPays.filter(p=>p.status==='pending');
+  const buy=`<div class="mcard"><h3>${st==='active'?'升級或續訂':'選擇方案'}</h3>
+    <div class="planpick">${plans.map(p=>`<button data-plan="${p.id}" aria-pressed="${payPick.plan===p.id}"><b>${p.name}</b><span>${p.price}</span><small>${p.readings==null?'不限卦數':'每月 '+p.readings+' 卦'}</small></button>`).join('')}</div>
+    <div class="methods"><button data-m="line" aria-pressed="${payPick.method==='line'}">LINE 轉帳</button><button data-m="bank" aria-pressed="${payPick.method==='bank'}">銀行轉帳</button></div>
+    <div class="payinfo">${esc(pubSet.payment_info||'')}</div>
+    <input class="minput" id="payRef" inputmode="numeric" placeholder="${payPick.method==='bank'?'轉帳帳號後五碼':'LINE 轉帳的名稱或備註'}">
+    <button class="big gold" id="paySend">我已轉帳，送出</button><div id="payMsg"></div></div>`;
+  const hist=myPays.length?`<div class="mcard"><h3>付款紀錄</h3>${myPays.map(p=>`<div class="pst">${d8(p.created_at)}　${(plans.find(x=>x.id===p.plan)||{}).name||p.plan}　${p.amount} 元　<b>${({pending:'確認中',approved:'已開通',rejected:'未通過，請聯繫我們'})[p.status]}</b></div>`).join('')}</div>`:'';
+  B.innerHTML=info+(pend.length?'<div class="mcard okmsg">你的轉帳正在確認中，開通後就能使用。</div>':'')+buy+hist;
+}
+$('memBtn').addEventListener('click',openMem);
+$('memClose').addEventListener('click',()=>{ $('memSheet').hidden=true; });
+$('memSheet').addEventListener('click',async e=>{
+  if(e.target===$('memSheet')){ $('memSheet').hidden=true; return; }
+  const t=e.target.closest('button'); if(!t) return;
+  if(t.id==='memSend'){ const em=$('memEmail').value.trim(); if(!/^\S+@\S+\.\S+$/.test(em)){ $('memMsg').innerHTML='<span class="errmsg">Email 格式不對</span>'; return; }
+    t.disabled=true; const {error}=await sb.auth.signInWithOtp({email:em,options:{emailRedirectTo:location.href.split('#')[0]}}); t.disabled=false;
+    $('memMsg').innerHTML=error?`<span class="errmsg">寄送失敗：${esc(error.message)}</span>`:'<span class="okmsg">已寄出，請到信箱點登入連結（也看一下垃圾信件匣）。</span>'; return; }
+  if(t.id==='memOut'){ await sb.auth.signOut(); await memRefresh(); renderMem(); return; }
+  if(t.dataset.plan){ payPick.plan=t.dataset.plan; renderMem(); return; }
+  if(t.dataset.m){ payPick.method=t.dataset.m; renderMem(); return; }
+  if(t.id==='paySend'){ const ref=$('payRef').value.trim(); if(!ref){ $('payMsg').innerHTML='<span class="errmsg">請填寫後五碼或備註</span>'; return; }
+    const pl=plans.find(p=>p.id===payPick.plan); t.disabled=true;
+    const {error}=await sb.from('payments').insert({user_id:sess.user.id,plan:pl.id,amount:pl.price,method:payPick.method,ref});
+    t.disabled=false; if(error){ $('payMsg').innerHTML=`<span class="errmsg">送出失敗：${esc(error.message)}</span>`; return; }
+    await memRefresh(); renderMem(); }
+});
+async function memInit(){
+  $('memBtn').hidden=false;
+  if(!CFG.url||!CFG.anon){ renderGsGate(); return; }
+  if(!window.supabase) await new Promise((ok,no)=>{ const sc=document.createElement('script'); sc.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js'; sc.onload=ok; sc.onerror=no; document.head.appendChild(sc); }).catch(()=>{});
+  if(!window.supabase) { renderGsGate(); return; }
+  sb=window.supabase.createClient(CFG.url,CFG.anon);
+  const [pl,ps]=await Promise.all([sb.from('plans').select('*').order('sort'),sb.from('public_settings').select('*')]);
+  plans=pl.data||[]; pubSet=Object.fromEntries((ps.data||[]).map(r=>[r.key,r.value]));
+  sb.auth.onAuthStateChange(()=>{ memRefresh(); });
+  await memRefresh();
+}
 // ── 卦師解卦 ──
 // 解卦引擎：目前走 Claude（卡片內建），之後換成自己的伺服器（訂閱＋金流＋訓練好的卦師規則）只要改這裡。
-const INTERPRETER={mode:'sample', version:'v0 通用斷法（卦師訓練中）', apiUrl:''};
+const SITE=!!window.GG_SITE; // 網站版（GitHub）才有會員；Claude 卡片版走 Claude
+const INTERPRETER={mode:SITE?'api':'sample', version:'v0 通用斷法（卦師訓練中）', apiUrl:''};
 const GUASHI_RULES=`你是一位六爻卦師，依《增刪卜易》《卜筮正宗》的火珠林法（納甲筮法）斷卦。
 斷卦順序：
 1. 依占類確認用神；用神不上卦就看伏神，並看飛神對伏神的生剋。
@@ -1117,10 +1219,14 @@ ${chartText(A,now)}
 }
 let gsCtl=null, sampleFn=null, isOwner=false;
 (async()=>{ try{ if(window.claude){ sampleFn=await claude.use('sample'); const u=await claude.use('user'); isOwner=u?u.isOwner():false; } }catch(e){} renderGsGate(); })();
-function canInterpret(){ return isOwner; } // 之後改成：查訂閱狀態
+function canInterpret(){ return SITE?memCanUse():isOwner; }
 function renderGsGate(){
   $('gsVer').textContent=INTERPRETER.version;
   const ok=canInterpret();
+  if(SITE){ const st=memState(); $('gsPlan').hidden=ok; $('gsBtn').disabled=false;
+    if(plans.length) $('gsPlan').innerHTML=`<div class="plans p3">${plans.map(p=>`<div class="plan ${p.id==='plus'?'best':''}"><b>${esc(p.name)}</b><span>${p.price}</span><small>${p.readings==null?'不限卦數':'每月 '+p.readings+' 卦'}</small></div>`).join('')}</div><div class="gsnote">起卦、排盤、卦象、梅花都免費；卦師解卦為訂閱服務，每卦可追問 ${esc(pubSet.followup_limit||'3')} 次。</div>`;
+    $('gsBtn').textContent=ok?'請卦師解卦':(st==='guest'?'登入後請卦師解卦':st==='off'?'會員系統設定中':'選擇方案');
+    $('gsMsg').textContent=ok?memLeftText():''; return; }
   $('gsPlan').hidden=ok; $('gsBtn').textContent=ok?'請卦師解卦':'訂閱後即可請卦師解卦';
   $('gsBtn').disabled=!ok||(INTERPRETER.mode==='sample'&&!sampleFn);
   $('gsMsg').textContent=ok&&INTERPRETER.mode==='sample'&&!sampleFn?'要在 Claude 裡開啟才能解卦':'';
@@ -1133,18 +1239,23 @@ async function askGuashi(input,onText,signal){
     const j=await r.json(); onText(j.text); return j.text; }
   const {text}=await sampleFn(input,{onText:({text})=>onText(text),signal,modelTier:'complex',cache:false}); return text;
 }
-let gsTurns=[];
+let gsTurns=[], gsReadingId=null;
+function setFollowLeft(n){ $('gsAsk').placeholder=n>0?`繼續問卦師…（這一卦還能追問 ${n} 次）`:'這一卦的追問已用完'; }
 const GS_ERR={not_granted:'你沒有允許這個頁面使用 Claude，所以無法解卦。',sampling_disabled:'這個帳號目前不能使用 Claude。',rate_limited:'用量太多了，請稍後再試。',session_expired:'請重新登入 Claude 後再試。',refused:'這次的內容無法解讀，換個問法再試。'};
 $('gsBtn').addEventListener('click',async()=>{
+  if(SITE&&!canInterpret()){ openMem(); return; }
   if(!lastA||!canInterpret()) return;
-  const out=$('gsOut'); out.hidden=false; out.className='gsout wait'; out.textContent='卦師正在看盤，請稍候…（第一次會詢問是否允許使用 Claude）';
+  const out=$('gsOut'); out.hidden=false; out.className='gsout wait'; out.textContent=SITE?'卦師正在看盤，請稍候…':'卦師正在看盤，請稍候…（第一次會詢問是否允許使用 Claude）';
   $('gsBtn').disabled=true; $('gsStop').hidden=false; gsCtl=new AbortController();
   $('gsThread').innerHTML=''; $('gsAskRow').hidden=true; gsTurns=[];
-  try{ const p=gsPrompt(lastA,lastNow); const t=await askGuashi(p,t=>{ out.className='gsout'; out.innerHTML=mdLite(t); },gsCtl.signal);
-    gsTurns=[{role:'user',content:p},{role:'assistant',content:t}]; $('gsAskRow').hidden=false; }
+  try{
+    if(SITE){ const r=await siteCall({action:'read',chart:chartText(lastA,lastNow),question:$('q').value.trim(),category:catVal},gsCtl.signal);
+      out.className='gsout'; out.innerHTML=mdLite(r.text); gsReadingId=r.reading_id; gsTurns=[1]; $('gsAskRow').hidden=r.followups_left<=0; setFollowLeft(r.followups_left); await memRefresh(); }
+    else { const p=gsPrompt(lastA,lastNow); const t=await askGuashi(p,t=>{ out.className='gsout'; out.innerHTML=mdLite(t); },gsCtl.signal);
+      gsTurns=[{role:'user',content:p},{role:'assistant',content:t}]; $('gsAskRow').hidden=false; } }
   catch(e){ if(e&&e.code==='cancelled'){ if(!e.text) out.textContent='已停止。'; }
-    else { if(e&&e.text){ out.className='gsout'; out.innerHTML=mdLite(e.text)+'<p class="gsnote">（中途中斷）</p>'; } else { out.className='gsout wait'; out.textContent=(e&&GS_ERR[e.code])||'解卦失敗，請稍後再按一次。'; } } }
-  finally{ $('gsStop').hidden=true; $('gsBtn').disabled=false; $('gsBtn').textContent='再解一次'; }
+    else { if(e&&e.text){ out.className='gsout'; out.innerHTML=mdLite(e.text)+'<p class="gsnote">（中途中斷）</p>'; } else { out.className='gsout wait'; out.textContent=(SITE&&e&&e.message)?e.message:((e&&GS_ERR[e.code])||'解卦失敗，請稍後再按一次。'); } } }
+  finally{ $('gsStop').hidden=true; $('gsBtn').disabled=false; $('gsBtn').textContent=SITE?'再解一次（會再扣一卦）':'再解一次'; }
 });
 $('gsStop').addEventListener('click',()=>gsCtl&&gsCtl.abort());
 // 追問：帶著同一張盤和前面的對話繼續問
@@ -1155,8 +1266,10 @@ $('gsSend').addEventListener('click',async()=>{
   qd.className='gsq'; qd.textContent=q; ad.className='gsa wait'; ad.textContent='卦師思考中…'; th.append(qd,ad);
   $('gsAsk').value=''; $('gsAsk').style.height=''; $('gsSend').disabled=true; $('gsStop').hidden=false; gsCtl=new AbortController();
   const turns=gsTurns.concat([{role:'user',content:`追問：${q}\n（請根據同一張盤回答，說明是看哪幾爻、什麼生剋得出的；白話，300 字以內。）`}]);
-  try{ const t=await askGuashi(turns,t=>{ ad.className='gsa'; ad.innerHTML=mdLite(t); },gsCtl.signal); gsTurns=turns.concat([{role:'assistant',content:t}]); if(gsTurns.length>14) gsTurns=gsTurns.slice(0,2).concat(gsTurns.slice(-10)); }
-  catch(e){ if(e&&e.text){ ad.className='gsa'; ad.innerHTML=mdLite(e.text); } else { ad.className='gsa wait'; ad.textContent=e&&e.code==='cancelled'?'已停止。':((e&&GS_ERR[e.code])||'這次沒有回應，請再問一次。'); } }
+  try{
+    if(SITE){ const r=await siteCall({action:'ask',reading_id:gsReadingId,question:q},gsCtl.signal); ad.className='gsa'; ad.innerHTML=mdLite(r.text); setFollowLeft(r.followups_left); if(r.followups_left<=0) $('gsAskRow').hidden=true; }
+    else { const t=await askGuashi(turns,t=>{ ad.className='gsa'; ad.innerHTML=mdLite(t); },gsCtl.signal); gsTurns=turns.concat([{role:'assistant',content:t}]); if(gsTurns.length>14) gsTurns=gsTurns.slice(0,2).concat(gsTurns.slice(-10)); } }
+  catch(e){ if(e&&e.text){ ad.className='gsa'; ad.innerHTML=mdLite(e.text); } else { ad.className='gsa wait'; ad.textContent=e&&e.code==='cancelled'?'已停止。':((e&&e.message&&SITE)?e.message:(e&&GS_ERR[e.code])||'這次沒有回應，請再問一次。'); } }
   finally{ $('gsSend').disabled=false; $('gsStop').hidden=true; }
 });
 $('copyBtn').addEventListener('click',async()=>{ if(!lastA) return; const t=chartText(lastA,lastNow); try{ await navigator.clipboard.writeText(t); $('gsMsg').textContent='已複製'; }catch(e){ const ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy'); $('gsMsg').textContent='已複製';}catch(_){ $('gsMsg').textContent='無法複製'; } ta.remove(); } });
@@ -1217,6 +1330,7 @@ $('suggest').addEventListener('click',e=>{ if(!e.target.closest('button')||!sugV
 renderToday(); renderRecord(); setInterval(renderToday,60000);
 function restCoins(){ const G=geom(); [1,0,1].forEach((v,i)=>{ const R=G.rest[i], rz=Math.round(Math.random()*40-20), ry=v?0:180; coinState[i]={x:R.x,y:R.y,rz,ry,shown:true}; coinEls[i].firstElementChild.style.transform=`rotateY(${ry}deg)`; place(i,R.x,R.y,rz,1,1); }); }
 requestAnimationFrame(restCoins);
+if(SITE) memInit();
 // 畫面寬度改變時，檯面上的銅錢跟著等比例移動，不會跑出畫面
 let stageW=0; new ResizeObserver(()=>{ const W=$('stage').clientWidth; if(!W) return; if(stageW&&!busy&&W!==stageW){ const k=W/stageW; coinState.forEach((s,i)=>{ if(s.shown){ s.x*=k; place(i,s.x,s.y,s.rz,1,1);} }); $('matTags').querySelectorAll('span').forEach((t,i)=>t.style.left=coinState[i].x+'px'); } stageW=W; }).observe($('stage'));
 </script>
