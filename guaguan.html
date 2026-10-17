@@ -140,6 +140,15 @@ button{cursor:pointer}
 .gsout h3{font-family:var(--serif);font-size:19px;margin:12px 0 2px;color:var(--accent)}
 .gsout p{margin:0 0 4px}
 .gsout.wait{white-space:normal}
+.gsthread{display:flex;flex-direction:column;gap:10px}
+.gsq{align-self:flex-end;max-width:85%;background:var(--accent);color:#fff;border-radius:14px 14px 4px 14px;padding:8px 12px;font-size:16px;line-height:1.6;word-break:break-word}
+.gsa{background:#fff;border:1px solid var(--line);border-radius:14px 14px 14px 4px;padding:8px 12px;font-size:16px;line-height:1.8;word-break:break-word}
+.gsa h3{font-family:var(--serif);font-size:17px;margin:8px 0 2px;color:var(--accent)} .gsa p{margin:0 0 4px}
+.gsa.wait{color:var(--muted)}
+.gsask{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end}
+#gsAsk{width:100%;border:2px solid var(--line);border-radius:12px;padding:10px 12px;font-size:16px;resize:none;min-height:46px;line-height:1.5;background:#fff}
+#gsAsk:focus{outline:none;border-color:var(--accent)}
+.gsask .big{padding:11px 18px;font-size:17px;white-space:nowrap}
 .gstools{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:14px;color:var(--muted)}
 .lnk{background:none;border:0;padding:4px 0;color:var(--accent);font-size:15px;font-weight:700;text-decoration:underline;text-underline-offset:3px}
 
@@ -459,6 +468,8 @@ button{cursor:pointer}
       </div>
       <div class="btns2"><button class="big gold" id="gsBtn">請卦師解卦</button><button class="big ghost" id="gsStop" hidden>停止</button></div>
       <div class="gsout" id="gsOut" hidden aria-live="polite"></div>
+      <div class="gsthread" id="gsThread"></div>
+      <div class="gsask" id="gsAskRow" hidden><textarea id="gsAsk" rows="1" placeholder="繼續問卦師…"></textarea><button class="big" id="gsSend">追問</button></div>
       <div class="gstools"><button class="lnk" id="copyBtn">複製盤面文字</button><span id="gsMsg"></span></div>
     </section>
   </section>
@@ -1115,28 +1126,44 @@ function renderGsGate(){
   $('gsMsg').textContent=ok&&INTERPRETER.mode==='sample'&&!sampleFn?'要在 Claude 裡開啟才能解卦':'';
 }
 function mdLite(t){ return esc(t).split('\n').map(l=>l.trim()).filter(Boolean).map(l=>/^#{1,3} /.test(l)?`<h3>${l.replace(/^#+ /,'')}</h3>`:`<p>${l.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')}</p>`).join(''); }
-async function askGuashi(prompt,onText,signal){
+// input 可以是一段文字，或整串對話 [{role,content}...]（追問用）
+async function askGuashi(input,onText,signal){
   if(INTERPRETER.mode==='api'){ // 之後：自己的後端（帶登入、訂閱驗證，API 金鑰只放伺服器）
-    const r=await fetch(INTERPRETER.apiUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt}),signal});
+    const r=await fetch(INTERPRETER.apiUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:typeof input==='string'?[{role:'user',content:input}]:input}),signal});
     const j=await r.json(); onText(j.text); return j.text; }
-  const {text}=await sampleFn(prompt,{onText:({text})=>onText(text),signal,modelTier:'complex',cache:false}); return text;
+  const {text}=await sampleFn(input,{onText:({text})=>onText(text),signal,modelTier:'complex',cache:false}); return text;
 }
+let gsTurns=[];
 const GS_ERR={not_granted:'你沒有允許這個頁面使用 Claude，所以無法解卦。',sampling_disabled:'這個帳號目前不能使用 Claude。',rate_limited:'用量太多了，請稍後再試。',session_expired:'請重新登入 Claude 後再試。',refused:'這次的內容無法解讀，換個問法再試。'};
 $('gsBtn').addEventListener('click',async()=>{
   if(!lastA||!canInterpret()) return;
   const out=$('gsOut'); out.hidden=false; out.className='gsout wait'; out.textContent='卦師正在看盤，請稍候…（第一次會詢問是否允許使用 Claude）';
   $('gsBtn').disabled=true; $('gsStop').hidden=false; gsCtl=new AbortController();
-  try{ await askGuashi(gsPrompt(lastA,lastNow),t=>{ out.className='gsout'; out.innerHTML=mdLite(t); },gsCtl.signal); }
+  $('gsThread').innerHTML=''; $('gsAskRow').hidden=true; gsTurns=[];
+  try{ const p=gsPrompt(lastA,lastNow); const t=await askGuashi(p,t=>{ out.className='gsout'; out.innerHTML=mdLite(t); },gsCtl.signal);
+    gsTurns=[{role:'user',content:p},{role:'assistant',content:t}]; $('gsAskRow').hidden=false; }
   catch(e){ if(e&&e.code==='cancelled'){ if(!e.text) out.textContent='已停止。'; }
     else { if(e&&e.text){ out.className='gsout'; out.innerHTML=mdLite(e.text)+'<p class="gsnote">（中途中斷）</p>'; } else { out.className='gsout wait'; out.textContent=(e&&GS_ERR[e.code])||'解卦失敗，請稍後再按一次。'; } } }
   finally{ $('gsStop').hidden=true; $('gsBtn').disabled=false; $('gsBtn').textContent='再解一次'; }
 });
 $('gsStop').addEventListener('click',()=>gsCtl&&gsCtl.abort());
+// 追問：帶著同一張盤和前面的對話繼續問
+$('gsAsk').addEventListener('input',e=>{e.target.style.height='auto';e.target.style.height=e.target.scrollHeight+2+'px';});
+$('gsSend').addEventListener('click',async()=>{
+  const q=$('gsAsk').value.trim(); if(!q||!gsTurns.length) return;
+  const th=$('gsThread'), qd=document.createElement('div'), ad=document.createElement('div');
+  qd.className='gsq'; qd.textContent=q; ad.className='gsa wait'; ad.textContent='卦師思考中…'; th.append(qd,ad);
+  $('gsAsk').value=''; $('gsAsk').style.height=''; $('gsSend').disabled=true; $('gsStop').hidden=false; gsCtl=new AbortController();
+  const turns=gsTurns.concat([{role:'user',content:`追問：${q}\n（請根據同一張盤回答，說明是看哪幾爻、什麼生剋得出的；白話，300 字以內。）`}]);
+  try{ const t=await askGuashi(turns,t=>{ ad.className='gsa'; ad.innerHTML=mdLite(t); },gsCtl.signal); gsTurns=turns.concat([{role:'assistant',content:t}]); if(gsTurns.length>14) gsTurns=gsTurns.slice(0,2).concat(gsTurns.slice(-10)); }
+  catch(e){ if(e&&e.text){ ad.className='gsa'; ad.innerHTML=mdLite(e.text); } else { ad.className='gsa wait'; ad.textContent=e&&e.code==='cancelled'?'已停止。':((e&&GS_ERR[e.code])||'這次沒有回應，請再問一次。'); } }
+  finally{ $('gsSend').disabled=false; $('gsStop').hidden=true; }
+});
 $('copyBtn').addEventListener('click',async()=>{ if(!lastA) return; const t=chartText(lastA,lastNow); try{ await navigator.clipboard.writeText(t); $('gsMsg').textContent='已複製'; }catch(e){ const ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy'); $('gsMsg').textContent='已複製';}catch(_){ $('gsMsg').textContent='無法複製'; } ta.remove(); } });
 
 function reset(){
   if(busy) return;
-  lines=[]; lastA=null; selRow=-1; if(gsCtl) gsCtl.abort(); $('gsOut').hidden=true; $('gsOut').textContent=''; $('gsBtn').textContent=canInterpret()?'請卦師解卦':'訂閱後即可請卦師解卦';
+  lines=[]; lastA=null; selRow=-1; if(gsCtl) gsCtl.abort(); $('gsOut').hidden=true; $('gsOut').textContent=''; $('gsThread').innerHTML=''; $('gsAskRow').hidden=true; gsTurns=[]; $('gsBtn').textContent=canInterpret()?'請卦師解卦':'訂閱後即可請卦師解卦';
   $('result').hidden=true; $('resetBtn').hidden=true; ['tPan','tXiang','tMei'].forEach(i=>$(i).innerHTML='');
   restCoins(); resetRice();
   $('matTags').innerHTML=''; $('shell').disabled=false; $('throwBtn').disabled=false; $('throwBtn').textContent='搖初爻'; $('hint').textContent='準備搖初爻';
