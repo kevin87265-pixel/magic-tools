@@ -204,3 +204,86 @@ end $$;
 
 -- 第一次設定：把自己設成管理員（把信箱換成你的，註冊登入一次後再執行）
 -- update public.profiles set is_admin = true where email = 'kevin87265@gmail.com';
+
+-- ══ 第二版新增：開通碼、雲端起卦紀錄 ══════════════════════
+
+-- ── 開通碼（管理員產生 → LINE 傳給會員 → 會員輸入開通；一碼一用）──
+create table if not exists public.activation_codes (
+  code text primary key,
+  plan text not null references public.plans(id),
+  days int not null default 30,
+  note text,
+  created_at timestamptz not null default now(),
+  created_by uuid,
+  used_by uuid references public.profiles(id) on delete set null,
+  used_at timestamptz
+);
+create table if not exists public.redeem_fails (
+  id bigint generated always as identity primary key,
+  user_id uuid not null,
+  at timestamptz not null default now()
+);
+alter table public.activation_codes enable row level security;
+alter table public.redeem_fails enable row level security;
+drop policy if exists codes_admin on public.activation_codes;
+create policy codes_admin on public.activation_codes for select using (public.is_admin(auth.uid()));
+
+create or replace function public.admin_create_code(p_plan text, p_days int, p_note text) returns text
+language plpgsql security definer set search_path = public as $$
+declare c text; h text;
+begin
+  if not public.is_admin(auth.uid()) then raise exception 'not_admin'; end if;
+  loop
+    h := upper(replace(gen_random_uuid()::text, '-', ''));
+    h := translate(h, '0', 'G');                      -- 避免 0 跟 O 看錯
+    c := substr(h,1,4) || '-' || substr(h,5,4) || '-' || substr(h,9,4);
+    exit when not exists (select 1 from public.activation_codes where code = c);
+  end loop;
+  insert into public.activation_codes (code, plan, days, note, created_by) values (c, p_plan, greatest(p_days,1), p_note, auth.uid());
+  return c;
+end $$;
+
+create or replace function public.redeem_code(p_code text) returns json
+language plpgsql security definer set search_path = public as $$
+declare uid uuid := auth.uid(); k public.activation_codes; norm text; fails int;
+begin
+  if uid is null then raise exception 'login'; end if;
+  select count(*) into fails from public.redeem_fails where user_id = uid and at > now() - interval '1 hour';
+  if fails >= 8 then return json_build_object('error','too_many'); end if;
+  norm := upper(regexp_replace(coalesce(p_code,''), '[^0-9A-Za-z]', '', 'g'));
+  norm := translate(norm, '0', 'G');
+  if length(norm) = 12 then norm := substr(norm,1,4) || '-' || substr(norm,5,4) || '-' || substr(norm,9,4); end if;
+  select * into k from public.activation_codes where code = norm and used_by is null for update;
+  if not found then insert into public.redeem_fails (user_id) values (uid); return json_build_object('error','invalid'); end if;   -- 用 return 不用 raise，失敗紀錄才會留下來
+  update public.activation_codes set used_by = uid, used_at = now() where code = norm;
+  update public.profiles set plan = k.plan, period_start = now(), period_end = now() + make_interval(days => k.days), used = 0 where id = uid;
+  return json_build_object('plan', k.plan, 'days', k.days);
+end $$;
+revoke all on function public.redeem_code(text) from public, anon;
+grant execute on function public.redeem_code(text) to authenticated;
+
+-- ── 雲端起卦紀錄（登入後每次排盤自動存，換手機也看得到）──
+create table if not exists public.casts (
+  id bigint generated always as identity primary key,
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  cast_at timestamptz not null,
+  question text,
+  category text,
+  grp text,
+  yongshen text,
+  how text,
+  nums jsonb,
+  lines jsonb not null,
+  ben text,
+  bian text,
+  created_at timestamptz not null default now(),
+  unique (user_id, cast_at)
+);
+create index if not exists casts_user_time on public.casts(user_id, cast_at desc);
+alter table public.casts enable row level security;
+drop policy if exists casts_own_read on public.casts;
+create policy casts_own_read on public.casts for select using (user_id = auth.uid() or public.is_admin(auth.uid()));
+drop policy if exists casts_own_insert on public.casts;
+create policy casts_own_insert on public.casts for insert with check (user_id = auth.uid());
+drop policy if exists casts_own_delete on public.casts;
+create policy casts_own_delete on public.casts for delete using (user_id = auth.uid());

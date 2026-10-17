@@ -70,11 +70,21 @@ const pname=id=>(plans.find(p=>p.id===id)||{}).name||id||'無';
 async function renderPay(){
   const {data}=await sb.from('payments').select('*,profiles(email)').order('created_at',{ascending:false}).limit(60);
   const rows=data||[], pend=rows.filter(r=>r.status==='pending'), done=rows.filter(r=>r.status!=='pending').slice(0,20);
-  $('pane').innerHTML=(pend.length?pend.map(r=>`<div class="card"><div class="row"><b>${esc(r.profiles?.email)}</b><span class="tag">${pname(r.plan)} ${r.amount} 元</span></div>
+  const codes=(await sb.from('activation_codes').select('*,profiles:used_by(email)').order('created_at',{ascending:false}).limit(30)).data||[];
+  const gen=`<div class="card"><h2>產生開通碼</h2><div class="muted">LINE 收到錢後，產生一組碼傳給對方，他登入輸入就開通。一碼只能用一次。</div>
+    <div class="grid3"><select id="cPlan">${plans.map(p=>`<option value="${p.id}">${p.name} ${p.price} 元</option>`).join('')}</select><input id="cDays" type="number" min="1" value="30" aria-label="天數"><input id="cNote" placeholder="備註（誰）"></div>
+    <button class="btn gold" id="cGo">產生開通碼</button><div id="cOut"></div></div>`;
+  const codeList=`<div class="card"><h2>最近的開通碼</h2>${codes.map(c=>`<div class="row"><span><b style="font-family:monospace;letter-spacing:.05em">${esc(c.code)}</b>　<span class="muted">${pname(c.plan)} ${c.days} 天${c.note?'・'+esc(c.note):''}</span></span><span class="tag ${c.used_by?'':'off'}">${c.used_by?'已用：'+esc(c.profiles?.email||''):'未使用'}</span></div>`).join('')||'<div class="muted">尚無</div>'}</div>`;
+  $('pane').innerHTML=gen+(pend.length?pend.map(r=>`<div class="card"><div class="row"><b>${esc(r.profiles?.email)}</b><span class="tag">${pname(r.plan)} ${r.amount} 元</span></div>
     <div class="muted">${d8(r.created_at)}　${r.method==='bank'?'銀行轉帳 後五碼':'LINE 轉帳'}：<b style="color:var(--ink)">${esc(r.ref)}</b></div>
     <div class="row"><button class="btn ok" data-ok="${r.id}">確認收到，開通 30 天</button><button class="btn no" data-no="${r.id}">沒收到</button></div></div>`).join(''):'<div class="card muted">目前沒有待確認的轉帳。</div>')
-   +`<div class="card"><h2>最近處理</h2>${done.map(r=>`<div class="muted">${d8(r.decided_at)}　${esc(r.profiles?.email)}　${pname(r.plan)} ${r.amount} 元　<span class="tag ${r.status==='rejected'?'off':''}">${r.status==='approved'?'已開通':'已退回'}</span></div>`).join('')||'<div class="muted">尚無</div>'}</div>`;
+   +codeList+`<div class="card"><h2>最近處理</h2>${done.map(r=>`<div class="muted">${d8(r.decided_at)}　${esc(r.profiles?.email)}　${pname(r.plan)} ${r.amount} 元　<span class="tag ${r.status==='rejected'?'off':''}">${r.status==='approved'?'已開通':'已退回'}</span></div>`).join('')||'<div class="muted">尚無</div>'}</div>`;
   $('pane').onclick=async e=>{ const ok=e.target.closest('[data-ok]'), no=e.target.closest('[data-no]');
+    if(e.target.id==='cGo'){ e.target.disabled=true; const {data:code,error}=await sb.rpc('admin_create_code',{p_plan:$('cPlan').value,p_days:+$('cDays').value||30,p_note:$('cNote').value.trim()}); e.target.disabled=false;
+      if(error){ msg($('cOut'),error.message,true); return; }
+      const pl=plans.find(p=>p.id===$('cPlan').value), text=`你的六爻卦館開通碼：${code}\n方案：${pl?pl.name:''}（${+$('cDays').value||30} 天）\n登入卦館 → 會員 → 輸入開通碼\nhttps://tinyurl.com/liuyao-guaguan`;
+      $('cOut').innerHTML=`<div style="font-family:monospace;font-size:26px;font-weight:900;letter-spacing:.08em;text-align:center;padding:8px">${esc(code)}</div><button class="btn" id="cCopy">複製給 LINE</button> <span id="cCm" class="muted"></span>`;
+      $('cCopy').onclick=async()=>{ try{ await navigator.clipboard.writeText(text); $('cCm').textContent='已複製，貼到 LINE 就好'; }catch(_){ $('cCm').textContent=text; } }; return; }
     if(ok){ ok.disabled=true; const {error}=await sb.rpc('approve_payment',{pid:+ok.dataset.ok}); if(error) alertBox(error.message); render(); }
     if(no){ no.disabled=true; const {error}=await sb.rpc('reject_payment',{pid:+no.dataset.no}); if(error) alertBox(error.message); render(); } };
 }
