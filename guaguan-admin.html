@@ -194,7 +194,7 @@ async function renderLearn(){
   $('pane').innerHTML=`<div class="card"><h2>查詢</h2><div class="row" style="flex-wrap:nowrap"><input id="lq" placeholder="例如：空亡、回頭剋、復合、應期" value="${esc(sessionQ)}"><button class="btn" id="lqGo" style="flex:none">搜尋</button></div><div id="lres"></div></div>
   <div class="card"><h2>規則書</h2><div class="muted">卦師解卦用的規則，已整理 20 堂課並套用你確認過的規則。</div>
     <div class="row" style="justify-content:flex-start">${has('rules')?'<button class="btn" data-open="rules">讀規則書</button>':''}${has('pending')?'<button class="btn no" style="color:var(--accent);border-color:var(--accent-soft)" data-open="pending">待確認清單</button>':''}</div>
-    ${has('rules')?'<button class="btn gold" id="applyRules">把這版規則書套用到卦師</button><div id="applyM" class="muted">套用後，網站上的卦師立刻照這版解卦（等於覆蓋「設定」裡的規則書）。</div>':''}</div>
+    ${has('rules')?'<button class="btn gold" id="applyRules">把這版規則書套用到卦師</button><div id="applyM" class="muted">套用時會自動拿掉課程出處和人名，卦師只看到規則本身。</div>':''}</div>
   <div class="card"><h2>課程 ${lessons.length} 堂</h2>${lessons.map(n=>`<div class="lsn"><div class="t"><b>第 ${n} 堂</b>${esc(lsnTopic(n))}</div>${has(`L${String(n).padStart(2,'0')}-重點`)?`<button data-open="L${String(n).padStart(2,'0')}-重點">重點</button>`:''}${has(`L${String(n).padStart(2,'0')}-逐字稿`)?`<button data-open="L${String(n).padStart(2,'0')}-逐字稿">全文</button>`:''}</div>`).join('')}</div>`+imp;
   bindImport();
   const doSearch=async()=>{ const q=$('lq').value.trim(); sessionQ=q; const box=$('lres'); if(!q){ box.innerHTML=''; return; }
@@ -208,8 +208,11 @@ async function renderLearn(){
   $('lqGo').onclick=doSearch; $('lq').onkeydown=e=>{ if(e.key==='Enter') doSearch(); };
   if(sessionQ) doSearch();
   $('pane').onclick=async e=>{ const o=e.target.closest('[data-open]'); if(o){ LV={id:o.dataset.open,q:o.classList.contains('hit')?sessionQ:''}; renderReader(); window.scrollTo(0,0); return; }
-    if(e.target.id==='applyRules'){ e.target.disabled=true; const body=await loadBody('rules'); const {error}=await sb.rpc('admin_set_setting',{k:'rules',v:body,is_private:true}); e.target.disabled=false; msg($('applyM'),error?error.message:'已套用，卦師現在照這版規則書解卦',!!error); } };
+    if(e.target.id==='applyRules'){ e.target.disabled=true; const body=await loadBody('rules'); const {error}=await sb.rpc('admin_set_setting',{k:'rules',v:aiRules(body),is_private:true}); e.target.disabled=false; msg($('applyM'),error?error.message:'已套用，卦師現在照這版規則書解卦',!!error); } };
 }
+function aiRules(t){ return t.replace(/（[^（）]*第\s*[\d、～\-\s]+\s*堂[^（）]*）/g,'').replace(/（K\s*定案[^（）]*）/g,'')
+  .replace('（黃連老師火珠林法）','（火珠林法）').replace('依黃連老師火珠林法','依火珠林法').replace('國運：老師看子孫','國運：看子孫')
+  .replace('是老師明確反對的','是明確不用的').replace('老師叫「到底破」','叫「到底破」').replace(/標「K 定案」的是網站主人確認過的規則，跟老師講法不同時以 K 定案為準。/,''); }
 let sessionQ='';
 function bindImport(){ const f=$('impF'); if(!f) return; f.onchange=async()=>{ const file=f.files[0]; if(!file) return; const m=$('impM');
   let rows; try{ rows=JSON.parse(await file.text()); if(!Array.isArray(rows)||!rows.every(r=>r.id&&r.kind&&r.title&&typeof r.body==='string')) throw new Error('格式不對'); }catch(e){ msg(m,'這個檔案不能用：'+e.message,true); return; }
