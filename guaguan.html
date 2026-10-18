@@ -646,7 +646,7 @@ function analyze(lines,now){
   const rows=lines.map((l,i)=>{
     const z=ben.zhi[i], r={i,z,w:ZW[z],qin:qinOf(gwx,ZW[z]),shen:SHEN[(s0+i)%6],yang:l.yang,moving:l.moving,shi:shi===i+1,ying:ying===i+1,
       ws:wangshuai(cal.mz,ZW[z]),dr:dayRel(cal.dz,z),cs:csOf(ZW[z],cal.dz),kong:cal.kong.includes(z),po:chong(cal.mz,z),lin:cal.mz===z,lind:cal.dz===z};
-    if(l.moving){ const bz=bian.zhi[i]; Object.assign(r,{bz,bw:ZW[bz],bqin:qinOf(gwx,ZW[bz]),hua:huaRel(z,bz),bkong:cal.kong.includes(bz),bcs:csOf(ZW[z],bz)}); }
+    if(l.moving){ const bz=bian.zhi[i]; Object.assign(r,{bz,bw:ZW[bz],bqin:qinOf(gwx,ZW[bz]),hua:huaRel(z,bz),bkong:cal.kong.includes(bz)&&bz!==cal.mz,bcs:csOf(ZW[z],bz)}); }
     // 靜爻逢日沖：旺相為暗動，休囚為日破（K 確認的用法）
     if(!l.moving&&r.dr==='日沖') r.an='旺相'.includes(r.ws)?'暗動':'日破';
     return r;
@@ -1296,7 +1296,7 @@ function chartText(A,now){
   L.push(`卦身：${A.guashen}　身爻：${POS[A.shenyao]}`);
   L.push('爻位（由上爻到初爻）：');
   [5,4,3,2,1,0].forEach(i=>{ const r=A.rows[i], fu=A.fu.filter(f=>f.i===i);
-    const tags=[r.shi?'世':'',r.ying?'應':'',r.moving?(r.yang?'老陽動○':'老陰動×'):'',r.an||'',r.kong?'旬空':'',r.po?'月破':'',r.lin?'臨月建':'',r.lind?'臨日辰':''].filter(Boolean).join('、');
+    const tags=[r.shi?'世':'',r.ying?'應':'',r.moving?(r.yang?'老陽動○':'老陰動×'):'',r.an||'',r.kong?(r.lin?'旬空但臨月建（不空）':'旬空'):'',r.po?'月破':'',r.lin?'臨月建':'',r.lind?'臨日辰':''].filter(Boolean).join('、');
     L.push(`${POS[i]}　${r.shen}　${r.qin}${r.z}${r.w}　${r.yang?'陽':'陰'}　月令${r.ws}　${r.dr}　於日${r.cs}${tags?'　'+tags:''}${r.moving?`　→ 變出 ${r.bqin}${r.bz}${r.bw}（${r.hua.join('、')}${['長生','帝旺','墓','絕'].includes(r.bcs)?'、化'+r.bcs:''}${r.bkong?'、化空':''}）`:''}${fu.length?'　伏神：'+fu.map(f=>f.q+f.z+ZW[f.z]).join('、'):''}`); });
   L.push('【作用檢查表】系統依規則自動列出；解卦時每一條動爻、沖、合、旺衰都要交代，不可漏看：'); relations(A).forEach(x=>L.push(x));
   L.push(`梅花易數：體${M.ti.n}${M.ti.wx}、用${M.yong.n}${M.yong.wx}，${M.r.k}${M.note?'（'+M.note+'）':''}`);
