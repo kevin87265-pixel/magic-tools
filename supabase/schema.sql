@@ -15,6 +15,8 @@ insert into public.plans (id,name,price,readings,daily_cap,sort) values
   ('plus','進階',299,30,null,2),
   ('pro','無限',599,null,30,3)
 on conflict (id) do nothing;
+alter table public.plans add column if not exists app_price int;   -- App 內購價格（含平台手續費）
+update public.plans set app_price = case id when 'basic' then 149 when 'plus' then 399 when 'pro' then 788 end where app_price is null;
 
 -- ── 會員 ───────────────────────────────────────────────
 create table if not exists public.profiles (
@@ -301,3 +303,12 @@ alter table public.course_docs enable row level security;
 drop policy if exists course_docs_admin on public.course_docs;
 create policy course_docs_admin on public.course_docs for all
   using (public.is_admin(auth.uid())) with check (public.is_admin(auth.uid()));
+
+-- ── 權限：讓網站能連到資料表（真正的存取限制由上面每張表的 RLS 規則把關）──
+grant usage on schema public to anon, authenticated;
+grant select on public.plans, public.public_settings to anon, authenticated;
+grant select, insert, update, delete on all tables in schema public to authenticated;
+grant usage, select on all sequences in schema public to authenticated;
+grant execute on all functions in schema public to authenticated;
+revoke execute on function public.consume_reading(uuid,text,text,text,text) from authenticated, anon;
+revoke execute on function public.refund_reading(bigint) from authenticated, anon;
