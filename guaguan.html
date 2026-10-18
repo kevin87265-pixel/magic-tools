@@ -216,7 +216,9 @@ button{cursor:pointer}
 .histempty{color:var(--muted);font-size:15px;text-align:center;padding:10px}
 
 /* 會員 */
-.hbtns{display:flex;gap:8px;flex:none}
+.hbtns{display:flex;gap:6px;flex:none}
+.hrow h1{white-space:nowrap}
+@media (max-width:360px){.histbtn{padding:4px 8px;font-size:13px}.hbtns{gap:4px}}
 .sheet-bg{position:fixed;inset:0;background:rgba(20,24,40,.45);z-index:50;display:flex;align-items:flex-end;justify-content:center}
 .sheetbox{background:var(--bg);width:100%;max-width:600px;max-height:88vh;overflow:auto;border-radius:20px 20px 0 0;padding:16px max(16px,env(safe-area-inset-left,0px)) calc(20px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px}
 .sheethead{display:flex;justify-content:space-between;align-items:center}
@@ -273,6 +275,9 @@ button{cursor:pointer}
 
 /* 盤面 */
 .sheet{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.kongrow{display:flex;flex-wrap:wrap;gap:2px 8px;align-items:center;padding:7px 10px;font-size:clamp(12px,3.7vw,15px);white-space:nowrap;border-bottom:1px solid var(--line);background:#F5F6FA}
+.kongrow b{margin-right:2px} .kongrow i{font-style:normal;font-weight:700;margin-left:3px} .kongrow{justify-content:space-between} .kongrow .d{color:var(--bad);font-weight:700}
+.setsec h3{margin:6px 0 2px;font-size:17px;font-family:var(--serif);color:var(--accent)} .setsec p{margin:0;font-size:15px;line-height:1.8;color:var(--ink)}
 .askline{padding:12px 14px;border-bottom:1px solid var(--line);font-size:16px;line-height:1.7}
 .askline b{font-family:var(--serif);font-weight:900;font-size:18px}
 .askline span{color:var(--muted);font-size:14px}
@@ -292,8 +297,8 @@ button{cursor:pointer}
 .kongline .k{color:var(--muted)}
 .kongline .d{color:var(--ink);font-weight:700}
 .grid{display:grid;grid-template-columns:repeat(8,minmax(0,1fr))}
-.grid .h{font-size:15px;font-weight:700;text-align:center;padding:8px 0;background:var(--accent-soft);color:var(--accent);border-bottom:1px solid var(--line-2);white-space:nowrap}
-.cell{min-height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-bottom:1px solid var(--line);font-size:18px;line-height:1.15;position:relative;text-align:center}
+.grid .h{font-size:16px;font-weight:700;text-align:center;padding:9px 0;background:var(--panel);color:var(--ink);border-bottom:2px solid var(--ink);white-space:nowrap}
+.cell{min-height:68px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-bottom:1px solid var(--line);font-size:18px;line-height:1.15;position:relative;text-align:center}
 .cell.bl{border-left:1px solid var(--line)}
 .cell.bk,.grid .h.bk{border-left:2px solid var(--line-2)}
 .cell .v{display:flex;flex-direction:column;align-items:center;font-family:var(--serif);font-weight:700}
@@ -305,7 +310,7 @@ button{cursor:pointer}
 .prow{display:contents;cursor:pointer}
 .prow.sel .cell{background:#EAEEFA}
 .prow.sel .cell.yong{background:#F4E8A8}
-.tip{padding:9px 12px;font-size:15px;color:var(--muted);text-align:center;border-bottom:1px solid var(--line);background:#F5F6FA}
+.tip{padding:7px 12px;font-size:14px;color:var(--muted);text-align:center;border-bottom:1px solid var(--line);background:#EEF0F4}
 .detail{padding:12px 14px;font-size:16px;line-height:1.85;border-bottom:1px solid var(--line);background:#F4F6FC}
 .detail b{font-family:var(--serif);font-weight:900}
 .tg{display:inline-block;font-size:14px;font-weight:700;padding:0 9px;border-radius:99px;background:#EEF0F4;color:#555C6B;margin:3px 4px 3px 0;line-height:1.8}
@@ -378,7 +383,7 @@ button{cursor:pointer}
 </style>
 
 </head><body><header class="hud"><div class="hud-in">
-  <div class="hrow"><div><h1>六爻卦館</h1><div class="date" id="todayDate"></div></div><div class="hbtns"><button class="histbtn" id="memBtn" hidden>登入</button><button class="histbtn" id="histBtn">紀錄<span id="histN"></span></button></div></div>
+  <div class="hrow"><div><h1>六爻卦館</h1><div class="date" id="todayDate"></div></div><div class="hbtns"><button class="histbtn" id="memBtn" hidden>登入</button><button class="histbtn" id="histBtn">紀錄<span id="histN"></span></button><button class="histbtn" id="setBtn">設定</button></div></div>
   <div class="gz" id="today"></div>
 </div></header>
 <div class="wrap">
@@ -515,7 +520,15 @@ button{cursor:pointer}
     <div id="histList"></div>
   </section>
 
-  <div class="foot">銅錢：字為陽、背為陰。兩背一字為少陽，兩字一背為少陰，三字為老陽 ○，三背為老陰 ×。<br>年以立春、月以節氣交接時刻換；晚上 11 點後算隔日。僅供參考。</div>
+  <div class="sheet-bg" id="setSheet" hidden>
+    <section class="sheetbox" role="dialog" aria-modal="true" aria-labelledby="setTitle">
+      <div class="sheethead"><h2 id="setTitle">設定與說明</h2><button class="lnk" id="setClose">關閉</button></div>
+      <div class="setsec"><h3>銅錢起卦</h3><p>字為陽、背為陰。兩背一字為少陽，兩字一背為少陰，三字為老陽 ○，三背為老陰 ×。</p></div>
+      <div class="setsec"><h3>曆法</h3><p>年以立春換、月以節氣交接時刻換；晚上 11 點後算隔日。</p></div>
+      <div class="setsec"><h3>盤面標示</h3><p>黃底是用神；伏神取自本宮純卦。○ 老陽動、× 老陰動，變卦欄只列動爻，六親依本宮五行。「空」是旬空，「暗」是暗動，「破」是日破。</p></div>
+      <div class="setsec"><h3>服務範圍</h3><p>本館不判斷投資標的、股票或買賣時機，只看整體財運。結果僅供參考。</p></div>
+    </section>
+  </div>
 </div>
 
 <script>
@@ -987,6 +1000,8 @@ document.querySelector('.bowl').addEventListener('click',grabRice); $('riceBtn')
 // ── 結果 ──
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const zw=(z,w)=>`<span class="v w-${w}"><span>${z}</span><span>${w}</span></span>`;
+function xunKong(i){ const h=i-(i%10); return [ZHI[(h+10)%12],ZHI[(h+11)%12]]; }
+function gtype(h){ const n=h.m.name; return ['乾為天','坤為地','坎為水','離為火','震為雷','巽為風','艮為山','兌為澤','天雷无妄','雷天大壯'].includes(n)?'六沖':['天地否','地天泰','水澤節','澤水困','山火賁','火山旅','雷地豫','地雷復'].includes(n)?'六合':h.pal.type.replace('卦',''); }
 function renderPan(A,now){
   const c=A.cal, ys=ysVal, [tPrev,tNext]=terms(now), q=$('q').value.trim();
   const P=[['時',c.hIdx],['日',c.dIdx],['月',c.mIdx],['年',c.yIdx]];
@@ -1011,19 +1026,19 @@ function renderPan(A,now){
   const ord=[mw,SHENG[mw],gen,ke,KE[mw]]; // 旺 相 休 囚 死
   const g=A.ben.pal, bg=A.bian?A.bian.pal:null;
   $('tPan').innerHTML=`<div class="sheet">
-    <div class="askline">${CAT_MAP[catVal]?`<span class="catTag">${CAT_MAP[catVal].g}·${CAT_MAP[catVal].k}</span>`:''}所問：<b>${q?esc(q):'（未填）'}</b><span class="how">${lines.how==='自訂'?'自訂卦象':lines.numbers?(lines.how||'數字')+' '+lines.numbers.join('、'):'龜殼銅錢'}</span></div>
     <div class="calhead"><div class="calinfo"><div class="dt">${fmtDT(now)}</div><div>${lunar(now)} ${c.hz}時</div><div>${tPrev}</div><div>${tNext}</div></div>${pill}</div>
+    <div class="kongrow"><b>空亡</b>${P.slice().reverse().map(([n,i])=>`<span class="${n==='日'?'d':''}">${n}<i>${xunKong(i).join('')}</i></span>`).join('')}</div>
     <div class="grid"><div class="h">伏神</div><div class="h">六親</div><div class="h bk">六獸</div><div class="h">六親</div><div class="h">本卦</div><div class="h">裝卦</div><div class="h bk">變卦</div><div class="h">六親</div>${rowsH}</div>
-    <div class="tip" id="panTip">點任一爻，看月建、日辰、空亡、回頭生剋</div>
+    <div class="tip" id="panTip">點擊爻位，看月建、日辰、空亡、回頭生剋</div>
     <div class="detail" id="panDetail" hidden></div>
     <div class="wsrow">${ord.map((w,k)=>`<div class="w-${w}">${w}${'旺相休囚死'[k]}</div>`).join('')}</div>
     <div class="shensha"><span>驛馬【${YIMA[c.dz]}】</span><span>桃花【${TAOHUA[c.dz]}】</span><span>貴人【${GUIREN[c.dg]}】</span><span>文昌【${WENCHANG[c.dg]}】</span><span>羊刃【${YANGREN[c.dg]||'—'}】</span><span class="kongh">空亡【${c.kong.join('')}】</span></div>
     <div class="summary">
-      <div class="sr"><b>本卦</b><span class="nm2">${A.ben.m.name}</span><span class="t">${g.type}</span><span>${g.gong}宮 <span class="w-${g.gwx}">${g.gwx}</span></span></div>
-      <div class="sr"><b>變卦</b><span class="nm2">${A.bian?A.bian.m.name:'無'}</span><span class="t">${bg?bg.type:''}</span><span>${bg?`${bg.gong}宮 <span class="w-${bg.gwx}">${bg.gwx}</span>`:''}</span></div>
+      <div class="sr"><b>本卦</b><span class="nm2">${A.ben.m.name}</span><span class="t">${gtype(A.ben)}</span><span>${g.gong}宮 <span class="w-${g.gwx}">${g.gwx}</span></span></div>
+      <div class="sr"><b>變卦</b><span class="nm2">${A.bian?A.bian.m.name:'無'}</span><span class="t">${A.bian?gtype(A.bian):''}</span><span>${bg?`${bg.gong}宮 <span class="w-${bg.gwx}">${bg.gwx}</span>`:''}</span></div>
       <div class="sr"><b>用神</b><span class="nm2">${ys||'未定'}</span><span class="t">卦身</span><span class="w-${ZW[A.guashen]}">${A.guashen}</span></div>
     </div></div>
-  <div class="legend">黃底是用神，伏神取自${g.gong}宮純卦。× 老陰動、○ 老陽動，變卦欄只列動爻，六親依本宮五行。</div>`;
+`;
   $('tPan').querySelectorAll('.prow').forEach(el=>{
     const go=()=>{ selRow=+el.dataset.i; showDetail(A); $('tPan').querySelectorAll('.prow').forEach(x=>x.classList.toggle('sel',x===el)); };
     el.addEventListener('click',go); el.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();go();} });
@@ -1168,6 +1183,9 @@ function renderMem(){
 }
 $('memBtn').addEventListener('click',openMem);
 $('memClose').addEventListener('click',()=>{ $('memSheet').hidden=true; });
+$('setBtn').addEventListener('click',()=>{ $('setSheet').hidden=false; });
+$('setClose').addEventListener('click',()=>{ $('setSheet').hidden=true; });
+$('setSheet').addEventListener('click',e=>{ if(e.target===$('setSheet')) $('setSheet').hidden=true; });
 $('memSheet').addEventListener('click',async e=>{
   if(e.target===$('memSheet')){ $('memSheet').hidden=true; return; }
   const t=e.target.closest('button'); if(!t) return;
