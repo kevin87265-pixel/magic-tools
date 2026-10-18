@@ -13,6 +13,7 @@ const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...CORS, "Content-Type": "application/json" } });
 
 const MSG: Record<string, string> = {
+  no_invest: "本館不判斷投資標的、股票或買賣時機，請改問整體財運（占類選「財運·財運」）。這次沒有扣卦數。",
   no_plan: "還沒有訂閱方案，請先選方案並完成轉帳。",
   expired: "方案已到期，請續訂。",
   quota: "本期卦數已用完，可以升級方案（從開通日重新計算 30 天）。",
@@ -20,13 +21,22 @@ const MSG: Record<string, string> = {
   followup_limit: "這一卦的追問次數已用完，可以重新起一卦。",
 };
 
+const INVEST_RE = /股票|股市|個股|投資|基金|虛擬幣|加密貨幣|比特幣|幣圈|期貨|選擇權|權證|ETF|外匯|進場|出場|買進|賣出|標的|當沖|融資|融券/i;
+const GUARD = `【固定規則，優先於下面的規則書】
+1. 不回答投資標的、股票、基金、虛擬幣、期貨或任何買賣時機的問題；遇到這類問題只談整體財運，並說明本館不做投資判斷。
+2. 盤面附的【作用檢查表】是系統依規則算好的；每一個動爻、暗動、日月沖合、旺衰都要交代，不可漏看。
+3. 靜爻之間不生不剋；變爻只回頭作用在自己的動爻。
+
+`;
+
 const FORMAT = `【輸出格式】
 先用一句話給結論（吉、凶、或有條件），再分四段，每段用「## 」開頭當標題：
 ## 用神狀態
 ## 關鍵爻與動變
 ## 應期
 ## 建議
-全文 400 字以內，白話繁體中文。`;
+「關鍵爻與動變」要照【作用檢查表】逐條交代：每個動爻、暗動生剋沖合了誰，變爻回頭怎麼作用，日月沖合了誰；旺衰以檢查表為準。不會成就不給應期，改說原因。
+全文 500 字以內，白話繁體中文。`;
 
 async function callClaude(model: string, maxTokens: number, rules: string, messages: { role: string; content: string }[]) {
   const r = await fetch("https://api.anthropic.com/v1/messages", {
@@ -40,7 +50,7 @@ async function callClaude(model: string, maxTokens: number, rules: string, messa
       model,
       max_tokens: maxTokens,
       // 規則書每次都一樣，標記快取：第二次以後只收約 5% 費用
-      system: [{ type: "text", text: rules, cache_control: { type: "ephemeral" } }],
+      system: [{ type: "text", text: GUARD + rules, cache_control: { type: "ephemeral" } }],
       messages,
     }),
   });
@@ -73,8 +83,9 @@ Deno.serve(async (req) => {
 
   // ── 解一卦 ──
   if (body.action === "read") {
-    const chart = String(body.chart ?? "").slice(0, 8000);
+    const chart = String(body.chart ?? "").slice(0, 12000);
     if (!chart) return json({ error: "bad_request" }, 400);
+    if (INVEST_RE.test(String(body.question ?? ""))) return json({ error: "no_invest", message: MSG.no_invest }, 400);
     const { data: rid, error } = await admin.rpc("consume_reading", {
       uid: user.id, q: String(body.question ?? "").slice(0, 500), cat: String(body.category ?? "").slice(0, 50), chart_text: chart, model_name: model,
     });
@@ -98,6 +109,7 @@ Deno.serve(async (req) => {
     const rid = Number(body.reading_id);
     const q = String(body.question ?? "").trim().slice(0, 500);
     if (!rid || !q) return json({ error: "bad_request" }, 400);
+    if (INVEST_RE.test(q)) return json({ error: "no_invest", message: "本館不判斷投資標的或買賣時機，可以改問整體財運。這次沒有扣追問次數。" }, 400);
     const { data: r } = await admin.from("readings").select("*").eq("id", rid).eq("user_id", user.id).maybeSingle();
     if (!r || !r.answer) return json({ error: "not_found", message: "找不到這一卦。" }, 404);
     if (r.followups >= followLimit) return json({ error: "followup_limit", message: MSG.followup_limit }, 402);

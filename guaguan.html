@@ -688,7 +688,7 @@ let ysVal='', catVal='';
 const CATS=[
  ['自身',[['運勢','自身運勢、近況吉凶','世爻','問自己，以世爻為用神'],['出行','出行、旅遊平安','世爻','世爻為自身，子孫持世或發動主平安'],['疾病','自己的病','世爻','世爻為自身，官鬼為病，子孫為醫藥']]],
  ['事業',[['求職','求職、工作、事業','官鬼','官鬼為職位、功名'],['升遷','升遷、調職、考績','官鬼','官鬼為官職'],['考試','考試、升學、證照','父母','父母為文書試卷，官鬼為功名，世爻看自己實力（三者缺一不可）'],['合約','合約、文書、手續','父母','父母為文書契約'],['合夥','合夥人（問這個人）','兄弟','合夥人是兄弟爻；問合夥能不能賺錢請選財運·求財']]],
- ['財運',[['求財','求財、生意、業績','妻財','妻財為錢財，子孫（客源、財源）必看'],['投資','投資、股票、買賣','妻財','妻財為利潤，子孫（財源）必看，兄弟為劫財'],['借貸','借錢、討債','妻財','妻財為錢，應爻為對方'],['失物','失物、找東西','妻財','物品看妻財；證件、文書類看父母']]],
+ ['財運',[['求財','求財、生意、業績','妻財','妻財為錢財，子孫（客源、財源）必看'],['財運','近期整體財運','妻財','只看整體財運起伏；不判斷投資標的、股票或買賣時機'],['借貸','借錢、討債','妻財','妻財為錢，應爻為對方'],['失物','失物、找東西','妻財','物品看妻財；證件、文書類看父母']]],
  ['感情',[['男問','男問女友、妻子、婚姻','妻財','妻財是名分，應爻是對方的真心'],['女問','女問男友、丈夫、婚姻','官鬼','官鬼是名分，應爻是對方的真心'],['對象','對方心意','應爻','應爻為對方，看對方的真實心態']]],
  ['家庭',[['長輩','父母、長輩、師長','父母','父母爻為長輩'],['子女','子女、懷孕、晚輩','子孫','子孫爻為子女'],['手足','兄弟姊妹、朋友、同事','兄弟','兄弟爻為同輩'],['房屋','買房、租屋、搬家、家宅','父母','父母為房屋；買不買得成看兄弟爻（錢有沒有花出去）'],['車輛','買車、代步車','父母','平常代步、使用的車看父母'],['名車','跑車、收藏車','妻財','跑車、收藏車這類當財物看的，看妻財'],['寵物','寵物、六畜','妻財','寵物看妻財，不看子孫（黃連老師）']]],
  ['其他',[['官司','官司、糾紛','官鬼','官鬼為官府，世為我、應為對方'],['醫藥','醫生、藥效、療法','子孫','子孫為醫藥'],['自選','其他，自己選用神','','']]],
@@ -1209,7 +1209,63 @@ const GUASHI_RULES=`你是一位六爻卦師，依《增刪卜易》《卜筮正
 3. 看動爻與變爻：原神、忌神、仇神是否發動，動爻對用神的生剋，變爻回頭生剋、化進化退、化空化破化墓絕。
 4. 看世應關係與世爻狀態（問自己的事時世爻最重要）。
 5. 有把握才給應期，並說明依據（如逢值、逢沖、出空、填實、合住逢沖）。
-規則：只根據盤面資料推論，不可捏造盤上沒有的爻；用白話繁體中文，避免艱澀術語堆疊，術語第一次出現時用一句話解釋。`;
+規則：不回答投資標的、股票、基金、虛擬幣或買賣時機，遇到這類問題只談整體財運；盤面附的【作用檢查表】每一條動爻、暗動、日月沖合與旺衰都要交代，不可漏看；靜爻之間不生不剋。只根據盤面資料推論，不可捏造盤上沒有的爻；用白話繁體中文，避免艱澀術語堆疊，術語第一次出現時用一句話解釋。`;
+// ── 作用檢查表：把動爻、暗動、日月的生剋沖合與旺衰一條條列出，避免解卦時漏看 ──
+const Q_SHENG={父母:'兄弟',兄弟:'子孫',子孫:'妻財',妻財:'官鬼',官鬼:'父母'}, Q_KE={父母:'子孫',子孫:'官鬼',官鬼:'兄弟',兄弟:'妻財',妻財:'父母'};
+const SANHE=[['申','子','辰','水'],['亥','卯','未','木'],['寅','午','戌','火'],['巳','酉','丑','金']];
+function yaoName(r){ return `${POS[r.i]}${r.qin}${r.z}${r.w}${r.shi?'（世）':r.ying?'（應）':''}`; }
+function strength(r,c){
+  let s={旺:2,相:1,休:-1,囚:-1,死:-2}[r.ws]; const why=[`月令${r.ws}`];
+  if(r.lind){ s+=2; why.push('臨日辰'); }
+  else { const d=ZW[c.dz], w=r.w;
+    if(chong(c.dz,r.z)){ if(r.moving){ s-=1; why.push('日沖（動逢沖＝沖散）'); } else if(r.an==='暗動'){ s+=0.5; why.push('暗動'); } else { s-=2; why.push('日破'); } }
+    else { if(d===w){ s+=1; why.push('日扶'); } else if(SHENG[d]===w){ s+=1; why.push('日生'); } else if(KE[d]===w){ s-=1; why.push('日剋'); } else if(SHENG[w]===d){ s-=0.5; why.push('洩於日'); }
+      if(HE[c.dz]===r.z) why.push(r.moving?'日合（動逢合＝被合住）':'日合（靜逢合＝合起）'); } }
+  if(r.moving){ r.hua.forEach(h=>{ if(h==='回頭生'){ s+=1; why.push('回頭生'); } if(h==='回頭剋'){ s-=2; why.push('回頭剋'); } if(h==='化進神'){ s+=1; why.push('化進神'); } if(h==='化退神'){ why.push('化退神'); } });
+    if(['墓','絕'].includes(r.bcs)){ s-=1; why.push('化'+r.bcs); } }
+  if(r.po){ const same=ZW[c.mz]===r.w; if(same) why.push('月破（旺而破，影響不大）'); else { s-=2; why.push('月破'); } }
+  if(r.kong){ if(r.lin) why.push('旬空但臨月建＝不空'); else if(r.moving) why.push('旬空但動＝不論空'); else if(s>=1) why.push('旬空（旺而空＝假空，填實就實）'); else { s-=1; why.push('旬空（衰而空＝真空）'); } }
+  const lv=s>=3?'強':s>=1.5?'偏強':s>-1?'平':s>-3?'偏弱':'弱';
+  return {lv,why};
+}
+function relations(A){
+  const c=A.cal, R=A.rows, out=[];
+  // 用神、原神、忌神、仇神
+  const ysQ=QINS.includes(ysVal)?ysVal:ysVal==='世爻'?R[A.shi-1].qin:ysVal==='應爻'?R[A.ying-1].qin:null;
+  if(ysQ){ const yuan=Object.keys(Q_SHENG).find(k=>Q_SHENG[k]===ysQ), ji=Object.keys(Q_KE).find(k=>Q_KE[k]===ysQ), chou=Object.keys(Q_SHENG).find(k=>Q_SHENG[k]===ji);
+    const where=q=>{ const a=R.filter(r=>r.qin===q).map(r=>POS[r.i]+r.z+r.w); const f=A.fu.filter(x=>x.q===q).map(x=>`伏在${POS[x.i]}下${x.z}${ZW[x.z]}`); return a.concat(f).join('、')||'不上卦'; };
+    out.push(`用神 ${ysVal==='世爻'||ysVal==='應爻'?ysVal+'（'+ysQ+'）':ysQ}：${ysVal==='世爻'?POS[A.shi-1]:ysVal==='應爻'?POS[A.ying-1]:where(ysQ)}；原神 ${yuan}：${where(yuan)}；忌神 ${ji}：${where(ji)}；仇神 ${chou}：${where(chou)}`); }
+  // 旺衰總評
+  out.push('旺衰（系統估算，供參考）：');
+  [5,4,3,2,1,0].forEach(i=>{ const r=R[i], st=strength(r,c); out.push(`・${yaoName(r)}：${st.lv}（${st.why.join('、')}）`); });
+  // 動爻與暗動的作用
+  const act=R.filter(r=>r.moving||r.an==='暗動');
+  if(!act.length) out.push('動爻：六爻安靜，沒有動爻。靜爻之間不生不剋，只看日月對各爻的作用。');
+  act.forEach(a=>{ const eff=[];
+    R.forEach(t=>{ if(t.i===a.i) return; const k=[];
+      if(SHENG[a.w]===t.w) k.push('生'); if(KE[a.w]===t.w) k.push('剋'); if(chong(a.z,t.z)) k.push('沖'); if(HE[a.z]===t.z) k.push('合');
+      if(k.length) eff.push(`${k.join('、')} ${yaoName(t)}`); });
+    const self=a.moving?`變出${a.bqin}${a.bz}${a.bw}（${a.hua.join('、')}${['長生','帝旺','墓','絕'].includes(a.bcs)?'、化'+a.bcs:''}${a.bkong?'、化空':''}）`:'暗動：旺相被日沖而動，可以生剋其他爻';
+    out.push(`${a.moving?'動爻':'暗動'} ${yaoName(a)}：${eff.length?eff.join('；'):'對其他爻沒有生剋沖合'}。${self}`); });
+  // 日辰、月建的作用（只列生、剋、沖、合）
+  const dm=(lab,b)=>{ const e=[]; R.forEach(t=>{ const k=[]; if(t.z===b){ e.push(`臨 ${yaoName(t)}`); return; }
+      if(SHENG[ZW[b]]===t.w) k.push('生'); if(KE[ZW[b]]===t.w) k.push('剋'); if(chong(b,t.z)) k.push(lab==='日辰'?(t.moving?'沖（動爻逢沖）':t.an==='暗動'?'沖起（暗動）':'沖（日破）'):'沖（月破）'); if(HE[b]===t.z) k.push('合');
+      if(k.length) e.push(`${k.join('、')} ${yaoName(t)}`); }); return `${lab}${b}：${e.join('；')||'沒有特別作用'}`; };
+  out.push(dm('日辰',c.dz)); out.push(dm('月建',c.mz));
+  // 伏神
+  A.fu.forEach(f=>{ const fly=R[f.i]; out.push(`伏神 ${f.q}${f.z}${ZW[f.z]} 伏在 ${yaoName(fly)} 下：飛神${SHENG[ZW[f.z]]===fly.w?'被伏神生（伏神洩氣）':KE[ZW[f.z]]===fly.w?'被伏神剋（伏剋飛）':SHENG[fly.w]===ZW[f.z]?'生伏神（飛來生伏，易出）':KE[fly.w]===ZW[f.z]?'剋伏神（飛來剋伏，難出）':'與伏神比和'}${fly.moving?'；飛神發動':''}${chong(c.dz,fly.z)||chong(c.mz,fly.z)?'；飛神逢沖':''}`); });
+  // 三合：動爻、暗動、變爻、日、月湊成三字
+  const pool=[...act.map(r=>({z:r.z,s:yaoName(r)})),...R.filter(r=>r.moving).map(r=>({z:r.bz,s:POS[r.i]+'變爻'+r.bz})),{z:c.dz,s:'日辰'+c.dz},{z:c.mz,s:'月建'+c.mz}];
+  SANHE.forEach(([x,y,zz,wx])=>{ const got=[x,y,zz].map(b=>pool.find(p=>p.z===b)); const n=got.filter(Boolean).length; const movN=act.filter(r=>[x,y,zz].includes(r.z)).length;
+    if(n===3&&movN) out.push(`三合${wx}局（${x}${y}${zz}）成局：${got.map(g=>g.s).join('、')}`);
+    else if(n===2&&movN>=2) out.push(`三合${wx}局（${x}${y}${zz}）缺一字：缺「${[x,y,zz].find((b,i)=>!got[i])}」，逢此字值月或值日成局`); });
+  // 六沖六合卦
+  const LC=['乾為天','坤為地','坎為水','離為火','震為雷','巽為風','艮為山','兌為澤','天雷无妄','雷天大壯'], LH=['天地否','地天泰','水澤節','澤水困','山火賁','火山旅','雷地豫','地雷復'];
+  const tag=(h,lab)=>!h?'':LC.includes(h.m.name)?`${lab}六沖卦`:LH.includes(h.m.name)?`${lab}六合卦`:'';
+  const t1=tag(A.ben,'本卦是'), t2=tag(A.bian,'變卦是'); if(t1||t2) out.push([t1,t2].filter(Boolean).join('，')+'（大象：沖主散、合主聚，只描述輪廓，成敗仍看用神）');
+  out.push('提醒：靜爻之間不生不剋；世應都沒動時，不論世應生剋；變爻只回頭作用在自己的動爻。');
+  return out;
+}
 function chartText(A,now){
   const c=A.cal, C=CAT_MAP[catVal], q=$('q').value.trim(), [tPrev,tNext]=terms(now), M=meihua(A);
   const L=[];
@@ -1224,6 +1280,7 @@ function chartText(A,now){
   [5,4,3,2,1,0].forEach(i=>{ const r=A.rows[i], fu=A.fu.filter(f=>f.i===i);
     const tags=[r.shi?'世':'',r.ying?'應':'',r.moving?(r.yang?'老陽動○':'老陰動×'):'',r.an||'',r.kong?'旬空':'',r.po?'月破':'',r.lin?'臨月建':'',r.lind?'臨日辰':''].filter(Boolean).join('、');
     L.push(`${POS[i]}　${r.shen}　${r.qin}${r.z}${r.w}　${r.yang?'陽':'陰'}　月令${r.ws}　${r.dr}　於日${r.cs}${tags?'　'+tags:''}${r.moving?`　→ 變出 ${r.bqin}${r.bz}${r.bw}（${r.hua.join('、')}${['長生','帝旺','墓','絕'].includes(r.bcs)?'、化'+r.bcs:''}${r.bkong?'、化空':''}）`:''}${fu.length?'　伏神：'+fu.map(f=>f.q+f.z+ZW[f.z]).join('、'):''}`); });
+  L.push('【作用檢查表】系統依規則自動列出；解卦時每一條動爻、沖、合、旺衰都要交代，不可漏看：'); relations(A).forEach(x=>L.push(x));
   L.push(`梅花易數：體${M.ti.n}${M.ti.wx}、用${M.yong.n}${M.yong.wx}，${M.r.k}${M.note?'（'+M.note+'）':''}`);
   return L.join('\n');
 }
@@ -1239,7 +1296,7 @@ ${chartText(A,now)}
 ## 關鍵爻與動變
 ## 應期
 ## 建議
-全文 400 字以內。`;
+「關鍵爻與動變」要照【作用檢查表】逐條交代：每個動爻、暗動生剋沖合了誰，變爻回頭怎麼作用，日月沖合了誰；旺衰以檢查表為準。不會成就不給應期，改說原因。全文 500 字以內。`;
 }
 let gsCtl=null, sampleFn=null, isOwner=false;
 (async()=>{ try{ if(window.claude){ sampleFn=await claude.use('sample'); const u=await claude.use('user'); isOwner=u?u.isOwner():false; } }catch(e){} renderGsGate(); })();
@@ -1269,6 +1326,7 @@ const GS_ERR={not_granted:'你沒有允許這個頁面使用 Claude，所以無�
 $('gsBtn').addEventListener('click',async()=>{
   if(SITE&&!canInterpret()){ openMem(); return; }
   if(!lastA||!canInterpret()) return;
+  if(INVEST_RE.test($('q').value)){ const out=$('gsOut'); out.hidden=false; out.className='gsout'; out.textContent='本館不判斷投資標的、股票或買賣時機。請把問題改成整體財運（例如「這三個月財運如何」），占類選「財運·財運」再起一卦。'; return; }
   const out=$('gsOut'); out.hidden=false; out.className='gsout wait'; out.textContent=SITE?'卦師正在看盤，請稍候…':'卦師正在看盤，請稍候…（第一次會詢問是否允許使用 Claude）';
   $('gsBtn').disabled=true; $('gsStop').hidden=false; gsCtl=new AbortController();
   $('gsThread').innerHTML=''; $('gsAskRow').hidden=true; gsTurns=[];
@@ -1286,6 +1344,7 @@ $('gsStop').addEventListener('click',()=>gsCtl&&gsCtl.abort());
 $('gsAsk').addEventListener('input',e=>{e.target.style.height='auto';e.target.style.height=e.target.scrollHeight+2+'px';});
 $('gsSend').addEventListener('click',async()=>{
   const q=$('gsAsk').value.trim(); if(!q||!gsTurns.length) return;
+  if(INVEST_RE.test(q)){ $('gsMsg').textContent='不判斷投資標的或買賣時機，可以改問整體財運。'; return; }
   const th=$('gsThread'), qd=document.createElement('div'), ad=document.createElement('div');
   qd.className='gsq'; qd.textContent=q; ad.className='gsa wait'; ad.textContent='卦師思考中…'; th.append(qd,ad);
   $('gsAsk').value=''; $('gsAsk').style.height=''; $('gsSend').disabled=true; $('gsStop').hidden=false; gsCtl=new AbortController();
@@ -1311,6 +1370,7 @@ $('resetBtn').addEventListener('click',reset);
 $('q').addEventListener('input',e=>{e.target.style.height='auto';e.target.style.height=e.target.scrollHeight+2+'px'; clearTimeout(sugT); sugT=setTimeout(renderSuggest,250);});
 // ── 依所問之事的關鍵字推薦占類（只是建議，按「套用」才會選）──
 // 由上往下比對，先中的先用；感情類沒講男女時只推薦大方向
+const INVEST_RE=/股票|股市|個股|投資|基金|虛擬幣|加密貨幣|比特幣|幣圈|期貨|選擇權|權證|ETF|外匯|進場|出場|買進|賣出|標的|當沖|融資|融券/i;
 const SUGGEST_RULES=[
   ['感情·女問',/男友|男朋友|老公|丈夫|先生|前男友|男生|男方|他.{0,3}(愛|喜歡|想念|在乎)/],
   ['感情·男問',/女友|女朋友|老婆|太太|妻子|前女友|女生|女方|她.{0,3}(愛|喜歡|想念|在乎)/],
@@ -1318,7 +1378,7 @@ const SUGGEST_RULES=[
   ['財運·失物',/遺失|掉了|弄丟|不見|找不到|失物|被偷/],
   ['財運·借貸',/借錢|借款|借給|借我|欠錢|欠款|欠我|債|還錢|還我|討債|討錢|討得回|討回|要回來|貸款/],
   ['家庭·房屋',/房子|買房|賣房|租屋|租房|租金|搬家|房東|房客|裝潢|家宅|住宅|店面/],
-  ['財運·投資',/股票|股市|投資|基金|虛擬幣|加密貨幣|比特幣|期貨|ETF|買進|賣出|漲|跌/i],
+  ['NOINVEST',INVEST_RE],
   ['事業·考試',/考試|考上|證照|升學|學測|指考|國考|高考|分數|錄取率|面試考/],
   ['事業·升遷',/升遷|升職|加薪|調職|調動|考績|主管位|晉升/],
   ['事業·合約',/合約|簽約|契約|合同|文件|申請|手續|簽證|批准|核准/],
@@ -1345,6 +1405,7 @@ function renderSuggest(){
   const [g,k]=r.k.split('·'), C=k?CAT_MAP[r.k]:null;
   if(C&&catVal===r.k){ box.hidden=true; return; }
   if(!C&&grpVal===g&&catVal) { box.hidden=true; return; }
+  if(r.k==='NOINVEST'){ sugVal='財運·財運'; box.innerHTML=`本館不判斷投資標的、股票或買賣時機，只能問<b>整體財運</b><button type="button">改問財運</button><span class="why">因為提到「${esc(r.hit)}」</span>`; box.hidden=false; return; }
   sugVal=r.k;
   box.innerHTML=C?`建議占類 <b>${g}·${k}</b>　用神 <b>${C.ys}</b><button type="button">套用</button><span class="why">因為提到「${esc(r.hit)}」</span>`
                  :`建議占類 <b>${g}</b>　請再選男問或女問<button type="button">套用</button><span class="why">因為提到「${esc(r.hit)}」</span>`;
